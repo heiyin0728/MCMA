@@ -1376,7 +1376,7 @@
     }
 
     // =========================================================================
-    // 2. 雙層本機永久儲存 (localStorage + IndexedDB)
+    // 2. 雙層本機永久儲存 (localStorage + IndexedDB，具備無痕模式容錯)
     // =========================================================================
     const STORAGE_KEY = 'MCMA_GUARDIAN_PERMANENT_DATA';
     const LEGACY_KEYS = ['MCMA_GUARDIAN_DATA_V1', 'MCMA_STATE_DATA'];
@@ -1452,13 +1452,17 @@
     function openGuardianIDB() {
       return new Promise((resolve, reject) => {
         if (!window.indexedDB) return reject('No IDB');
-        const req = indexedDB.open(IDB_NAME, 1);
-        req.onupgradeneeded = (e) => {
-          const db = e.target.result;
-          if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
-        };
-        req.onsuccess = (e) => resolve(e.target.result);
-        req.onerror = (e) => reject(e.target.error);
+        try {
+          const req = indexedDB.open(IDB_NAME, 1);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
+          };
+          req.onsuccess = (e) => resolve(e.target.result);
+          req.onerror = (e) => reject(e.target.error);
+        } catch (err) {
+          reject(err);
+        }
       });
     }
 
@@ -1514,11 +1518,12 @@
     let tempMedImage = '';
 
     // =========================================================================
-    // 3. 多戶口家庭雲端同步引擎（已鎖定 homestocktake Firebase Realtime Database）
+    // 3. 多戶口家庭雲端同步引擎（跨瀏覽器 / 無痕模式全相容版）
     // =========================================================================
     const LOCKED_FIREBASE_URL = 'https://homestocktake-default-rtdb.asia-southeast1.firebasedatabase.app';
     let isSyncingNow = false;
     let lastSyncedSignature = '';
+    let memorySyncConfig = null;
 
     function getSyncConfig() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -1527,12 +1532,15 @@
         saved = JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY) || '{}');
       } catch (e) {}
 
-      const familyCode = urlParams.get('family') || saved.familyCode || 'MCMA-2027-LOVE';
+      const familyCode = urlParams.get('family') || (memorySyncConfig && memorySyncConfig.familyCode) || saved.familyCode || 'MCMA-2027-LOVE';
       const firebaseUrl = LOCKED_FIREBASE_URL;
-      const userName = saved.userName || '家人';
+      const userName = (memorySyncConfig && memorySyncConfig.userName) || saved.userName || '家人';
 
-      localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify({ familyCode, firebaseUrl, userName }));
-      return { familyCode, firebaseUrl, userName };
+      memorySyncConfig = { familyCode, firebaseUrl, userName };
+      try {
+        localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(memorySyncConfig));
+      } catch (e) {}
+      return memorySyncConfig;
     }
 
     function setSyncUI(mode, labelText) {
@@ -1604,12 +1612,21 @@
       const safeKey = 'mcma_family_' + cfg.familyCode.replace(/[^a-zA-Z0-9_-]/g, '_');
       const cleanFb = LOCKED_FIREBASE_URL.replace(/\/+$/, '');
       try {
-        const res = await fetch(`${cleanFb}/mcma_rooms/${safeKey}.json?t=${Date.now()}`, { cache: 'no-store' });
+        const res = await fetch(`${cleanFb}/mcma_rooms/${safeKey}.json?t=${Date.now()}`, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit',
+          cache: 'no-store'
+        });
         if (res.ok) {
           const data = await res.json();
           if (data && data.twinMeasurements) return data;
+        } else {
+          window._lastSyncErr = `HTTP ${res.status}`;
         }
-      } catch (e) {}
+      } catch (e) {
+        window._lastSyncErr = e.message || '瀏覽器防追蹤攔截跨網域連線';
+      }
       return null;
     }
 
@@ -1618,13 +1635,18 @@
       const bodyStr = JSON.stringify(buildCloudSafePayload(payloadObj));
       const cleanFb = LOCKED_FIREBASE_URL.replace(/\/+$/, '');
       try {
+        // 省略自訂 headers 並設定 credentials: 'omit'，避免 Firefox 與無痕模式觸發 CORS Preflight 預檢或防追蹤攔截
         const res = await fetch(`${cleanFb}/mcma_rooms/${safeKey}.json`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          mode: 'cors',
+          credentials: 'omit',
           body: bodyStr
         });
         if (res.ok) return true;
-      } catch (e) {}
+        window._lastSyncErr = `HTTP ${res.status}`;
+      } catch (e) {
+        window._lastSyncErr = e.message || '瀏覽器防追蹤攔截跨網域連線';
+      }
       return false;
     }
 
@@ -1657,6 +1679,7 @@
       }
 
       isSyncingNow = true;
+      window._lastSyncErr = '';
       const cfg = getSyncConfig();
       setSyncUI('syncing', '同步中...');
 
@@ -1674,13 +1697,13 @@
           }
         }
 
-        const shouldPush = hasLocalChanges || !remote || (appState.updatedAt || 0) > (remote.updatedAt || 0);
-        let pushOk = true;
+        const shouldPush = hasLocalChanges || (!remote && !window._lastSyncErr) || (remote && (appState.updatedAt || 0) > (remote.updatedAt || 0));
+        let pushOk = !shouldPush;
         if (shouldPush) {
           pushOk = await pushRemoteState(cfg, appState);
         }
 
-        if (pushOk || remote) {
+        if ((remote || pushOk) && !window._lastSyncErr) {
           lastSyncedSignature = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}`;
           setSyncUI('ok', '已同步');
           if (receivedRemote) {
@@ -1691,7 +1714,9 @@
           }
         } else {
           setSyncUI('offline', '已存本機');
-          if (showToastMsg) showToast('ℹ️ 暫未能連接雲端，資料已安全儲存於本機');
+          if (showToastMsg) {
+            showToast(`ℹ️ 暫未能連接雲端 (${window._lastSyncErr || '請檢查網絡或關閉網址列防追蹤盾牌'})`);
+          }
         }
       } finally {
         isSyncingNow = false;
@@ -1711,7 +1736,10 @@
       const userName = document.getElementById('sync-user-name').value.trim() || '家人';
       const familyCode = document.getElementById('sync-code-input').value.trim() || 'MCMA-2027-LOVE';
 
-      localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify({ userName, familyCode, firebaseUrl: LOCKED_FIREBASE_URL }));
+      memorySyncConfig = { userName, familyCode, firebaseUrl: LOCKED_FIREBASE_URL };
+      try {
+        localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(memorySyncConfig));
+      } catch (e) {}
       lastSyncedSignature = '';
       closeAllModals();
       await syncWithCloud(true, true);
@@ -2568,7 +2596,7 @@
     }
 
     function saveLocalAlarms() {
-      localStorage.setItem(LOCAL_ALARM_KEY, JSON.stringify(localAlarms));
+      try { localStorage.setItem(LOCAL_ALARM_KEY, JSON.stringify(localAlarms)); } catch (e) {}
       renderLocalAlarms();
       manageWakeLock();
     }
