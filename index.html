@@ -10,9 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang HK", "Microsoft JhengHei", sans-serif; }
-        .modal-backdrop { background-color: rgba(15, 23, 42, 0.55); backdrop-filter: blur(3px); }
+        .modal-backdrop { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); }
         .tab-active { color: #e11d48; border-bottom: 3px solid #e11d48; font-weight: 700; }
-        /* 自訂捲軸 */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #f8fafc; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
@@ -23,11 +22,10 @@
         .alarm-ringing { animation: ringPulse 1s infinite ease-in-out; }
     </style>
 </head>
-<body class="bg-rose-50/40 text-slate-800 min-h-screen flex flex-col pb-16">
+<body class="bg-rose-50/40 text-slate-800 min-h-screen flex flex-col pb-14">
 
-    <!-- ==================== 頂部固定導航與清晰預產期橫幅 ==================== -->
+    <!-- ==================== 頂部固定導航與清晰預產期橫幅（已取消 LMP 顯示） ==================== -->
     <header class="bg-white border-b border-rose-100 sticky top-0 z-30 shadow-xs">
-        <!-- 頂層核心孕期資訊列：確保預產期 27/6/2027 在任何手機螢幕都清晰可見 -->
         <div class="bg-gradient-to-r from-rose-600 via-pink-600 to-amber-600 text-white px-3 py-2">
             <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
@@ -38,11 +36,10 @@
                         <div class="flex items-center gap-2 flex-wrap">
                             <h1 class="text-base sm:text-lg font-extrabold tracking-tight">MCMA守護寶</h1>
                             <span id="headerGestationalBadge" class="bg-white text-rose-700 text-xs font-extrabold px-2 py-0.5 rounded-full shadow-2xs">
-                                孕週計算中...
+                                計算中...
                             </span>
                         </div>
-                        <div class="text-[11px] sm:text-xs text-rose-50 font-medium flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
-                            <span><i class="fa-regular fa-calendar mr-1"></i>LMP: 19/09/2026</span>
+                        <div class="text-[11px] sm:text-xs text-rose-50 font-medium flex flex-wrap items-center gap-x-2.5 gap-y-0.5 mt-0.5">
                             <span class="bg-amber-300 text-amber-950 font-extrabold px-1.5 py-0.2 rounded">預產期 EDD: 27/06/2027</span>
                             <span id="headerCountdownBadge" class="text-white/95 font-semibold">倒數計算中...</span>
                         </div>
@@ -50,22 +47,20 @@
                 </div>
 
                 <div class="flex items-center gap-1.5 ml-auto">
-                    <!-- 天使BB紀念冊按鈕 -->
                     <button type="button" onclick="openModal('memorialModal')" class="bg-white/15 hover:bg-white/25 border border-white/40 text-white text-xs font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1 transition cursor-pointer">
                         <i class="fa-solid fa-feather-pointed text-amber-200"></i>
-                        <span>天使BB紀念冊</span>
+                        <span>18/5/2026 天使BB紀念冊</span>
                     </button>
-                    <!-- 雙機家庭同步按鈕 -->
-                    <button type="button" onclick="openModal('syncModal')" class="bg-slate-900/30 hover:bg-slate-900/45 border border-white/30 text-white text-xs font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1 transition cursor-pointer" title="設定兩部電話即時同步">
-                        <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-                        <span class="hidden sm:inline" id="headerSyncCodeText">同步碼</span>
-                        <i class="fa-solid fa-rotate text-[11px]"></i>
+                    <button type="button" onclick="openModal('syncModal')" class="bg-slate-900/35 hover:bg-slate-900/50 border border-white/30 text-white text-xs font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1 transition cursor-pointer" title="雙機雲端即時同步設定">
+                        <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                        <span class="hidden sm:inline" id="headerSyncCodeText">雙機雲端同步</span>
+                        <i class="fa-solid fa-cloud-arrow-up text-[11px]"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- 精簡主分頁列（3分頁：主頁總覽、母體今日總覽與日誌、影像庫與本機鬧鐘） -->
+        <!-- 主分頁導航（3分頁） -->
         <nav class="max-w-7xl mx-auto px-2 grid grid-cols-3 text-center text-xs sm:text-sm bg-white">
             <button type="button" onclick="switchTab('home')" id="tabBtn-home" class="py-2.5 tab-active flex items-center justify-center gap-1.5 cursor-pointer transition">
                 <i class="fa-solid fa-house-medical"></i>
@@ -73,11 +68,11 @@
             </button>
             <button type="button" onclick="switchTab('maternal')" id="tabBtn-maternal" class="py-2.5 text-slate-600 hover:text-rose-600 flex items-center justify-center gap-1.5 cursor-pointer transition">
                 <i class="fa-solid fa-person-pregnant"></i>
-                <span>母體狀況與用藥</span>
+                <span>母體與用藥</span>
             </button>
-            <button type="button" onclick="switchTab('mediaAlarm')" id="tabBtn-mediaAlarm" class="py-2.5 text-slate-600 hover:text-rose-600 flex items-center justify-center gap-1.5 cursor-pointer transition">
+            <button type="button" onclick="switchTab('gallery')" id="tabBtn-gallery" class="py-2.5 text-slate-600 hover:text-rose-600 flex items-center justify-center gap-1.5 cursor-pointer transition">
                 <i class="fa-solid fa-photo-film"></i>
-                <span>影像庫與本機鬧鐘</span>
+                <span>超聲波影像庫</span>
             </button>
         </nav>
     </header>
@@ -86,25 +81,23 @@
     <main class="max-w-7xl w-full mx-auto px-3 sm:px-4 pt-4 space-y-5 flex-1">
 
         <!-- =========================================================
-             分頁 1：主頁（雙胎左右卡片、覆診+更期月曆、分離病史與紀念、動態安全活動建議）
+             分頁 1：主頁（雙胎左右卡片、覆診+更期月曆、動態安全建議、獨立病史）
              ========================================================= -->
         <section id="view-home" class="space-y-5">
 
-            <!-- 1. 雙胞胎左右並排發育卡片（點擊卡片彈出胎兒專屬檔案與線性成長對比圖） -->
+            <!-- 1. 雙胞胎左右並排發育卡片 -->
             <div>
                 <div class="flex items-center justify-between mb-2">
                     <h2 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-1.5">
                         <i class="fa-solid fa-baby text-rose-500"></i>
                         <span>MCMA 雙胞胎發育監察</span>
-                        <span class="text-[11px] font-normal text-slate-500">（點擊卡片查看成長線性圖與影像時間線）</span>
+                        <span class="text-[11px] font-normal text-slate-500">（點擊卡片檢視成長線性對比圖與影像時間線）</span>
                     </h2>
                 </div>
-                <div class="grid grid-cols-2 gap-2.5 sm:gap-4" id="homeTwinsGrid">
-                    <!-- JS 動態生成 Twin A (左) 與 Twin B (右) 卡片 -->
-                </div>
+                <div class="grid grid-cols-2 gap-2.5 sm:gap-4" id="homeTwinsGrid"></div>
             </div>
 
-            <!-- 2. 主頁覆診與工作更期月曆（更期顯示於頂部標籤，不遮擋底部 5 種活動色條） -->
+            <!-- 2. 主頁覆診與工作更期月曆 -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-3.5 sm:p-5">
                 <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <div>
@@ -112,7 +105,6 @@
                             <i class="fa-solid fa-calendar-days text-indigo-600"></i>
                             <span>覆診日程與工作更期月曆</span>
                         </h2>
-                        <!-- 5種醫療活動色條圖例 + 更期說明 -->
                         <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px]">
                             <span class="inline-flex items-center gap-1 font-medium text-blue-700"><span class="w-3 h-1.5 rounded-full bg-blue-600"></span>公立覆診</span>
                             <span class="inline-flex items-center gap-1 font-medium text-fuchsia-700"><span class="w-3 h-1.5 rounded-full bg-fuchsia-600"></span>私家覆診</span>
@@ -140,7 +132,6 @@
                     </div>
                 </div>
 
-                <!-- 星期列 -->
                 <div class="grid grid-cols-7 text-center text-[11px] font-bold text-slate-400 pb-1.5 border-b border-slate-100">
                     <div class="text-rose-500">日</div>
                     <div>一</div>
@@ -151,20 +142,14 @@
                     <div class="text-indigo-500">六</div>
                 </div>
 
-                <!-- 日期格子 -->
-                <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1 pt-1.5">
-                    <!-- JS 動態生成 -->
-                </div>
+                <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1 pt-1.5"></div>
             </div>
 
-            <!-- 3. 動態 MCMA 雙胎專屬安全活動建議（根據當前孕週 + 最新活動日誌 + 病況進展自動評估） -->
-            <div class="bg-white rounded-2xl border border-teal-200/80 shadow-xs p-4 space-y-2.5" id="dynamicAdviceCard">
-                <!-- JS 動態生成 -->
-            </div>
+            <!-- 3. 動態 MCMA 雙胎專屬安全活動建議 -->
+            <div class="bg-white rounded-2xl border border-teal-200/80 shadow-xs p-4 space-y-2.5" id="dynamicAdviceCard"></div>
 
-            <!-- 4. 分離顯示：今胎病情發展（子宮頸瘜肉/流血流啡） vs 過往孕產史紀念（18/5/2026 天使BB） -->
+            <!-- 4. 分離顯示：今胎病情發展 vs 過往孕產史紀念 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- 卡片 A：今胎病情發展（子宮頸瘜肉 & 孕初期多次流血流啡） -->
                 <div class="bg-white rounded-2xl border border-rose-200 shadow-xs p-4 flex flex-col justify-between space-y-3">
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-2">
@@ -176,16 +161,13 @@
                                 <i class="fa-solid fa-plus mr-0.5"></i>更新病情
                             </button>
                         </div>
-                        <div id="conditionHistoryBox" class="space-y-2 text-xs">
-                            <!-- JS 動態渲染病情進展紀錄 -->
-                        </div>
+                        <div id="conditionHistoryBox" class="space-y-2 text-xs"></div>
                     </div>
                     <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2">
-                        獨立追蹤子宮頸瘜肉、孕初期流血流啡及安胎治療進展（與日常心情日誌分開記錄）。
+                        獨立追蹤子宮頸瘜肉、孕初期多次流血流啡及安胎治療進展（與日常心情日誌分開記錄）。
                     </div>
                 </div>
 
-                <!-- 卡片 B：過往孕產史紀念專區（18/5/2026 11w1d 天使BB） -->
                 <div class="bg-gradient-to-br from-amber-50/80 via-rose-50/60 to-white rounded-2xl border border-amber-200 shadow-xs p-4 flex flex-col justify-between space-y-3">
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-2">
@@ -200,9 +182,7 @@
                         <p class="text-xs text-slate-700 leading-relaxed bg-white/80 p-3 rounded-xl border border-amber-100">
                             銘記 <strong class="text-amber-900">2026年5月18日（11週1日）</strong> 停止發育的小天使。感謝你曾來過爸爸媽媽的生命裡，帶著你的愛與守護，我們會陪伴今胎 MCMA 雙胞胎弟弟妹妹平安健康成長。
                         </p>
-                        <div id="homeMemorialThumbnails" class="flex items-center gap-2 mt-2.5 overflow-x-auto pb-1">
-                            <!-- JS 動態顯示天使BB紀念相片縮圖 -->
-                        </div>
+                        <div id="homeMemorialThumbnails" class="flex items-center gap-2 mt-2.5 overflow-x-auto pb-1"></div>
                     </div>
                     <div class="text-[11px] text-amber-800/80 border-t border-amber-100 pt-2">
                         支援在紀念冊內多選上傳珍貴超聲波照片、影片與懷念文字。
@@ -212,100 +192,94 @@
         </section>
 
         <!-- =========================================================
-             分頁 2：母體狀況與用藥（頂部當日總覽 + 底部過往日子狀況紀錄）
+             分頁 2：母體與用藥（頂部左右雙欄：左縮小總覽 + 右用藥清單；中間過往日誌；底部精巧本機鬧鐘）
              ========================================================= -->
-        <section id="view-maternal" class="hidden space-y-5">
-            <!-- 頂部：今日母體總覽（當日更期、覆診、藥物、身體情況、心情） -->
-            <div class="bg-white rounded-2xl border border-pink-200 shadow-xs p-4 sm:p-5 space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                    <div>
-                        <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-1.5">
-                            <i class="fa-solid fa-heart-pulse text-pink-600"></i>
-                            <span>今日母體總覽</span>
-                            <span id="maternalTodayDateBadge" class="text-xs font-mono bg-pink-50 text-pink-700 px-2 py-0.5 rounded-lg border border-pink-200"></span>
-                        </h2>
-                        <p class="text-xs text-slate-500 mt-0.5">即時整合今日工作更期、醫療覆診、中西藥與保健品、身體感覺及心情。</p>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="openMedicationModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-2xs cursor-pointer">
-                            <i class="fa-solid fa-pills mr-1"></i>記錄每日用藥
+        <section id="view-maternal" class="hidden space-y-4">
+
+            <!-- 頂部左右雙欄佈局 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+                <!-- 左側 (5欄)：縮小版今日母體總覽 -->
+                <div class="lg:col-span-5 bg-white rounded-2xl border border-pink-200 shadow-xs p-3.5 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                                <i class="fa-solid fa-heart-pulse text-pink-600"></i>
+                                <span>今日母體總覽</span>
+                            </h2>
+                            <span id="maternalTodayDateBadge" class="text-[11px] font-mono text-pink-700 font-semibold"></span>
+                        </div>
+                        <button type="button" onclick="openMaternalLogModal()" class="bg-pink-600 hover:bg-pink-700 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold shadow-2xs cursor-pointer">
+                            <i class="fa-solid fa-plus mr-0.5"></i>記錄狀況
                         </button>
-                        <button type="button" onclick="openMaternalLogModal()" class="bg-pink-600 hover:bg-pink-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-2xs cursor-pointer">
-                            <i class="fa-solid fa-plus mr-1"></i>記錄身體與心情
-                        </button>
                     </div>
+
+                    <!-- 精簡緊湊的今日狀態指標網格 -->
+                    <div id="todayMaternalCompactGrid" class="grid grid-cols-2 gap-2 text-xs"></div>
                 </div>
 
-                <!-- 5大今日指標摘要網格 -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="todayMaternalSummaryGrid">
-                    <!-- JS 動態渲染：1.當日更期 2.今日覆診 3.今日用藥 4.身體情況 5.心情狀態 -->
-                </div>
-
-                <!-- 今日用藥詳細清單（中藥 / 西藥 / 保健品 + 圖片） -->
-                <div class="pt-2">
-                    <h3 class="text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
-                        <i class="fa-solid fa-prescription-bottle-medical text-emerald-600"></i>
-                        <span>每日用藥與保健品清單（中藥 · 西藥 · 保健品）</span>
-                    </h3>
-                    <div id="medicationListContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <!-- JS 動態渲染 -->
+                <!-- 右側 (7欄)：今日用藥與保健品清單（中藥 / 西藥 / 保健品 + 一鍵勾選已服用） -->
+                <div class="lg:col-span-7 bg-white rounded-2xl border border-emerald-200 shadow-xs p-3.5 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                                <i class="fa-solid fa-pills text-emerald-600"></i>
+                                <span>每日用藥與保健品清單</span>
+                            </h2>
+                            <p class="text-[11px] text-slate-500">涵蓋西藥、中藥及保健品，支援拍照留底與服藥勾選</p>
+                        </div>
+                        <button type="button" onclick="openMedicationModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold shadow-2xs cursor-pointer">
+                            <i class="fa-solid fa-plus mr-0.5"></i>新增藥物
+                        </button>
                     </div>
+
+                    <div id="medicationListContainer" class="space-y-2 max-h-[340px] overflow-y-auto pr-0.5"></div>
                 </div>
             </div>
 
-            <!-- 底部：過往日子母體狀況紀錄（時間軸，支援自由編輯日期時間與圖片） -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-3">
+            <!-- 中間：過往日子母體身心與活動紀錄 -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-3.5 sm:p-4 space-y-2.5">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-1.5">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                         <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i>
                         <span>過往日子母體身心與活動紀錄</span>
                     </h3>
-                    <span class="text-xs text-slate-400">可隨時修改日期、24小時制時間與照片</span>
+                    <span class="text-[11px] text-slate-400">可隨時修改日期、24h時間與照片</span>
                 </div>
-                <div id="pastMaternalLogsList" class="space-y-2.5">
-                    <!-- JS 動態渲染 -->
+                <div id="pastMaternalLogsList" class="space-y-2"></div>
+            </div>
+
+            <!-- 底部：精巧本機專屬鬧鐘卡片（移至母體狀況與用藥下方，嚴格僅限本機響鬧） -->
+            <div class="bg-white rounded-2xl border border-amber-200 shadow-xs p-3.5 space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                            <i class="fa-solid fa-bell text-amber-500"></i>
+                            <span>本機專屬服藥/覆診鬧鐘</span>
+                        </h3>
+                        <span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            僅限本機響鬧 · 伴侶手機不會響
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="autoEstimateAlarmsFromData()" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 px-2 py-1 rounded-lg text-[11px] font-bold cursor-pointer">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-0.5"></i>從用藥/影像預估
+                        </button>
+                        <button type="button" onclick="openAlarmModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer">
+                            <i class="fa-solid fa-plus mr-0.5"></i>新增鬧鐘
+                        </button>
+                    </div>
                 </div>
+
+                <!-- 精巧緊湊的橫向/多欄小鬧鐘卡片網格 -->
+                <div id="localAlarmsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2"></div>
             </div>
         </section>
 
         <!-- =========================================================
-             分頁 3：超聲波影像庫（左右並排 Twin A / Twin B）與本地專屬鬧鐘
+             分頁 3：超聲波影像庫（胎兒 A 與 B 左右並排）與報告匯出
              ========================================================= -->
-        <section id="view-mediaAlarm" class="hidden space-y-5">
-
-            <!-- A. 本地專屬鬧鐘提醒（嚴格僅限本機響鬧，絕不同步至伴侶手機） -->
-            <div class="bg-white rounded-2xl border border-amber-200 shadow-xs p-4 sm:p-5 space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                    <div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-1.5">
-                                <i class="fa-solid fa-bell text-amber-500"></i>
-                                <span>本機專屬鬧鐘提醒</span>
-                            </h2>
-                            <span class="bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-bold px-2 py-0.5 rounded-full">
-                                <i class="fa-solid fa-mobile-screen mr-1"></i>僅限本機響鬧 · 不會同步至伴侶電話
-                            </span>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-1">
-                            媽媽或爸爸各自在自己手機設定及開啟鬧鐘；邊部電話開啟就只會邊部響，不會影響對方手機。支援根據藥單/覆診影像自動預估提醒時間！
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="autoEstimateAlarmsFromData()" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer">
-                            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>從用藥/覆診自動預估鬧鐘
-                        </button>
-                        <button type="button" onclick="openAlarmModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-2xs cursor-pointer">
-                            <i class="fa-solid fa-plus mr-1"></i>手動新增鬧鐘
-                        </button>
-                    </div>
-                </div>
-
-                <div id="localAlarmsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <!-- JS 動態渲染本機鬧鐘卡片（含獨立手動開關按鈕） -->
-                </div>
-            </div>
-
-            <!-- B. 超聲波照片與影片紀錄庫（胎兒 A 與胎兒 B 左右分欄卡片顯示） -->
+        <section id="view-gallery" class="hidden space-y-5">
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                     <div>
@@ -313,16 +287,14 @@
                             <i class="fa-solid fa-images text-indigo-600"></i>
                             <span>超聲波照片與影片紀錄庫（AB 雙胎左右對照）</span>
                         </h2>
-                        <p class="text-xs text-slate-500 mt-0.5">支援多選上傳照片與影片；標籤設為「同框」會同時顯示於兩邊，並可一鍵設為胎兒個人頭像。</p>
+                        <p class="text-xs text-slate-500 mt-0.5">支援多選上傳；選擇「同框」會同時顯示於兩邊，並可設為胎兒個人頭像。</p>
                     </div>
                     <button type="button" onclick="openMediaModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-2xs cursor-pointer">
                         <i class="fa-solid fa-cloud-arrow-up mr-1"></i>多選上傳照片 / 影片
                     </button>
                 </div>
 
-                <!-- 左右兩欄：左邊 Twin A，右邊 Twin B -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- 左欄：胎兒 A 影像庫 -->
                     <div class="bg-pink-50/40 rounded-2xl border border-pink-200 p-3.5 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-extrabold bg-pink-600 text-white px-2.5 py-1 rounded-full">
@@ -330,12 +302,9 @@
                             </span>
                             <span id="countMediaA" class="text-xs text-pink-700 font-semibold">0 項紀錄</span>
                         </div>
-                        <div id="galleryTwinA" class="space-y-3">
-                            <!-- JS 動態渲染 -->
-                        </div>
+                        <div id="galleryTwinA" class="space-y-3"></div>
                     </div>
 
-                    <!-- 右欄：胎兒 B 影像庫 -->
                     <div class="bg-purple-50/40 rounded-2xl border border-purple-200 p-3.5 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-extrabold bg-purple-600 text-white px-2.5 py-1 rounded-full">
@@ -343,25 +312,23 @@
                             </span>
                             <span id="countMediaB" class="text-xs text-purple-700 font-semibold">0 項紀錄</span>
                         </div>
-                        <div id="galleryTwinB" class="space-y-3">
-                            <!-- JS 動態渲染 -->
-                        </div>
+                        <div id="galleryTwinB" class="space-y-3"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- C. 每日自動匯出與完整備份 -->
+            <!-- 每日自動匯出與醫生查閱報告 -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 flex flex-wrap items-center justify-between gap-3">
                 <div class="text-xs">
                     <div class="font-bold text-slate-800"><i class="fa-solid fa-file-export text-rose-500 mr-1"></i>每日自動匯出與醫生查閱報告</div>
-                    <div id="autoExportInfoText" class="text-slate-500 mt-0.5">每日首次開啟或更新數據時自動備份所有胎兒、母體與覆診時間紀錄。</div>
+                    <div id="autoExportInfoText" class="text-slate-500 mt-0.5">每日首次開啟或更新數據時自動產生完整備份快照。</div>
                 </div>
                 <div class="flex gap-2">
                     <button type="button" onclick="exportFullReport('txt')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer">
                         <i class="fa-solid fa-file-lines mr-1"></i>匯出醫生報告 (.txt)
                     </button>
                     <button type="button" onclick="exportFullReport('json')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer">
-                        <i class="fa-solid fa-download mr-1"></i>備份 JSON
+                        <i class="fa-solid fa-download mr-1"></i>匯出備份 (.json)
                     </button>
                 </div>
             </div>
@@ -370,167 +337,197 @@
     </main>
 
     <!-- =====================================================================
-         全站彈窗系統（支援點擊任何外部位置或按 ESC 關閉）
+         全站彈窗系統
          ===================================================================== -->
 
-    <!-- 彈窗 1：胎兒專屬檔案、成長線性對比圖（Chart.js）與影像時間線（功能 5, 6, 8） -->
-    <div id="fetalDetailModal" onclick="backdropClose(event, 'fetalDetailModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-2 sm:p-4">
-        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
-            <!-- 頂部標題與頭像 -->
-            <div id="fetalModalHeader" class="p-4 border-b border-slate-100 flex items-center justify-between bg-pink-50">
-                <div class="flex items-center gap-3">
-                    <img id="fetalModalAvatar" src="" alt="胎兒頭像" class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm bg-white">
-                    <div>
-                        <h3 id="fetalModalTitle" class="text-base sm:text-lg font-extrabold text-slate-900">胎兒 A (Twin A) 專屬成長檔案</h3>
-                        <p id="fetalModalSubtitle" class="text-xs text-slate-600">成長線性曲線對比 · 生理數據紀錄 · 超聲波影像時間線</p>
+    <!-- 彈窗 1：胎兒專屬檔案（已縮小三分之一至 max-h-[66vh] 安全置中，頂部關閉按鈕永不遮擋，內部流暢上下滑動） -->
+    <div id="fetalDetailModal" onclick="backdropClose(event, 'fetalDetailModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[66vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden" onclick="event.stopPropagation()">
+            <!-- 固定頂部標題列與醒目關閉按鈕 -->
+            <div id="fetalModalHeader" class="px-3.5 py-2.5 border-b border-slate-200 flex items-center justify-between bg-pink-50 shrink-0">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <img id="fetalModalAvatar" src="" alt="胎兒頭像" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-2xs bg-white shrink-0">
+                    <div class="min-w-0">
+                        <h3 id="fetalModalTitle" class="text-sm font-extrabold text-slate-900 truncate">胎兒 A 專屬成長檔案</h3>
+                        <p class="text-[10px] text-slate-500 truncate">上下滑動瀏覽成長曲線圖、數據與時間線</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeModal('fetalDetailModal')" class="w-9 h-9 rounded-full bg-white/80 hover:bg-white text-slate-600 flex items-center justify-center shadow-2xs cursor-pointer">
-                    <i class="fa-solid fa-xmark text-base"></i>
+                <button type="button" onclick="closeModal('fetalDetailModal')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1 shadow-xs shrink-0 cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>關閉</span>
                 </button>
             </div>
 
-            <!-- 彈窗內部可捲動區 -->
-            <div class="p-4 sm:p-5 overflow-y-auto space-y-5 flex-1">
-                <!-- 1. 成長線性圖（與正常 MCMA 胎兒標準曲線對比） -->
-                <div class="bg-slate-50 rounded-2xl border border-slate-200 p-3.5 sm:p-4">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <div>
-                            <h4 class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                                <i class="fa-solid fa-chart-line text-rose-500"></i>
-                                <span>發育成長線性圖（實線：寶寶實際數據 vs 虛線：正常 MCMA 雙胎標準）</span>
-                            </h4>
-                        </div>
-                        <div class="flex items-center gap-1.5 text-xs">
-                            <label class="text-slate-500 font-medium">指標：</label>
-                            <select id="chartMetricSelect" onchange="renderFetalGrowthChart()" class="border border-slate-300 rounded-lg px-2 py-1 bg-white font-bold text-slate-700">
-                                <option value="crl">頂臀徑 CRL (mm)</option>
-                                <option value="efw">估計體重 EFW (g)</option>
-                                <option value="bpd">雙頂徑 BPD (mm)</option>
-                                <option value="fl">股骨長 FL (mm)</option>
-                                <option value="fhr">胎心率 FHR (bpm)</option>
-                            </select>
-                        </div>
+            <!-- 彈窗內部可上下滑動區域 -->
+            <div class="p-3.5 overflow-y-auto space-y-4 flex-1 overscroll-contain">
+                <!-- 1. 成長線性圖 -->
+                <div class="bg-slate-50 rounded-xl border border-slate-200 p-3">
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+                        <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1">
+                            <i class="fa-solid fa-chart-line text-rose-500"></i>
+                            <span>成長線性對比圖（實線：寶寶 vs 虛線：MCMA標準）</span>
+                        </h4>
+                        <select id="chartMetricSelect" onchange="renderFetalGrowthChart()" class="border border-slate-300 rounded-lg px-2 py-1 bg-white text-[11px] font-bold text-slate-700">
+                            <option value="crl">頂臀徑 CRL (mm)</option>
+                            <option value="efw">估計體重 EFW (g)</option>
+                            <option value="bpd">雙頂徑 BPD (mm)</option>
+                            <option value="fl">股骨長 FL (mm)</option>
+                            <option value="fhr">胎心率 FHR (bpm)</option>
+                        </select>
                     </div>
-                    <div class="h-56 sm:h-64 w-full">
+                    <div class="h-44 sm:h-52 w-full">
                         <canvas id="fetalGrowthCanvas"></canvas>
                     </div>
                 </div>
 
                 <!-- 2. 新增 / 更新該胎兒生理數據表單 -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-3.5 sm:p-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <h4 class="text-xs sm:text-sm font-bold text-slate-800"><i class="fa-solid fa-pen-to-square text-teal-600 mr-1"></i>新增產檢發育數據</h4>
-                        <div class="flex items-center gap-1.5 text-xs">
-                            <input type="date" id="fetalRecDate" class="border border-slate-300 rounded-lg px-2 py-1 bg-slate-50">
-                            <select id="fetalRecHour" class="border border-slate-300 rounded-lg px-1.5 py-1 bg-slate-50"></select>
+                <div class="bg-white rounded-xl border border-slate-200 p-3 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-1.5">
+                        <h4 class="text-xs font-bold text-slate-800"><i class="fa-solid fa-pen-to-square text-teal-600 mr-1"></i>輸入/更新產檢數據</h4>
+                        <div class="flex items-center gap-1 text-[11px]">
+                            <input type="date" id="fetalRecDate" class="border border-slate-300 rounded-lg px-1.5 py-1 bg-slate-50">
+                            <select id="fetalRecHour" class="border border-slate-300 rounded-lg px-1 py-1 bg-slate-50"></select>
                             <span>:</span>
-                            <select id="fetalRecMin" class="border border-slate-300 rounded-lg px-1.5 py-1 bg-slate-50"></select>
+                            <select id="fetalRecMin" class="border border-slate-300 rounded-lg px-1 py-1 bg-slate-50"></select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                         <div>
-                            <label class="block text-slate-500 mb-0.5">頂臀徑 CRL (mm)</label>
-                            <input type="number" step="0.1" id="fIn_crl" placeholder="如 10" class="w-full border border-slate-300 rounded-lg p-2">
+                            <label class="block text-[10px] text-slate-500">CRL (mm)</label>
+                            <input type="number" step="0.1" id="fIn_crl" placeholder="如 10" class="w-full border border-slate-300 rounded-lg p-1.5">
                         </div>
                         <div>
-                            <label class="block text-slate-500 mb-0.5">對應孕週 (如 7w2d)</label>
-                            <input type="text" id="fIn_ga" placeholder="如 7w2d" class="w-full border border-slate-300 rounded-lg p-2">
+                            <label class="block text-[10px] text-slate-500">對應孕週</label>
+                            <input type="text" id="fIn_ga" placeholder="如 7w2d" class="w-full border border-slate-300 rounded-lg p-1.5">
                         </div>
                         <div>
-                            <label class="block text-slate-500 mb-0.5">胎心率 FHR (bpm)</label>
-                            <input type="number" id="fIn_fhr" placeholder="如 132" class="w-full border border-slate-300 rounded-lg p-2">
+                            <label class="block text-[10px] text-slate-500">胎心率 FHR</label>
+                            <input type="number" id="fIn_fhr" placeholder="bpm" class="w-full border border-slate-300 rounded-lg p-1.5">
                         </div>
                         <div>
-                            <label class="block text-slate-500 mb-0.5">估計體重 EFW (g)</label>
-                            <input type="number" id="fIn_efw" placeholder="克 (g)" class="w-full border border-slate-300 rounded-lg p-2">
+                            <label class="block text-[10px] text-slate-500">體重 EFW (g)</label>
+                            <input type="number" id="fIn_efw" placeholder="g" class="w-full border border-slate-300 rounded-lg p-1.5">
                         </div>
                         <div>
-                            <label class="block text-slate-500 mb-0.5">雙頂徑 BPD (mm)</label>
-                            <input type="number" step="0.1" id="fIn_bpd" placeholder="mm" class="w-full border border-slate-300 rounded-lg p-2">
+                            <label class="block text-[10px] text-slate-500">雙頂徑 BPD</label>
+                            <input type="number" step="0.1" id="fIn_bpd" placeholder="mm" class="w-full border border-slate-300 rounded-lg p-1.5">
                         </div>
                         <div>
-                            <label class="block text-slate-500 mb-0.5">頭圍 HC (mm)</label>
-                            <input type="number" step="0.1" id="fIn_hc" placeholder="mm" class="w-full border border-slate-300 rounded-lg p-2">
+                            <label class="block text-[10px] text-slate-500">頭圍 HC</label>
+                            <input type="number" step="0.1" id="fIn_hc" placeholder="mm" class="w-full border border-slate-300 rounded-lg p-1.5">
                         </div>
                         <div>
-                            <label class="block text-slate-500 mb-0.5">腹圍 AC (mm)</label>
-                            <input type="number" step="0.1" id="fIn_ac" placeholder="mm" class="w-full border border-slate-300 rounded-lg p-2">
+                            <label class="block text-[10px] text-slate-500">腹圍 AC</label>
+                            <input type="number" step="0.1" id="fIn_ac" placeholder="mm" class="w-full border border-slate-300 rounded-lg p-1.5">
                         </div>
                         <div>
-                            <label class="block text-slate-500 mb-0.5">股骨長 FL (mm)</label>
-                            <input type="number" step="0.1" id="fIn_fl" placeholder="mm" class="w-full border border-slate-300 rounded-lg p-2">
+                            <label class="block text-[10px] text-slate-500">股骨 FL</label>
+                            <input type="number" step="0.1" id="fIn_fl" placeholder="mm" class="w-full border border-slate-300 rounded-lg p-1.5">
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-                        <div>
-                            <label class="block text-slate-500 mb-0.5">羊水深度 / 臍帶血流</label>
-                            <input type="text" id="fIn_afi" placeholder="正常 / DVP" class="w-full border border-slate-300 rounded-lg p-2">
-                        </div>
-                        <div>
-                            <label class="block text-slate-500 mb-0.5">發育速度評估</label>
-                            <select id="fIn_status" class="w-full border border-slate-300 rounded-lg p-2 bg-white">
-                                <option value="符合標準">符合標準</option>
-                                <option value="發育偏快">發育偏快</option>
-                                <option value="略慢 1-2 天 (正常範圍)">略慢 1-2 天 (正常範圍)</option>
-                                <option value="發育偏慢 (需密切監察)">發育偏慢 (需密切監察)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-slate-500 mb-0.5">醫生評語備註</label>
-                            <input type="text" id="fIn_note" placeholder="備註..." class="w-full border border-slate-300 rounded-lg p-2">
-                        </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <input type="text" id="fIn_afi" placeholder="羊水深度 / 血流" class="w-full border border-slate-300 rounded-lg p-1.5">
+                        <select id="fIn_status" class="w-full border border-slate-300 rounded-lg p-1.5 bg-white">
+                            <option value="符合標準">符合標準</option>
+                            <option value="發育偏快">發育偏快</option>
+                            <option value="略慢 1-2 天 (正常範圍)">略慢 1-2 天 (正常範圍)</option>
+                            <option value="發育偏慢 (需密切監察)">發育偏慢 (需密切監察)</option>
+                        </select>
+                        <input type="text" id="fIn_note" placeholder="醫生評語備註..." class="w-full border border-slate-300 rounded-lg p-1.5">
                     </div>
                     <div class="flex justify-end">
-                        <button type="button" onclick="saveSingleFetalMeasurement()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">
-                            <i class="fa-solid fa-floppy-disk mr-1"></i>儲存數據並更新主頁卡片
+                        <button type="button" onclick="saveSingleFetalMeasurement()" class="bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i>儲存並更新主頁卡片
                         </button>
                     </div>
                 </div>
 
-                <!-- 3. 該胎兒歷次數據列表 -->
-                <div class="space-y-2">
-                    <h4 class="text-xs sm:text-sm font-bold text-slate-800"><i class="fa-solid fa-table-list text-indigo-500 mr-1"></i>歷次產檢生理數據明細</h4>
-                    <div id="fetalModalRecordsList" class="space-y-2 text-xs"></div>
+                <!-- 3. 歷次數據明細 -->
+                <div class="space-y-1.5">
+                    <h4 class="text-xs font-bold text-slate-800"><i class="fa-solid fa-table-list text-indigo-500 mr-1"></i>歷次產檢生理數據明細</h4>
+                    <div id="fetalModalRecordsList" class="space-y-1.5 text-xs"></div>
                 </div>
 
-                <!-- 4. 該胎兒專屬影像時間線（包含「同框」照片自動同步顯示 + 設為頭像） -->
-                <div class="space-y-3 pt-2 border-t border-slate-200">
+                <!-- 4. 專屬影像時間線 -->
+                <div class="space-y-2.5 pt-2 border-t border-slate-200">
                     <div class="flex items-center justify-between">
-                        <h4 class="text-xs sm:text-sm font-bold text-slate-800">
-                            <i class="fa-solid fa-timeline text-purple-600 mr-1"></i>
-                            <span>專屬超聲波影像時間線（含「同框」影像）</span>
+                        <h4 class="text-xs font-bold text-slate-800">
+                            <i class="fa-solid fa-timeline text-purple-600 mr-1"></i>專屬影像時間線（含同框照片）
                         </h4>
-                        <button type="button" onclick="openMediaModalFromFetal()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg font-bold cursor-pointer">
-                            <i class="fa-solid fa-plus mr-0.5"></i>上傳影像到此時間線
+                        <button type="button" onclick="openMediaModalFromFetal()" class="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-2 py-1 rounded-lg font-bold cursor-pointer">
+                            + 上傳到此時間線
                         </button>
                     </div>
-                    <div id="fetalModalTimeline" class="relative border-l-2 border-indigo-200 ml-3 pl-4 space-y-4">
-                        <!-- JS 動態渲染時間線 -->
-                    </div>
+                    <div id="fetalModalTimeline" class="relative border-l-2 border-indigo-200 ml-2.5 pl-3.5 space-y-3"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 彈窗 2：月曆單日詳情（顯示當日更期 + 5種顏色覆診細節 + 附件圖片） -->
+    <!-- 彈窗 2：雙機雲端即時同步設定（全面升級跨網路自動雙向同步 + 分享連結 + 手動強制同步） -->
+    <div id="syncModal" onclick="backdropClose(event, 'syncModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-3.5" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-cloud-arrow-up text-teal-600"></i>
+                    <span>跨手機雲端即時同步中心</span>
+                </h3>
+                <button type="button" onclick="closeModal('syncModal')" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-3 rounded-xl bg-teal-50 border border-teal-200 text-xs text-teal-950 space-y-1">
+                <div class="font-bold flex items-center justify-between">
+                    <span><i class="fa-solid fa-circle-check text-teal-600 mr-1"></i>雲端雙向同步狀態</span>
+                    <span id="cloudSyncLastTime" class="text-[10px] font-mono text-teal-700">等待同步...</span>
+                </div>
+                <p class="text-[11px] text-teal-800 leading-relaxed">
+                    爸爸和媽媽兩部手機只要使用<strong>相同的「家庭專屬同步碼」</strong>（或直接打開下方專屬連結），即可透過 4G/5G 或不同 Wi-Fi 自動同步所有數據（<strong>本機鬧鐘除外</strong>）。
+                </p>
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <label class="block font-bold text-slate-700">家庭專屬同步碼（建議使用獨特英文數字組合）</label>
+                <div class="flex gap-2">
+                    <input type="text" id="syncCodeInput" class="flex-1 border border-slate-300 rounded-xl p-2.5 font-mono font-bold bg-slate-50" placeholder="如 MCMA-2027-LOVE">
+                    <button type="button" onclick="applySyncCode()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl font-bold cursor-pointer">
+                        連線同步
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1 text-xs">
+                <button type="button" onclick="forceSyncNow()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-rotate"></i> 立即強制雙向同步
+                </button>
+                <button type="button" onclick="copyShareSyncLink()" class="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-link"></i> 複製連結傳給伴侶
+                </button>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <span>離線備份還原：</span>
+                <label class="text-indigo-600 font-bold hover:underline cursor-pointer">
+                    <i class="fa-solid fa-file-import mr-1"></i>匯入 JSON 備份檔
+                    <input type="file" accept=".json" onchange="importJsonBackup(event)" class="hidden">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 彈窗 3：月曆單日詳情 -->
     <div id="dayDetailModal" onclick="backdropClose(event, 'dayDetailModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+        <div class="bg-white rounded-2xl max-w-md w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
             <div class="p-4 border-b border-slate-100 flex items-center justify-between">
-                <h3 id="dayDetailTitle" class="text-sm font-extrabold text-slate-900">2026-11-12 日程詳情</h3>
+                <h3 id="dayDetailTitle" class="text-sm font-extrabold text-slate-900">日程詳情</h3>
                 <button type="button" onclick="closeModal('dayDetailModal')" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <div class="p-4 overflow-y-auto space-y-3 flex-1 text-xs">
-                <!-- 當日工作更期區塊 -->
-                <div id="dayDetailShiftBox" class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                    <!-- JS 動態渲染 -->
-                </div>
-                <!-- 當日醫療覆診列表 -->
-                <div id="dayDetailApptsList" class="space-y-2.5">
-                    <!-- JS 動態渲染 -->
-                </div>
+                <div id="dayDetailShiftBox" class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between"></div>
+                <div id="dayDetailApptsList" class="space-y-2.5"></div>
             </div>
             <div class="p-3.5 border-t border-slate-100 flex flex-wrap justify-between gap-2 bg-slate-50">
                 <div class="flex gap-1.5">
@@ -546,9 +543,9 @@
         </div>
     </div>
 
-    <!-- 彈窗 3：新增/編輯月曆醫療日程（公立/私家/急症室/入院/睇中醫 + 多選影像上傳 + 24小時00/15/30/45） -->
+    <!-- 彈窗 4：新增/編輯月曆醫療日程 -->
     <div id="appointmentModal" onclick="backdropClose(event, 'appointmentModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+        <div class="bg-white rounded-2xl max-w-md w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
             <div class="p-4 border-b border-slate-100 flex items-center justify-between">
                 <h3 id="apptModalHeading" class="text-sm font-extrabold text-slate-900">新增醫療覆診 / 入院日程</h3>
                 <button type="button" onclick="closeModal('appointmentModal')" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center cursor-pointer">
@@ -558,7 +555,7 @@
             <div class="p-4 overflow-y-auto space-y-3 text-xs flex-1">
                 <input type="hidden" id="editApptId">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">活動類別（月曆底部色條區分）</label>
+                    <label class="block font-bold text-slate-700 mb-1">活動類別</label>
                     <select id="apptCategory" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 font-bold">
                         <option value="public">🔵 公立覆診（醫院/母嬰健康院）</option>
                         <option value="private">🟣 私家覆診（私家診所/私家醫院）</option>
@@ -601,7 +598,7 @@
         </div>
     </div>
 
-    <!-- 彈窗 4：輸入工作更期（功能 14：顯示於月曆頂部，不影響色條） -->
+    <!-- 彈窗 5：輸入工作更期 -->
     <div id="shiftModal" onclick="backdropClose(event, 'shiftModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -615,19 +612,16 @@
                     <label class="block font-bold text-slate-700 mb-1">選擇日期</label>
                     <input type="date" id="shiftDateInput" onchange="loadShiftForDate()" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
                 </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">快速選擇更期</label>
-                    <div class="grid grid-cols-3 gap-1.5">
-                        <button type="button" onclick="setShiftPreset('早更')" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 font-semibold cursor-pointer">早更</button>
-                        <button type="button" onclick="setShiftPreset('中更')" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 font-semibold cursor-pointer">中更</button>
-                        <button type="button" onclick="setShiftPreset('夜更')" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 font-semibold cursor-pointer">夜更</button>
-                        <button type="button" onclick="setShiftPreset('休假')" class="p-2 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold cursor-pointer">休假</button>
-                        <button type="button" onclick="setShiftPreset('病假安胎')" class="p-2 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 font-semibold cursor-pointer">病假安胎</button>
-                        <button type="button" onclick="setShiftPreset('')" class="p-2 rounded-lg border border-slate-200 text-slate-400 cursor-pointer">清除更期</button>
-                    </div>
+                <div class="grid grid-cols-3 gap-1.5">
+                    <button type="button" onclick="setShiftPreset('早更')" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 font-semibold cursor-pointer">早更</button>
+                    <button type="button" onclick="setShiftPreset('中更')" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 font-semibold cursor-pointer">中更</button>
+                    <button type="button" onclick="setShiftPreset('夜更')" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 font-semibold cursor-pointer">夜更</button>
+                    <button type="button" onclick="setShiftPreset('休假')" class="p-2 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold cursor-pointer">休假</button>
+                    <button type="button" onclick="setShiftPreset('病假安胎')" class="p-2 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 font-semibold cursor-pointer">病假安胎</button>
+                    <button type="button" onclick="setShiftPreset('')" class="p-2 rounded-lg border border-slate-200 text-slate-400 cursor-pointer">清除更期</button>
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">自訂更期文字（顯示於月曆日期格上方）</label>
+                    <label class="block font-bold text-slate-700 mb-1">自訂更期文字</label>
                     <input type="text" id="shiftTextInput" maxlength="8" placeholder="例：媽休/爸早、A更、OFF" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
                 </div>
             </div>
@@ -638,9 +632,9 @@
         </div>
     </div>
 
-    <!-- 彈窗 5：天使BB紀念冊（18/5/2026 11w1d + 多選上傳影像，功能 10） -->
+    <!-- 彈窗 6：天使BB紀念冊 -->
     <div id="memorialModal" onclick="backdropClose(event, 'memorialModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
             <div class="p-4 border-b border-amber-100 bg-gradient-to-r from-amber-50 to-rose-50 flex items-center justify-between">
                 <h3 class="text-sm sm:text-base font-extrabold text-amber-950 flex items-center gap-2">
                     <i class="fa-solid fa-feather-pointed text-amber-600"></i>
@@ -651,35 +645,26 @@
                 </button>
             </div>
             <div class="p-4 overflow-y-auto space-y-4 text-xs flex-1">
-                <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-center space-y-2">
-                    <div class="w-10 h-10 rounded-full bg-white text-amber-600 flex items-center justify-center mx-auto shadow-2xs text-base">
-                        <i class="fa-solid fa-dove"></i>
-                    </div>
+                <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-center space-y-1.5">
                     <div class="font-extrabold text-amber-950 text-sm">給我們永遠的小天使</div>
                     <p class="text-slate-700 leading-relaxed">
                         2026年5月18日（11週1日），你悄悄成為守護我們的小天使。爸爸媽媽永遠愛你、懷念你，請在天上保佑今胎的雙胞胎弟弟妹妹健康長大。
                     </p>
                 </div>
-
-                <!-- 多選上傳紀念相片/影片 -->
-                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-2.5">
-                    <div class="font-bold text-slate-800"><i class="fa-solid fa-cloud-arrow-up text-amber-600 mr-1"></i>上傳紀念照片 / 影片（支援多選）</div>
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+                    <div class="font-bold text-slate-800"><i class="fa-solid fa-cloud-arrow-up text-amber-600 mr-1"></i>多選上傳紀念照片 / 影片</div>
                     <input type="text" id="memorialNoteInput" placeholder="寫下想對天使BB說的話..." class="w-full border border-slate-300 rounded-xl p-2 bg-white">
                     <input type="file" id="memorialFilesInput" accept="image/*,video/*" multiple class="w-full border border-slate-300 rounded-xl p-2 bg-white">
                     <button type="button" onclick="uploadMemorialMedia()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-xl font-bold cursor-pointer">
                         儲存紀念影像與留言
                     </button>
                 </div>
-
-                <!-- 紀念冊影像與留言展示 -->
-                <div id="memorialGalleryList" class="grid grid-cols-2 gap-2.5">
-                    <!-- JS 動態渲染 -->
-                </div>
+                <div id="memorialGalleryList" class="grid grid-cols-2 gap-2.5"></div>
             </div>
         </div>
     </div>
 
-    <!-- 彈窗 6：更新今胎病情發展（子宮頸瘜肉 / 流血流啡病史獨立紀錄，功能 11） -->
+    <!-- 彈窗 7：更新今胎病情發展 -->
     <div id="conditionModal" onclick="backdropClose(event, 'conditionModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-3.5" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -714,7 +699,7 @@
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">詳細情況與醫生評估</label>
-                    <textarea id="condDetail" rows="3" placeholder="例：今日醫生檢查子宮頸瘜肉穩定，流啡已明顯減少，繼續服用黃體素..." class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50"></textarea>
+                    <textarea id="condDetail" rows="3" placeholder="輸入最新病情評估..." class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50"></textarea>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
@@ -724,11 +709,11 @@
         </div>
     </div>
 
-    <!-- 彈窗 7：記錄媽媽每日用藥（中藥、西藥、保健品 + 多選影像上傳，功能 9） -->
+    <!-- 彈窗 8：記錄媽媽每日用藥 -->
     <div id="medicationModal" onclick="backdropClose(event, 'medicationModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-3.5" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="text-sm font-extrabold text-emerald-900"><i class="fa-solid fa-pills text-emerald-600 mr-1.5"></i>記錄媽媽每日用藥</h3>
+                <h3 class="text-sm font-extrabold text-emerald-900"><i class="fa-solid fa-pills text-emerald-600 mr-1.5"></i>新增媽媽每日用藥</h3>
                 <button type="button" onclick="closeModal('medicationModal')" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -751,32 +736,32 @@
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">藥物分類</label>
                     <select id="medCategory" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold">
-                        <option value="西藥">💊 西藥（如黃體素安胎藥、阿士匹靈）</option>
-                        <option value="中藥">🍵 中藥（如安胎中藥湯劑/顆粒）</option>
-                        <option value="保健品">🌿 保健品（如葉酸、DHA、鈣片、孕婦維他命）</option>
+                        <option value="西藥">💊 西藥（黃體素安胎藥等）</option>
+                        <option value="中藥">🍵 中藥（安胎中藥湯劑/顆粒）</option>
+                        <option value="保健品">🌿 保健品（葉酸、DHA、鈣片等）</option>
                     </select>
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">藥物名稱與劑量</label>
-                    <input type="text" id="medName" placeholder="例：黃體素 Duphaston 1粒 / 葉酸 400mcg" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
+                    <input type="text" id="medName" placeholder="例：黃體素 Duphaston 10mg (1粒)" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">備註（飯前/飯後）</label>
-                    <input type="text" id="medNote" placeholder="例：早餐後服用" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
+                    <label class="block font-bold text-slate-700 mb-1">服法備註</label>
+                    <input type="text" id="medNote" placeholder="例：早晚飯後各一粒" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">上傳藥物包裝 / 藥單照片（可多選）</label>
+                    <label class="block font-bold text-slate-700 mb-1">上傳藥物 / 藥單照片（可多選）</label>
                     <input type="file" id="medFilesInput" accept="image/*" multiple class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
                 <button type="button" onclick="closeModal('medicationModal')" class="px-3.5 py-2 rounded-xl text-xs border border-slate-200 cursor-pointer">取消</button>
-                <button type="button" onclick="saveMedication()" class="px-4 py-2 rounded-xl text-xs bg-emerald-600 text-white font-bold cursor-pointer">儲存用藥紀錄</button>
+                <button type="button" onclick="saveMedication()" class="px-4 py-2 rounded-xl text-xs bg-emerald-600 text-white font-bold cursor-pointer">儲存藥物</button>
             </div>
         </div>
     </div>
 
-    <!-- 彈窗 8：新增/編輯媽媽日常身體情況與心情日誌（功能 15） -->
+    <!-- 彈窗 9：新增/編輯媽媽身體情況與心情日誌 -->
     <div id="maternalLogModal" onclick="backdropClose(event, 'maternalLogModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-3.5" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -821,7 +806,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">出血 / 分泌物狀態（連動安全活動建議）</label>
+                    <label class="block font-bold text-slate-700 mb-1">出血 / 分泌物狀態</label>
                     <select id="matBleeding" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
                         <option value="無流血、無流啡（正常）">無流血、無流啡（正常）</option>
                         <option value="少量咖啡色分泌物（流啡）">少量咖啡色分泌物（流啡）</option>
@@ -831,7 +816,7 @@
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">身體感覺描述</label>
-                    <input type="text" id="matSymptom" placeholder="例：輕微孕吐、下腹微脹、精神不錯" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
+                    <input type="text" id="matSymptom" placeholder="例：精神不錯，無腹痛" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50">
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">附加照片（可多選）</label>
@@ -845,7 +830,7 @@
         </div>
     </div>
 
-    <!-- 彈窗 9：多選上傳超聲波照片/影片（功能 1, 6, 8, 10, 13） -->
+    <!-- 彈窗 10：多選上傳超聲波照片/影片 -->
     <div id="mediaModal" onclick="backdropClose(event, 'mediaModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-3.5" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -898,7 +883,7 @@
         </div>
     </div>
 
-    <!-- 彈窗 10：新增本機專屬鬧鐘（功能 16：嚴格僅存於本機，絕不同步至伴侶手機） -->
+    <!-- 彈窗 11：新增本機專屬鬧鐘 -->
     <div id="alarmModal" onclick="backdropClose(event, 'alarmModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-3.5" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -938,26 +923,6 @@
         </div>
     </div>
 
-    <!-- 彈窗 11：家庭雙機同步碼設定 -->
-    <div id="syncModal" onclick="backdropClose(event, 'syncModal')" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-3.5" onclick="event.stopPropagation()">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="text-sm font-extrabold text-slate-900"><i class="fa-solid fa-rotate text-teal-600 mr-1.5"></i>父母雙機同步設定</h3>
-                <button type="button" onclick="closeModal('syncModal')" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center cursor-pointer">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <p class="text-xs text-slate-600 leading-relaxed">
-                在爸爸和媽媽手機輸入相同的「家庭同步碼」，雙胞胎數據、覆診月曆、更期與用藥紀錄即可雙向互通（<strong>本機鬧鐘除外</strong>）。
-            </p>
-            <input type="text" id="syncCodeInput" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs font-mono font-bold bg-slate-50" placeholder="輸入家庭同步碼">
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeModal('syncModal')" class="px-3.5 py-2 rounded-xl text-xs border border-slate-200 cursor-pointer">取消</button>
-                <button type="button" onclick="applySyncCode()" class="px-4 py-2 rounded-xl text-xs bg-teal-600 text-white font-bold cursor-pointer">套用同步碼</button>
-            </div>
-        </div>
-    </div>
-
     <!-- 本機鬧鐘響鬧全螢幕橫幅 -->
     <div id="alarmRingingOverlay" class="fixed inset-0 bg-slate-950/85 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl alarm-ringing border-4 border-amber-400">
@@ -979,33 +944,28 @@
         <span id="toastText">已更新</span>
     </div>
 
-    <!-- ==================== 核心 JavaScript 邏輯 ==================== -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // 基準日期：LMP 2026-09-19, 預產期 EDD 2027-06-27
-        const LMP_STR = '2026-09-19';
+    <!-- ==================== 核心 JavaScript 邏輯（含跨手機雲端 REST 即時同步引擎） ==================== -->
+    <script>
+        // 基準日期：預產期 EDD 2027-06-27（自動反推 280 天作為孕週計算基準 2026-09-19，不在畫面顯示 LMP）
         const EDD_STR = '2027-06-27';
+        const GESTATION_BASE_MS = new Date(EDD_STR + 'T00:00:00').getTime() - (280 * 86400000);
 
-        // 正常 MCMA 雙胎各孕週標準成長參考數據（用於 Chart.js 虛線標準曲線對比）
+        // 正常 MCMA 雙胎各孕週標準成長參考數據
         const MCMA_STANDARDS = [
-            { week: 6, label: '6週', crl: 5, efw: 1, bpd: 10, fl: 2, fhr: 115 },
-            { week: 7, label: '7週', crl: 10, efw: 2, bpd: 12, fl: 4, fhr: 130 },
-            { week: 8, label: '8週', crl: 16, efw: 4, bpd: 14, fl: 6, fhr: 155 },
-            { week: 10, label: '10週', crl: 31, efw: 10, bpd: 17, fl: 8, fhr: 165 },
-            { week: 12, label: '12週', crl: 54, efw: 20, bpd: 21, fl: 10, fhr: 160 },
-            { week: 16, label: '16週', crl: 105, efw: 110, bpd: 34, fl: 21, fhr: 150 },
-            { week: 20, label: '20週', crl: 160, efw: 310, bpd: 47, fl: 32, fhr: 145 },
-            { week: 24, label: '24週', crl: 210, efw: 620, bpd: 59, fl: 43, fhr: 142 },
-            { week: 28, label: '28週', crl: 250, efw: 1080, bpd: 71, fl: 53, fhr: 140 },
-            { week: 32, label: '32週', crl: 285, efw: 1750, bpd: 81, fl: 62, fhr: 138 }
+            { week: 6, crl: 5, efw: 1, bpd: 10, fl: 2, fhr: 115 },
+            { week: 7, crl: 10, efw: 2, bpd: 12, fl: 4, fhr: 130 },
+            { week: 8, crl: 16, efw: 4, bpd: 14, fl: 6, fhr: 155 },
+            { week: 10, crl: 31, efw: 10, bpd: 17, fl: 8, fhr: 165 },
+            { week: 12, crl: 54, efw: 20, bpd: 21, fl: 10, fhr: 160 },
+            { week: 16, crl: 105, efw: 110, bpd: 34, fl: 21, fhr: 150 },
+            { week: 20, crl: 160, efw: 310, bpd: 47, fl: 32, fhr: 145 },
+            { week: 24, crl: 210, efw: 620, bpd: 59, fl: 43, fhr: 142 },
+            { week: 28, crl: 250, efw: 1080, bpd: 71, fl: 53, fhr: 140 },
+            { week: 32, crl: 285, efw: 1750, bpd: 81, fl: 62, fhr: 138 }
         ];
 
-        // 預設共享資料結構
         const DEFAULT_SHARED_STATE = {
-            updatedAt: new Date().toISOString(),
+            updatedAt: 1731571200000,
             lastAutoExportDate: '',
             twinAvatars: {
                 A: 'https://placehold.co/200x200/fce7f3/be185d?text=BB+A',
@@ -1071,6 +1031,7 @@
                     category: '西藥',
                     name: '黃體素 Duphaston 10mg (1粒)',
                     note: '早晚飯後各一粒安胎',
+                    takenToday: false,
                     images: []
                 },
                 {
@@ -1080,6 +1041,7 @@
                     category: '保健品',
                     name: '孕婦綜合維他命 + 葉酸 400mcg',
                     note: '午餐後服用',
+                    takenToday: false,
                     images: []
                 },
                 {
@@ -1089,6 +1051,7 @@
                     category: '中藥',
                     name: '安胎固腎中藥沖劑',
                     note: '晚飯後一小時溫服',
+                    takenToday: false,
                     images: []
                 }
             ],
@@ -1137,27 +1100,166 @@
             ]
         };
 
-        // 全域狀態變數
-        let sharedState = JSON.parse(JSON.stringify(DEFAULT_SHARED_STATE));
-        // 16. 本機專屬鬧鐘（嚴格僅存於當前裝置 localStorage，絕不放入 sharedState 同步）
-        let localDeviceAlarms = [];
+        // 檢查網址是否帶有 ?room=XXXX 參數（方便伴侶點擊分享連結直接連線）
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramRoom = urlParams.get('room');
+        if (paramRoom && paramRoom.trim()) {
+            localStorage.setItem('mcma_sync_code', paramRoom.trim());
+        }
+
         let syncCode = localStorage.getItem('mcma_sync_code') || 'MCMA-2027-LOVE';
+        let sharedState = JSON.parse(JSON.stringify(DEFAULT_SHARED_STATE));
+        let localDeviceAlarms = [];
         let calYear = 2026;
-        let calMonth = 10; // 11月
+        let calMonth = 10;
         window.selectedDateStr = '2026-11-14';
         let activeFetalTab = 'A';
         let growthChartInstance = null;
         let ringingAudioCtx = null;
         let ringingInterval = null;
+        let isSyncingNow = false;
 
-        // Firebase 變數
-        let db = null;
-        let auth = null;
-        let fbUser = null;
-        let unsubSnapshot = null;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mcma-guardian-v3';
+        // ==================== 跨手機雲端即時同步引擎 (REST KV Cloud Sync) ====================
+        function getCloudBucketUrl(code) {
+            const clean = encodeURIComponent(code.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '_'));
+            return `https://kvdb.io/A2k9mP7xQz4wN8vR3tY6bL/mcma_guardian_${clean}`;
+        }
 
-        // ==================== 初始化與時間工具 ====================
+        async function pullFromCloud(silent = true) {
+            if (isSyncingNow) return;
+            isSyncingNow = true;
+            try {
+                const res = await fetch(getCloudBucketUrl(syncCode), {
+                    method: 'GET',
+                    cache: 'no-store'
+                });
+                if (res.ok) {
+                    const remoteData = await res.json();
+                    if (remoteData && typeof remoteData === 'object' && remoteData.updatedAt) {
+                        if (remoteData.updatedAt > (sharedState.updatedAt || 0)) {
+                            sharedState = { ...DEFAULT_SHARED_STATE, ...remoteData };
+                            localStorage.setItem(`mcma_shared_${syncCode}`, JSON.stringify(sharedState));
+                            renderAll();
+                            if (!silent) showToast('已從雲端同步伴侶最新更新！');
+                        } else if ((sharedState.updatedAt || 0) > remoteData.updatedAt) {
+                            await pushToCloud();
+                        }
+                        updateSyncStatusIndicator(true);
+                    }
+                } else if (res.status === 404) {
+                    await pushToCloud();
+                }
+            } catch (e) {
+                updateSyncStatusIndicator(false);
+            } finally {
+                isSyncingNow = false;
+            }
+        }
+
+        async function pushToCloud() {
+            try {
+                const payloadStr = JSON.stringify(sharedState);
+                if (payloadStr.length > 900000) {
+                    const slimState = JSON.parse(payloadStr);
+                    slimState.mediaItems = slimState.mediaItems.map(m => ({
+                        ...m,
+                        url: m.url && m.url.startsWith('data:') && m.url.length > 150000
+                            ? 'https://placehold.co/600x400/e0e7ff/3730a3?text=Synced+Ultrasound'
+                            : m.url
+                    }));
+                    await fetch(getCloudBucketUrl(syncCode), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(slimState)
+                    });
+                } else {
+                    await fetch(getCloudBucketUrl(syncCode), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: payloadStr
+                    });
+                }
+                updateSyncStatusIndicator(true);
+            } catch (e) {
+                updateSyncStatusIndicator(false);
+            }
+        }
+
+        function updateSyncStatusIndicator(online) {
+            const dot = document.getElementById('syncStatusDot');
+            const label = document.getElementById('headerSyncCodeText');
+            const timeEl = document.getElementById('cloudSyncLastTime');
+            const nowStr = new Date().toTimeString().slice(0, 5);
+            if (dot) dot.className = online ? 'w-2 h-2 rounded-full bg-emerald-300 animate-pulse' : 'w-2 h-2 rounded-full bg-amber-300';
+            if (label) label.textContent = online ? `已同步 (${syncCode})` : `離線 (${syncCode})`;
+            if (timeEl) timeEl.textContent = online ? `最後同步：${nowStr}` : '目前使用本機快取';
+        }
+
+        async function saveSharedState(triggerAutoExport = true) {
+            sharedState.updatedAt = Date.now();
+            localStorage.setItem(`mcma_shared_${syncCode}`, JSON.stringify(sharedState));
+            renderAll();
+            await pushToCloud();
+            if (triggerAutoExport) checkDailyAutoExport(true);
+        }
+
+        window.forceSyncNow = async function() {
+            showToast('正在與雲端雙向同步...');
+            await pullFromCloud(false);
+            await pushToCloud();
+            showToast('雙機雲端同步完成！');
+        };
+
+        window.applySyncCode = async function() {
+            const val = document.getElementById('syncCodeInput').value.trim();
+            if (!val) return;
+            syncCode = val;
+            localStorage.setItem('mcma_sync_code', syncCode);
+            const cached = localStorage.getItem(`mcma_shared_${syncCode}`);
+            if (cached) {
+                try { sharedState = { ...DEFAULT_SHARED_STATE, ...JSON.parse(cached) }; } catch (e) {}
+            }
+            renderAll();
+            await pullFromCloud(false);
+            closeModal('syncModal');
+            showToast(`已連線至家庭同步碼：${syncCode}`);
+        };
+
+        window.copyShareSyncLink = function() {
+            const baseUrl = window.location.href.split('?')[0];
+            const shareUrl = `${baseUrl}?room=${encodeURIComponent(syncCode)}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(shareUrl).then(() => showToast('已複製同步連結！請傳送給伴侶手機開啟'));
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = shareUrl;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('已複製同步連結！請傳送給伴侶手機開啟');
+            }
+        };
+
+        window.importJsonBackup = function(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    sharedState = { ...DEFAULT_SHARED_STATE, ...imported, updatedAt: Date.now() };
+                    await saveSharedState(false);
+                    closeModal('syncModal');
+                    showToast('已成功匯入並同步備份資料！');
+                } catch (err) {
+                    showToast('備份檔案格式錯誤');
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        // ==================== 時間與孕週計算（已取消 LMP，僅由預產期 27/06/2027 推算） ====================
         function getTodayStr() {
             const d = new Date();
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1171,7 +1273,6 @@
             return { hh, mm: snapped };
         }
 
-        // 7. 初始化全站所有 24 小時制選單（小時 00-23，分鐘嚴格 00, 15, 30, 45）
         function populateAll24hPickers() {
             const hourIds = ['fetalRecHour', 'apptHour', 'condHour', 'medHour', 'matHour', 'mediaHour', 'alarmHour'];
             const minIds = ['fetalRecMin', 'apptMin', 'condMin', 'medMin', 'matMin', 'mediaMin', 'alarmMin'];
@@ -1183,53 +1284,38 @@
             }
             const mOptions = ['00', '15', '30', '45'].map(m => `<option value="${m}">${m}</option>`).join('');
 
-            hourIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = hOptions;
-            });
-            minIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = mOptions;
-            });
+            hourIds.forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = hOptions; });
+            minIds.forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = mOptions; });
         }
 
-        // 4. 動態計算當前孕週與預產期倒數（LMP: 2026-09-19, EDD: 2027-06-27）
         function updatePregnancyHeaderInfo() {
-            const lmp = new Date(LMP_STR + 'T00:00:00');
             const edd = new Date(EDD_STR + 'T00:00:00');
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-            const diffDays = Math.floor((today - lmp) / 86400000);
+            const diffDays = Math.floor((today.getTime() - GESTATION_BASE_MS) / 86400000);
             const weeks = Math.max(0, Math.floor(diffDays / 7));
             const days = Math.max(0, diffDays % 7);
             const countdown = Math.ceil((edd - today) / 86400000);
 
             document.getElementById('headerGestationalBadge').textContent = `今日孕期：${weeks}週${days}日`;
             document.getElementById('headerCountdownBadge').textContent = countdown >= 0 ? `距離預產期 ${countdown} 天` : '已足月/達預產期';
-            document.getElementById('headerSyncCodeText').textContent = syncCode;
-
             return { weeks, days, countdown };
         }
 
+        // ==================== 初始化啟動 ====================
         async function initApp() {
             populateAll24hPickers();
             updatePregnancyHeaderInfo();
 
-            // 載入共享快取
             const cachedShared = localStorage.getItem(`mcma_shared_${syncCode}`);
             if (cachedShared) {
-                try {
-                    sharedState = { ...DEFAULT_SHARED_STATE, ...JSON.parse(cachedShared) };
-                } catch (e) {}
+                try { sharedState = { ...DEFAULT_SHARED_STATE, ...JSON.parse(cachedShared) }; } catch (e) {}
             }
 
-            // 載入嚴格限定本機的鬧鐘（不與伴侶同步）
             const cachedAlarms = localStorage.getItem('mcma_local_alarms_only');
             if (cachedAlarms) {
-                try {
-                    localDeviceAlarms = JSON.parse(cachedAlarms);
-                } catch (e) { localDeviceAlarms = []; }
+                try { localDeviceAlarms = JSON.parse(cachedAlarms); } catch (e) { localDeviceAlarms = []; }
             } else {
                 localDeviceAlarms = [
                     { id: 'loc-alarm-1', time: '09:00', label: '服用早間黃體素安胎藥', repeat: 'daily', enabled: false },
@@ -1243,65 +1329,14 @@
             startLocalAlarmWatcher();
             checkDailyAutoExport(false);
 
-            // 初始化 Firebase 跨裝置同步（僅同步 sharedState，絕不包含 localDeviceAlarms）
-            try {
-                if (typeof __firebase_config !== 'undefined') {
-                    const cfg = JSON.parse(__firebase_config);
-                    const fbApp = initializeApp(cfg);
-                    auth = getAuth(fbApp);
-                    db = getFirestore(fbApp);
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                    fbUser = auth.currentUser;
-                    connectFamilySync(syncCode);
+            await pullFromCloud(true);
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    pullFromCloud(true);
                 }
-            } catch (err) {
-                console.warn('本地離線模式運行中');
-            }
+            }, 8000);
         }
 
-        function connectFamilySync(code) {
-            if (!db || !fbUser) return;
-            if (unsubSnapshot) unsubSnapshot();
-            const safeCode = code.trim().replace(/[^a-zA-Z0-9_-]/g, '_') || 'DEFAULT';
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mcma_guardian_rooms', safeCode);
-
-            unsubSnapshot = onSnapshot(docRef, (snap) => {
-                if (snap.exists() && snap.data().payload) {
-                    const incoming = JSON.parse(snap.data().payload);
-                    sharedState = { ...DEFAULT_SHARED_STATE, ...incoming };
-                    localStorage.setItem(`mcma_shared_${safeCode}`, JSON.stringify(sharedState));
-                    renderAll();
-                } else {
-                    saveSharedState(false);
-                }
-            }, (err) => console.error('同步監聽異常:', err));
-        }
-
-        async function saveSharedState(triggerAutoExport = true) {
-            sharedState.updatedAt = new Date().toISOString();
-            const safeCode = syncCode.trim().replace(/[^a-zA-Z0-9_-]/g, '_') || 'DEFAULT';
-            localStorage.setItem(`mcma_shared_${safeCode}`, JSON.stringify(sharedState));
-            renderAll();
-
-            if (db && fbUser) {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mcma_guardian_rooms', safeCode);
-                    await setDoc(docRef, {
-                        payload: JSON.stringify(sharedState),
-                        updatedAt: sharedState.updatedAt
-                    });
-                } catch (e) {
-                    console.error('同步寫入失敗:', e);
-                }
-            }
-            if (triggerAutoExport) checkDailyAutoExport(true);
-        }
-
-        // 每日自動匯出備份
         function checkDailyAutoExport(isUpdate) {
             const today = getTodayStr();
             localStorage.setItem(`mcma_backup_snapshot_${today}`, JSON.stringify(sharedState));
@@ -1309,14 +1344,13 @@
             if (sharedState.lastAutoExportDate !== today) {
                 sharedState.lastAutoExportDate = today;
                 localStorage.setItem(`mcma_shared_${syncCode}`, JSON.stringify(sharedState));
-                exportFullReport('txt', true);
-                if (infoEl) infoEl.textContent = `今日 (${today}) 已自動完成每日備份與報告匯出！`;
+                if (infoEl) infoEl.textContent = `今日 (${today}) 已自動完成每日數據快照備份！`;
             } else if (isUpdate && infoEl) {
-                infoEl.textContent = `今日 (${today}) 最新數據已自動同步至每日備份快照。`;
+                infoEl.textContent = `今日 (${today}) 最新數據已自動同步至雲端與本地快照。`;
             }
         }
 
-        window.exportFullReport = function(type = 'txt', silent = false) {
+        window.exportFullReport = function(type = 'txt') {
             const today = getTodayStr();
             let content = '';
             let filename = '';
@@ -1327,7 +1361,7 @@
                 const lines = [
                     `====================================================`,
                     `MCMA守護寶 - 雙胞胎孕期醫療與母體紀錄報告`,
-                    `匯出日期：${today} | LMP：19/09/2026 | 預產期：27/06/2027`,
+                    `匯出日期：${today} | 預產期 EDD：27/06/2027`,
                     `====================================================\n`,
                     `【一、雙胞胎發育紀錄】`
                 ];
@@ -1350,21 +1384,19 @@
                 content = lines.join('\n');
                 filename = `MCMA守護寶_醫生報告_${today}.txt`;
             }
-            try {
-                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                if (!silent) showToast(`已匯出「${filename}」`);
-            } catch (e) {}
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`已匯出「${filename}」`);
         };
 
-        // ==================== 全站渲染函數 ====================
+        // ==================== UI 渲染函數 ====================
         function renderAll() {
             renderHomeTwinCards();
             renderCalendar();
@@ -1376,7 +1408,6 @@
             renderLocalAlarms();
         }
 
-        // 1. 渲染主頁左右並排胎兒卡片（含個人頭像 + 點擊打開線性成長圖與影像時間線）
         function renderHomeTwinCards() {
             const container = document.getElementById('homeTwinsGrid');
             if (!container) return;
@@ -1432,7 +1463,6 @@
                 cardHtml('B', '胎兒 B (Twin B)', 'border-purple-200 hover:border-purple-400', 'bg-purple-100 text-purple-800', latest.twinB);
         }
 
-        // 2 & 14. 渲染主頁月曆（頂部顯示工作更期，底部顯示 5 種顏色活動色條，互不遮擋）
         function getCategoryMeta(cat) {
             const map = {
                 public: { label: '公立覆診', bar: 'bg-blue-600', badge: 'bg-blue-50 text-blue-800 border-blue-200 border-l-blue-600' },
@@ -1468,14 +1498,11 @@
 
                 html += `
                     <button type="button" onclick="openDayDetailModal('${dateStr}')"
-                        class="h-16 sm:h-20 rounded-xl border ${isToday ? 'border-rose-500 bg-rose-50/40' : 'border-slate-150 hover:border-indigo-300 bg-white'} p-1 flex flex-col justify-between items-stretch transition cursor-pointer overflow-hidden">
-                        <!-- 頂部：日期數字 + 工作更期標籤（不影響底部色條） -->
+                        class="h-16 sm:h-20 rounded-xl border ${isToday ? 'border-rose-500 bg-rose-50/40' : 'border-slate-200 hover:border-indigo-300 bg-white'} p-1 flex flex-col justify-between items-stretch transition cursor-pointer overflow-hidden">
                         <div class="flex items-center justify-between gap-0.5 w-full">
                             <span class="text-[11px] sm:text-xs font-bold ${isToday ? 'text-rose-600' : 'text-slate-700'} leading-none">${day}</span>
                             ${shiftText ? `<span class="text-[9px] leading-tight px-1 py-0.2 rounded bg-slate-100 text-slate-700 font-bold truncate max-w-[44px] sm:max-w-[64px] border border-slate-200">${shiftText}</span>` : ''}
                         </div>
-
-                        <!-- 底部：純色條標示醫療活動類別（公立/私家/急症室/入院/中醫） -->
                         <div class="w-full space-y-0.5 mt-auto">
                             ${cats.map(c => `<div class="w-full h-1.5 rounded-full ${getCategoryMeta(c).bar}"></div>`).join('')}
                         </div>
@@ -1485,7 +1512,6 @@
             grid.innerHTML = html;
         }
 
-        // 12. 動態安全活動建議（結合當前孕週、最新活動日誌、出血/子宮頸瘜肉病況自動調整）
         function renderDynamicSafeAdvice() {
             const box = document.getElementById('dynamicAdviceCard');
             if (!box) return;
@@ -1502,11 +1528,11 @@
             let avoidList = [];
 
             if (hasActiveBleeding) {
-                riskBanner = `<span class="bg-rose-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i>偵測到近期有流血/流啡或瘜肉滲血 · 啟動嚴格安胎模式</span>`;
+                riskBanner = `<span class="bg-rose-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i>近期有流血/流啡或瘜肉滲血 · 嚴格安胎模式</span>`;
                 doList = [
                     '全天以左側臥或半臥位臥床休息為主，減少子宮頸壓力',
-                    '僅在床上進行輕柔腹式深呼吸及踝關節活動預防血栓',
-                    '按時服用黃體素安胎藥及中醫固胎藥，密切觀察分泌物顏色'
+                    '僅在床上進行輕柔腹式深呼吸及踝關節活動',
+                    '按時服用黃體素安胎藥及中醫固胎藥，密切觀察分泌物'
                 ];
                 avoidList = [
                     '嚴禁任何站立運動、散步、提重物或家務勞累',
@@ -1525,7 +1551,7 @@
                     '避免長時間久站超過 20 分鐘或提舉超過 2 公斤物品'
                 ];
             } else {
-                riskBanner = `<span class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">孕中後期 (${weeks}週${days}日) · MCMA 雙胎心肺與骨盆舒緩建議</span>`;
+                riskBanner = `<span class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">孕中後期 (${weeks}週${days}日) · MCMA 雙胎心肺與骨盆舒緩</span>`;
                 doList = [
                     '坐姿骨盆微傾與上肢伸展，減輕雙胞胎帶來的腰背負荷',
                     '每日定時左側臥休息 2-3 次，促進胎盤血液循環',
@@ -1562,7 +1588,6 @@
             `;
         }
 
-        // 11. 渲染分離的「今胎病情發展」卡片
         function renderConditionHistory() {
             const box = document.getElementById('conditionHistoryBox');
             if (!box) return;
@@ -1586,7 +1611,7 @@
             `).join('');
         }
 
-        // 15. 渲染分頁 2：「母體狀況與用藥」（頂部當日總覽 + 底部過往日子紀錄）
+        // 渲染分頁 2：「母體與用藥」（左縮小總覽 + 右用藥清單）
         function renderMaternalPage() {
             const today = getTodayStr();
             const badge = document.getElementById('maternalTodayDateBadge');
@@ -1594,70 +1619,71 @@
 
             const todayShift = (sharedState.workShifts && sharedState.workShifts[today]) || '未設定更期';
             const todayAppts = sharedState.appointments.filter(a => a.date === today);
-            const todayMeds = sharedState.medications.filter(m => m.date === today);
             const sortedLogs = [...sharedState.maternalLogs].sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
-            const latestTodayLog = sortedLogs.find(l => l.date === today) || sortedLogs[0];
+            const latestLog = sortedLogs.find(l => l.date === today) || sortedLogs[0];
 
-            const summaryGrid = document.getElementById('todayMaternalSummaryGrid');
-            if (summaryGrid) {
-                summaryGrid.innerHTML = `
-                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                        <div class="text-[11px] text-slate-500 font-semibold"><i class="fa-solid fa-briefcase mr-1"></i>當日工作更期</div>
-                        <div class="text-sm font-extrabold text-slate-900 mt-1">${todayShift}</div>
+            const compactGrid = document.getElementById('todayMaternalCompactGrid');
+            if (compactGrid) {
+                compactGrid.innerHTML = `
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <div class="text-[10px] text-slate-500 font-bold"><i class="fa-solid fa-briefcase mr-1"></i>當日更期</div>
+                        <div class="text-xs font-extrabold text-slate-900 mt-0.5 truncate">${todayShift}</div>
                     </div>
-                    <div class="p-3 rounded-xl bg-indigo-50/70 border border-indigo-200">
-                        <div class="text-[11px] text-indigo-700 font-semibold"><i class="fa-solid fa-hospital mr-1"></i>今日醫療覆診</div>
-                        <div class="text-xs font-extrabold text-indigo-950 mt-1">${todayAppts.length ? todayAppts.map(a => `${a.time} ${a.hospital}`).join('、') : '今日無預約覆診'}</div>
+                    <div class="p-2.5 rounded-xl bg-indigo-50/70 border border-indigo-200">
+                        <div class="text-[10px] text-indigo-700 font-bold"><i class="fa-solid fa-hospital mr-1"></i>今日覆診</div>
+                        <div class="text-xs font-extrabold text-indigo-950 mt-0.5 truncate">${todayAppts.length ? todayAppts.map(a => `${a.time} ${a.hospital}`).join('、') : '無覆診'}</div>
                     </div>
-                    <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200">
-                        <div class="text-[11px] text-emerald-700 font-semibold"><i class="fa-solid fa-pills mr-1"></i>今日用藥次數</div>
-                        <div class="text-sm font-extrabold text-emerald-950 mt-1">${todayMeds.length} 項藥物/保健品</div>
+                    <div class="p-2.5 rounded-xl bg-rose-50/70 border border-rose-200 col-span-2">
+                        <div class="text-[10px] text-rose-700 font-bold"><i class="fa-solid fa-heart-pulse mr-1"></i>身體與分泌物情況</div>
+                        <div class="text-xs font-extrabold text-rose-950 mt-0.5">${latestLog ? latestLog.bleeding : '待記錄'}</div>
+                        <div class="text-[11px] text-slate-600 mt-0.5 truncate">${latestLog ? (latestLog.symptom || '') : ''}</div>
                     </div>
-                    <div class="p-3 rounded-xl bg-rose-50/70 border border-rose-200">
-                        <div class="text-[11px] text-rose-700 font-semibold"><i class="fa-solid fa-heart-pulse mr-1"></i>最新身體情況</div>
-                        <div class="text-xs font-extrabold text-rose-950 mt-1">${latestTodayLog ? latestTodayLog.bleeding : '待記錄'}</div>
-                    </div>
-                    <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200">
-                        <div class="text-[11px] text-amber-800 font-semibold"><i class="fa-solid fa-face-smile mr-1"></i>最新心情狀態</div>
-                        <div class="text-sm font-extrabold text-amber-950 mt-1">${latestTodayLog ? latestTodayLog.mood : '待記錄'}</div>
+                    <div class="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200 col-span-2 flex items-center justify-between">
+                        <div>
+                            <div class="text-[10px] text-amber-800 font-bold"><i class="fa-solid fa-face-smile mr-1"></i>最新心情</div>
+                            <div class="text-xs font-extrabold text-amber-950 mt-0.5">${latestLog ? latestLog.mood : '待記錄'}</div>
+                        </div>
+                        <span class="text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-amber-200">${latestLog ? latestLog.activity : ''}</span>
                     </div>
                 `;
             }
 
-            // 渲染藥物列表（分類：中藥 / 西藥 / 保健品 + 圖片）
             const medContainer = document.getElementById('medicationListContainer');
             if (medContainer) {
-                const sortedMeds = [...sharedState.medications].sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
+                const sortedMeds = [...sharedState.medications].sort((a, b) => a.time.localeCompare(b.time));
                 medContainer.innerHTML = sortedMeds.map(m => {
                     const catColor = m.category === '中藥' ? 'bg-amber-100 text-amber-800' : m.category === '西藥' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800';
+                    const isTaken = !!m.takenToday;
                     return `
-                        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between space-y-2 text-xs">
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="px-2 py-0.5 rounded-full font-extrabold text-[11px] ${catColor}">${m.category}</span>
-                                    <span class="font-mono text-[11px] text-slate-400">${m.date} ${m.time}</span>
-                                </div>
-                                <div class="font-bold text-slate-900">${m.name}</div>
-                                <div class="text-slate-600 mt-0.5">${m.note || ''}</div>
-                                ${m.images && m.images.length ? `
-                                    <div class="flex gap-1.5 mt-2 overflow-x-auto">
-                                        ${m.images.map(img => `<img src="${img}" class="w-12 h-12 rounded-lg object-cover border border-slate-300">`).join('')}
+                        <div class="p-2.5 rounded-xl border ${isTaken ? 'border-emerald-300 bg-emerald-50/40' : 'border-slate-200 bg-slate-50/70'} flex items-center justify-between gap-2 text-xs">
+                            <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                                <input type="checkbox" ${isTaken ? 'checked' : ''} onchange="toggleMedicationTaken('${m.id}')" class="mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="px-1.5 py-0.2 rounded font-extrabold text-[10px] ${catColor}">${m.category}</span>
+                                        <span class="font-mono text-[11px] font-bold text-slate-600">${m.time}</span>
+                                        <span class="font-bold text-slate-900 truncate ${isTaken ? 'line-through text-slate-400' : ''}">${m.name}</span>
                                     </div>
-                                ` : ''}
+                                    <div class="text-[11px] text-slate-500 mt-0.5 truncate">${m.note || ''}</div>
+                                    ${m.images && m.images.length ? `
+                                        <div class="flex gap-1.5 mt-1.5 overflow-x-auto">
+                                            ${m.images.map(img => `<img src="${img}" class="w-10 h-10 rounded-lg object-cover border border-slate-300">`).join('')}
+                                        </div>
+                                    ` : ''}
+                                </div>
                             </div>
-                            <div class="flex justify-end pt-1 border-t border-slate-200/70">
-                                <button type="button" onclick="deleteMedication('${m.id}')" class="text-rose-500 hover:text-rose-700 text-[11px] cursor-pointer"><i class="fa-solid fa-trash mr-0.5"></i>刪除</button>
-                            </div>
+                            <button type="button" onclick="deleteMedication('${m.id}')" class="text-rose-400 hover:text-rose-600 p-1 cursor-pointer shrink-0" title="刪除">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
                         </div>
                     `;
                 }).join('');
             }
 
-            // 渲染過往日子母體狀況紀錄
             const pastList = document.getElementById('pastMaternalLogsList');
             if (pastList) {
                 pastList.innerHTML = sortedLogs.map(l => `
-                    <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 flex flex-wrap items-start justify-between gap-2 text-xs">
+                    <div class="p-3 rounded-xl border border-slate-200 bg-slate-50/70 flex flex-wrap items-start justify-between gap-2 text-xs">
                         <div class="space-y-1 flex-1 min-w-[200px]">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="font-mono font-bold text-pink-700"><i class="fa-regular fa-clock mr-1"></i>${l.date} ${l.time}</span>
@@ -1667,14 +1693,14 @@
                             <div class="font-bold text-rose-700">身體與出血狀況：${l.bleeding}</div>
                             <div class="text-slate-600">${l.symptom || ''}</div>
                             ${l.images && l.images.length ? `
-                                <div class="flex gap-2 pt-1.5 overflow-x-auto">
-                                    ${l.images.map(img => `<img src="${img}" class="w-14 h-14 rounded-lg object-cover border border-slate-300">`).join('')}
+                                <div class="flex gap-2 pt-1 overflow-x-auto">
+                                    ${l.images.map(img => `<img src="${img}" class="w-12 h-12 rounded-lg object-cover border border-slate-300">`).join('')}
                                 </div>
                             ` : ''}
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <button type="button" onclick="openMaternalLogModal('${l.id}')" class="px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold cursor-pointer">
-                                <i class="fa-solid fa-pen mr-0.5"></i>編輯
+                            <button type="button" onclick="openMaternalLogModal('${l.id}')" class="px-2 py-1 rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold cursor-pointer">
+                                <i class="fa-solid fa-pen"></i>
                             </button>
                             <button type="button" onclick="deleteMaternalLog('${l.id}')" class="px-2 py-1 rounded-lg bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 cursor-pointer">
                                 <i class="fa-solid fa-trash"></i>
@@ -1685,7 +1711,6 @@
             }
         }
 
-        // 13 & 8. 渲染超聲波影像庫（左右分欄顯示 Twin A 與 Twin B + 設為頭像）
         function renderMediaGallery() {
             const listA = sharedState.mediaItems.filter(m => m.target === 'A' || m.target === 'both')
                 .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
@@ -1736,12 +1761,12 @@
                 : `<div class="text-center text-xs text-slate-400 py-6">暫無胎兒 B 影像</div>`;
         }
 
-        // ==================== 胎兒專屬檔案 Modal & Chart.js 線性成長圖（功能 5, 6, 8） ====================
+        // ==================== 胎兒專屬檔案 Modal & Chart.js 線性成長圖 ====================
         window.openFetalDetailModal = function(which) {
             activeFetalTab = which;
             const isA = which === 'A';
             const header = document.getElementById('fetalModalHeader');
-            header.className = `p-4 border-b border-slate-100 flex items-center justify-between ${isA ? 'bg-pink-50' : 'bg-purple-50'}`;
+            header.className = `px-3.5 py-2.5 border-b border-slate-200 flex items-center justify-between ${isA ? 'bg-pink-50' : 'bg-purple-50'} shrink-0`;
 
             const avatar = (sharedState.twinAvatars && sharedState.twinAvatars[which]) ||
                 (isA ? 'https://placehold.co/200x200/fce7f3/be185d?text=BB+A' : 'https://placehold.co/200x200/f3e8ff/7e22ce?text=BB+B');
@@ -1758,29 +1783,25 @@
             openModal('fetalDetailModal');
         };
 
-        // 5. Chart.js 線性成長對比圖（寶寶數據 vs 正常 MCMA 胎兒標準）
         window.renderFetalGrowthChart = function() {
             const canvas = document.getElementById('fetalGrowthCanvas');
             if (!canvas) return;
             const metric = document.getElementById('chartMetricSelect').value;
             const metricNames = { crl: '頂臀徑 CRL (mm)', efw: '估計體重 EFW (g)', bpd: '雙頂徑 BPD (mm)', fl: '股骨長 FL (mm)', fhr: '胎心率 FHR (bpm)' };
 
-            const lmp = new Date(LMP_STR + 'T00:00:00');
             const sortedRecs = [...sharedState.twinRecords].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
-            // 將寶寶每次檢查日期換算為對應孕週（含小數），對齊標準線性軸
             const babyPoints = [];
             sortedRecs.forEach(r => {
                 const dObj = r[activeFetalTab === 'A' ? 'twinA' : 'twinB'];
                 const val = parseFloat(dObj[metric]);
                 if (!isNaN(val)) {
                     const scanDate = new Date(r.date + 'T00:00:00');
-                    const wk = Math.round(((scanDate - lmp) / 86400000 / 7) * 10) / 10;
+                    const wk = Math.round(((scanDate.getTime() - GESTATION_BASE_MS) / 86400000 / 7) * 10) / 10;
                     babyPoints.push({ x: wk, y: val, dateLabel: `${r.date} (${dObj.ga || wk + 'w'})` });
                 }
             });
 
-            // 決定顯示的孕週範圍（涵蓋寶寶已檢查週數前後）
             const maxBabyWk = babyPoints.length ? Math.max(...babyPoints.map(p => p.x)) : 8;
             const relevantStds = MCMA_STANDARDS.filter(s => s.week <= Math.max(12, Math.ceil(maxBabyWk + 2)));
             const standardPoints = relevantStds.map(s => ({ x: s.week, y: s[metric] }));
@@ -1793,23 +1814,22 @@
                 data: {
                     datasets: [
                         {
-                            label: `胎兒 ${activeFetalTab} 實際測量 (${metricNames[metric]})`,
+                            label: `胎兒 ${activeFetalTab} 實際測量`,
                             data: babyPoints,
                             borderColor: lineColor,
                             backgroundColor: lineColor,
                             borderWidth: 3,
-                            pointRadius: 6,
-                            pointHoverRadius: 8,
+                            pointRadius: 5,
                             tension: 0.25
                         },
                         {
-                            label: `正常 MCMA 雙胎標準參考線`,
+                            label: `正常 MCMA 雙胎標準線`,
                             data: standardPoints,
                             borderColor: '#0d9488',
                             backgroundColor: 'rgba(13, 148, 136, 0.1)',
                             borderWidth: 2,
-                            borderDash: [6, 5],
-                            pointRadius: 3,
+                            borderDash: [5, 5],
+                            pointRadius: 2.5,
                             tension: 0.35
                         }
                     ]
@@ -1818,16 +1838,11 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: {
-                            type: 'linear',
-                            title: { display: true, text: '懷孕週數 (Weeks)', font: { size: 11, weight: 'bold' } },
-                            ticks: { callback: v => `${v}週` }
-                        },
-                        y: {
-                            title: { display: true, text: metricNames[metric], font: { size: 11, weight: 'bold' } }
-                        }
+                        x: { type: 'linear', ticks: { callback: v => `${v}週`, font: { size: 10 } } },
+                        y: { ticks: { font: { size: 10 } } }
                     },
                     plugins: {
+                        legend: { labels: { boxWidth: 12, font: { size: 10 } } },
                         tooltip: {
                             callbacks: {
                                 label: ctx => {
@@ -1847,11 +1862,10 @@
             const which = activeFetalTab;
             const sortedRecs = [...sharedState.twinRecords].sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
 
-            // 數據列表
             document.getElementById('fetalModalRecordsList').innerHTML = sortedRecs.map(r => {
                 const d = r[which === 'A' ? 'twinA' : 'twinB'];
                 return `
-                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                    <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2">
                         <div>
                             <span class="font-mono font-bold text-slate-800">${r.date} ${r.time}</span> ·
                             <span class="font-extrabold text-rose-600">CRL ${d.crl ?? '-'}mm (${d.ga || '-'})</span> ·
@@ -1864,30 +1878,29 @@
                 `;
             }).join('');
 
-            // 6. 該胎兒專屬影像時間線（包含「同框」影像）
             const timelineItems = sharedState.mediaItems
                 .filter(m => m.target === which || m.target === 'both')
                 .sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
 
             document.getElementById('fetalModalTimeline').innerHTML = timelineItems.length ? timelineItems.map(m => `
-                <div class="relative bg-slate-50 rounded-xl border border-slate-200 p-3 space-y-2">
-                    <span class="w-3 h-3 rounded-full ${m.target === 'both' ? 'bg-indigo-600' : 'bg-rose-500'} absolute -left-[23px] top-4 ring-4 ring-white"></span>
-                    <div class="flex items-center justify-between flex-wrap gap-1 text-xs">
+                <div class="relative bg-slate-50 rounded-xl border border-slate-200 p-2.5 space-y-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full ${m.target === 'both' ? 'bg-indigo-600' : 'bg-rose-500'} absolute -left-[19px] top-3.5 ring-4 ring-white"></span>
+                    <div class="flex items-center justify-between flex-wrap gap-1 text-[11px]">
                         <span class="font-mono font-bold text-indigo-700">${m.date} ${m.time}</span>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${m.target === 'both' ? 'bg-indigo-100 text-indigo-800' : 'bg-pink-100 text-pink-800'}">
-                            ${m.target === 'both' ? '同框影像（同步顯示於雙胎）' : `胎兒 ${which} 專屬`}
+                            ${m.target === 'both' ? '同框影像' : `胎兒 ${which} 專屬`}
                         </span>
                     </div>
                     <div class="font-bold text-xs text-slate-900">${m.title}</div>
                     ${m.type === 'video'
-                        ? `<video src="${m.url}" controls class="w-full max-h-56 rounded-lg bg-black"></video>`
-                        : `<img src="${m.url}" class="w-full max-h-56 object-contain rounded-lg bg-slate-900">`
+                        ? `<video src="${m.url}" controls class="w-full max-h-44 rounded-lg bg-black"></video>`
+                        : `<img src="${m.url}" class="w-full max-h-44 object-contain rounded-lg bg-slate-900">`
                     }
                     <div class="flex items-center justify-between text-[11px] pt-1">
-                        <span class="text-slate-500">${m.desc || ''}</span>
+                        <span class="text-slate-500 truncate">${m.desc || ''}</span>
                         ${m.type !== 'video' ? `
-                            <button type="button" onclick="setTwinAvatar('${which}', '${m.id}')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-2.5 py-1 rounded-lg font-bold cursor-pointer">
-                                <i class="fa-solid fa-user-check mr-1"></i>設為個人頭像
+                            <button type="button" onclick="setTwinAvatar('${which}', '${m.id}')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-2 py-0.5 rounded-lg font-bold shrink-0 cursor-pointer">
+                                <i class="fa-solid fa-user-check mr-0.5"></i>設為頭像
                             </button>
                         ` : ''}
                     </div>
@@ -1895,7 +1908,6 @@
             `).join('') : `<div class="text-xs text-slate-400">尚未有該胎兒的超聲波影像，可點擊上方按鈕上傳。</div>`;
         }
 
-        // 儲存單一胎兒新增數據並同步更新首頁卡片與線性圖
         window.saveSingleFetalMeasurement = function() {
             const which = activeFetalTab;
             const date = document.getElementById('fetalRecDate').value || getTodayStr();
@@ -1923,7 +1935,6 @@
                 note: document.getElementById('fIn_note').value.trim() || latest[which === 'A' ? 'twinA' : 'twinB'].note
             };
 
-            // 若同一日期時間已有紀錄則更新該胎兒側，否則建立新時間點紀錄
             const existingIdx = sharedState.twinRecords.findIndex(r => r.date === date && r.time === time);
             if (existingIdx !== -1) {
                 sharedState.twinRecords[existingIdx][which === 'A' ? 'twinA' : 'twinB'] = updatedSide;
@@ -1944,7 +1955,7 @@
             saveSharedState(true);
             renderFetalGrowthChart();
             renderFetalRecordsAndTimeline();
-            showToast(`已更新胎兒 ${which} 數據並同步至主頁卡片！`);
+            showToast(`已更新胎兒 ${which} 數據並同步至主頁！`);
         };
 
         window.deleteTwinRecord = function(id) {
@@ -1959,7 +1970,6 @@
             showToast('已刪除該筆數據');
         };
 
-        // 8. 手動設定胎兒個人頭像
         window.setTwinAvatar = function(which, mediaId) {
             const item = sharedState.mediaItems.find(m => m.id === mediaId);
             if (!item || item.type === 'video') return;
@@ -1970,7 +1980,7 @@
             showToast(`已將此照片設為胎兒 ${which} 的個人頭像！`);
         };
 
-        // ==================== 多選檔案讀取與壓縮輔助（功能 1, 2, 9, 10） ====================
+        // ==================== 多選檔案壓縮處理 ====================
         async function processSelectedMediaFiles(fileList) {
             const results = [];
             if (!fileList || fileList.length === 0) return results;
@@ -1985,13 +1995,13 @@
                             const img = new Image();
                             img.onload = () => {
                                 const canvas = document.createElement('canvas');
-                                const maxW = 720;
+                                const maxW = 640;
                                 const scale = Math.min(1, maxW / img.width);
                                 canvas.width = img.width * scale;
                                 canvas.height = img.height * scale;
                                 const ctx = canvas.getContext('2d');
                                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                                resolve(canvas.toDataURL('image/jpeg', 0.76));
+                                resolve(canvas.toDataURL('image/jpeg', 0.72));
                             };
                             img.src = e.target.result;
                         };
@@ -2003,7 +2013,7 @@
             return results;
         }
 
-        // ==================== 月曆、日程與工作更期操作（功能 2, 14） ====================
+        // ==================== 月曆、日程與工作更期 ====================
         window.changeMonth = function(delta) {
             calMonth += delta;
             if (calMonth > 11) { calMonth = 0; calYear++; }
@@ -2117,7 +2127,7 @@
             if (y && m) { calYear = parseInt(y, 10); calMonth = parseInt(m, 10) - 1; }
             closeModal('appointmentModal');
             saveSharedState(true);
-            showToast('醫療日程已儲存至月曆！');
+            showToast('醫療日程已儲存並同步！');
         };
 
         window.deleteAppointment = function(id) {
@@ -2127,7 +2137,6 @@
             showToast('已刪除日程');
         };
 
-        // 工作更期設定
         window.openShiftModal = function(prefillDate = null) {
             const d = prefillDate || getTodayStr();
             document.getElementById('shiftDateInput').value = d;
@@ -2156,10 +2165,10 @@
             }
             closeModal('shiftModal');
             saveSharedState(true);
-            showToast('工作更期已更新至月曆！');
+            showToast('工作更期已更新並同步！');
         };
 
-        // ==================== 天使BB紀念冊多選上傳（功能 10） ====================
+        // ==================== 天使BB紀念冊 ====================
         window.uploadMemorialMedia = async function() {
             const note = document.getElementById('memorialNoteInput').value.trim();
             const files = await processSelectedMediaFiles(document.getElementById('memorialFilesInput').files);
@@ -2208,7 +2217,7 @@
             `).join('');
         }
 
-        // ==================== 今胎病情發展、每日用藥、媽媽狀況紀錄 ====================
+        // ==================== 病情發展、每日用藥、媽媽日誌 ====================
         window.openConditionModal = function() {
             const { hh, mm } = getCurrentSnappedTime();
             document.getElementById('condDate').value = getTodayStr();
@@ -2227,7 +2236,7 @@
             sharedState.conditionHistory.push({ id: 'cond-' + Date.now(), date, time, type, detail });
             closeModal('conditionModal');
             saveSharedState(true);
-            showToast('今胎病情發展已獨立更新！');
+            showToast('今胎病情發展已更新！');
         };
 
         window.openMedicationModal = function() {
@@ -2258,17 +2267,25 @@
                 category,
                 name,
                 note,
+                takenToday: false,
                 images
             });
             closeModal('medicationModal');
             saveSharedState(true);
-            showToast('媽媽每日用藥已儲存！');
+            showToast('藥物已儲存並同步！');
+        };
+
+        window.toggleMedicationTaken = function(id) {
+            const idx = sharedState.medications.findIndex(m => m.id === id);
+            if (idx === -1) return;
+            sharedState.medications[idx].takenToday = !sharedState.medications[idx].takenToday;
+            saveSharedState(false);
         };
 
         window.deleteMedication = function(id) {
             sharedState.medications = sharedState.medications.filter(m => m.id !== id);
             saveSharedState(true);
-            showToast('已刪除該筆用藥紀錄');
+            showToast('已刪除藥物紀錄');
         };
 
         window.openMaternalLogModal = function(editId = null) {
@@ -2338,7 +2355,7 @@
             showToast('已刪除紀錄');
         };
 
-        // ==================== 超聲波影像多選上傳與編輯 ====================
+        // ==================== 超聲波影像多選上傳 ====================
         window.openMediaModal = function(editId = null, presetTarget = 'both') {
             document.getElementById('editMediaId').value = editId || '';
             document.getElementById('mediaFilesInput').value = '';
@@ -2408,7 +2425,7 @@
             }
             closeModal('mediaModal');
             saveSharedState(true);
-            showToast('影像已儲存並更新時間線！');
+            showToast('影像已儲存並同步！');
         };
 
         window.deleteMedia = function(id) {
@@ -2417,7 +2434,7 @@
             showToast('已刪除影像');
         };
 
-        // ==================== 16. 本地專屬鬧鐘系統（嚴格本機儲存，絕不同步至伴侶手機） ====================
+        // ==================== 精巧本機專屬鬧鐘（嚴格僅存於本機） ====================
         function saveLocalAlarmsToDeviceOnly() {
             localStorage.setItem('mcma_local_alarms_only', JSON.stringify(localDeviceAlarms));
             renderLocalAlarms();
@@ -2427,21 +2444,22 @@
             const list = document.getElementById('localAlarmsList');
             if (!list) return;
             list.innerHTML = localDeviceAlarms.map(a => `
-                <div class="p-3.5 rounded-2xl border-2 ${a.enabled ? 'border-amber-400 bg-amber-50/50' : 'border-slate-200 bg-slate-50/70'} flex items-center justify-between gap-2 transition">
-                    <div>
-                        <div class="text-2xl font-mono font-black ${a.enabled ? 'text-amber-700' : 'text-slate-400'}">${a.time}</div>
-                        <div class="text-xs font-bold text-slate-800 mt-0.5">${a.label}</div>
-                        <div class="text-[10px] text-slate-500 mt-0.5">
-                            ${a.repeat === 'daily' ? '每日提醒' : '單次提醒'} · <span class="text-amber-800 font-semibold">僅限本機響鬧</span>
+                <div class="px-2.5 py-2 rounded-xl border ${a.enabled ? 'border-amber-400 bg-amber-50/60' : 'border-slate-200 bg-slate-50/70'} flex items-center justify-between gap-2 transition">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-sm font-mono font-black ${a.enabled ? 'text-amber-700' : 'text-slate-400'}">${a.time}</span>
+                            <span class="text-[10px] text-slate-400">${a.repeat === 'daily' ? '每日' : '單次'}</span>
                         </div>
+                        <div class="text-[11px] font-bold text-slate-800 truncate">${a.label}</div>
                     </div>
-                    <div class="flex flex-col items-end gap-2">
-                        <!-- 手動打開/關閉本機鬧鐘按鈕 -->
+                    <div class="flex items-center gap-1.5 shrink-0">
                         <button type="button" onclick="toggleLocalAlarm('${a.id}')"
-                            class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition cursor-pointer ${a.enabled ? 'bg-amber-500 text-white shadow-2xs' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}">
-                            ${a.enabled ? '<i class="fa-solid fa-bell mr-1"></i>已開啟' : '<i class="fa-regular fa-bell-slash mr-1"></i>已關閉'}
+                            class="px-2 py-1 rounded-lg text-[10px] font-extrabold transition cursor-pointer ${a.enabled ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'}">
+                            ${a.enabled ? '已開' : '已關'}
                         </button>
-                        <button type="button" onclick="deleteLocalAlarm('${a.id}')" class="text-[11px] text-rose-500 hover:underline cursor-pointer">刪除</button>
+                        <button type="button" onclick="deleteLocalAlarm('${a.id}')" class="text-rose-400 hover:text-rose-600 p-0.5 cursor-pointer" title="刪除">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -2457,7 +2475,7 @@
 
         window.saveLocalAlarm = function() {
             const time = `${document.getElementById('alarmHour').value}:${document.getElementById('alarmMin').value}`;
-            const label = document.getElementById('alarmLabel').value.trim() || '孕期服藥 / 休息提醒';
+            const label = document.getElementById('alarmLabel').value.trim() || '服藥 / 休息提醒';
             const repeat = document.getElementById('alarmRepeat').value;
 
             localDeviceAlarms.push({
@@ -2472,7 +2490,7 @@
             }
             closeModal('alarmModal');
             saveLocalAlarmsToDeviceOnly();
-            showToast(`已在本機設定 ${time} 鬧鐘（不會同步至伴侶電話）`);
+            showToast(`已在本機設定 ${time} 鬧鐘（伴侶手機不會響）`);
         };
 
         window.toggleLocalAlarm = function(id) {
@@ -2483,7 +2501,7 @@
                 Notification.requestPermission();
             }
             saveLocalAlarmsToDeviceOnly();
-            showToast(localDeviceAlarms[idx].enabled ? '本機鬧鐘已手動開啟' : '本機鬧鐘已關閉');
+            showToast(localDeviceAlarms[idx].enabled ? '本機鬧鐘已開啟' : '本機鬧鐘已關閉');
         };
 
         window.deleteLocalAlarm = function(id) {
@@ -2492,53 +2510,38 @@
             showToast('已刪除本機鬧鐘');
         };
 
-        // 根據用藥時間、藥單影像與覆診日程自動預估本機鬧鐘時間
         window.autoEstimateAlarmsFromData = function() {
             let addedCount = 0;
-            const existingTimes = new Set(localDeviceAlarms.map(a => `${a.time}_${a.label}`));
+            const existingKeys = new Set(localDeviceAlarms.map(a => `${a.time}_${a.label}`));
 
-            // 1. 從用藥紀錄提取服藥時間
             sharedState.medications.forEach(m => {
-                const key = `${m.time}_服藥：${m.name}`;
-                if (!existingTimes.has(key)) {
-                    localDeviceAlarms.push({
-                        id: 'loc-est-' + Date.now() + Math.random(),
-                        time: m.time,
-                        label: `服藥：${m.name}`,
-                        repeat: 'daily',
-                        enabled: true
-                    });
-                    existingTimes.add(key);
+                const lbl = `服藥：${m.name}`;
+                const key = `${m.time}_${lbl}`;
+                if (!existingKeys.has(key)) {
+                    localDeviceAlarms.push({ id: 'loc-est-' + Date.now() + Math.random(), time: m.time, label: lbl, repeat: 'daily', enabled: true });
+                    existingKeys.add(key);
                     addedCount++;
                 }
             });
 
-            // 2. 從未來覆診提取（自動提早 1 小時提醒出發）
             const today = getTodayStr();
             sharedState.appointments.filter(a => a.date >= today).forEach(a => {
                 const [hh, mm] = a.time.split(':').map(Number);
                 const preH = String(Math.max(0, hh - 1)).padStart(2, '0');
                 const preTime = `${preH}:${String(mm).padStart(2, '0')}`;
-                const lbl = `準備前往：${a.hospital} (${a.date} ${a.time})`;
+                const lbl = `覆診出發：${a.hospital} (${a.date})`;
                 const key = `${preTime}_${lbl}`;
-                if (!existingTimes.has(key)) {
-                    localDeviceAlarms.push({
-                        id: 'loc-appt-' + Date.now() + Math.random(),
-                        time: preTime,
-                        label: lbl,
-                        repeat: 'once',
-                        enabled: true
-                    });
-                    existingTimes.add(key);
+                if (!existingKeys.has(key)) {
+                    localDeviceAlarms.push({ id: 'loc-appt-' + Date.now() + Math.random(), time: preTime, label: lbl, repeat: 'once', enabled: true });
+                    existingKeys.add(key);
                     addedCount++;
                 }
             });
 
             saveLocalAlarmsToDeviceOnly();
-            showToast(addedCount > 0 ? `已根據用藥與覆診自動預估 ${addedCount} 個本機鬧鐘！` : '所有用藥與覆診時間均已建立本機鬧鐘');
+            showToast(addedCount > 0 ? `已預估並新增 ${addedCount} 個本機鬧鐘！` : '所有用藥與覆診時間均已建立鬧鐘');
         };
 
-        // 本機鬧鐘背景監測器（每 10 秒檢查一次本機時間）
         let lastTriggeredMinuteKey = '';
         function startLocalAlarmWatcher() {
             setInterval(() => {
@@ -2547,7 +2550,6 @@
                 const mm = String(now.getMinutes()).padStart(2, '0');
                 const nowTimeStr = `${hh}:${mm}`;
                 const minuteKey = `${getTodayStr()}_${nowTimeStr}`;
-
                 if (minuteKey === lastTriggeredMinuteKey) return;
 
                 const matched = localDeviceAlarms.find(a => a.enabled && a.time === nowTimeStr);
@@ -2601,9 +2603,9 @@
             }
         };
 
-        // ==================== 分頁切換、彈窗關閉與同步碼 ====================
+        // ==================== 分頁切換與彈窗控制 ====================
         window.switchTab = function(tab) {
-            ['home', 'maternal', 'mediaAlarm'].forEach(t => {
+            ['home', 'maternal', 'gallery'].forEach(t => {
                 const view = document.getElementById(`view-${t}`);
                 const btn = document.getElementById(`tabBtn-${t}`);
                 if (t === tab) {
@@ -2634,20 +2636,9 @@
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                ['fetalDetailModal', 'dayDetailModal', 'appointmentModal', 'shiftModal', 'memorialModal', 'conditionModal', 'medicationModal', 'maternalLogModal', 'mediaModal', 'alarmModal', 'syncModal'].forEach(closeModal);
+                ['fetalDetailModal', 'syncModal', 'dayDetailModal', 'appointmentModal', 'shiftModal', 'memorialModal', 'conditionModal', 'medicationModal', 'maternalLogModal', 'mediaModal', 'alarmModal'].forEach(closeModal);
             }
         });
-
-        window.applySyncCode = function() {
-            const val = document.getElementById('syncCodeInput').value.trim();
-            if (!val) return;
-            syncCode = val;
-            localStorage.setItem('mcma_sync_code', syncCode);
-            document.getElementById('headerSyncCodeText').textContent = syncCode;
-            connectFamilySync(syncCode);
-            closeModal('syncModal');
-            showToast(`已切換家庭同步碼：${syncCode}`);
-        };
 
         window.showToast = function(msg) {
             const el = document.getElementById('toast');
@@ -2657,7 +2648,6 @@
             window._tTimer = setTimeout(() => el.classList.add('translate-y-20', 'opacity-0'), 3000);
         };
 
-        // 啟動 MCMA守護寶
         initApp();
     </script>
 </body>
