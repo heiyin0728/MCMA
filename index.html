@@ -621,7 +621,7 @@
           </div>
         </div>
 
-        <!-- 雲端同步控制（有更新才同步，平時不無故轉圈） -->
+        <!-- 雲端同步控制（已鎖定 homestocktake Firebase Realtime Database） -->
         <div class="flex-center" style="flex-shrink: 0;">
           <button onclick="triggerManualSync()" title="立即檢查並同步" class="btn btn-soft" style="padding: 6px 8px;">🔄</button>
           <button onclick="openSyncModal()" class="sync-pill">
@@ -631,7 +631,7 @@
         </div>
       </div>
 
-      <!-- 桌面版分頁標籤（安全運動已移至最後一頁） -->
+      <!-- 桌面版分頁標籤 -->
       <nav class="desktop-nav">
         <button onclick="switchTab(0)" data-tab="0" class="tab-btn active">🏠 主頁概覽</button>
         <button onclick="switchTab(1)" data-tab="1" class="tab-btn">💊 母體與用藥</button>
@@ -826,7 +826,7 @@
         <div id="maternal-logs-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto;"></div>
       </div>
 
-      <!-- 本機專屬鬧鐘（支援 00-59 分鐘、防休眠喚醒、音頻解鎖與 .ics 日曆匯出） -->
+      <!-- 本機專屬鬧鐘 -->
       <div class="alarm-card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div class="flex-center" style="flex-wrap: wrap;">
@@ -949,7 +949,7 @@
     </section>
   </main>
 
-  <!-- 手機版底部導航列（安全運動在最後一頁） -->
+  <!-- 手機版底部導航列 -->
   <nav class="mobile-nav">
     <button onclick="switchTab(0)" data-tab="0" class="mobile-tab-btn active">
       <span style="font-size: 16px;">🏠</span>
@@ -972,7 +972,7 @@
   <!-- ==================== 彈出視窗群 ==================== -->
   <div id="modal-backdrop" onclick="handleBackdropClick(event)" class="modal-backdrop hidden">
 
-    <!-- 1. 胎兒成長曲線（離線原生 SVG 標準線性圖）與量度輸入 -->
+    <!-- 1. 胎兒成長曲線 -->
     <div id="modal-twin" class="modal-box hidden">
       <div class="modal-header">
         <div class="flex-center">
@@ -997,7 +997,6 @@
               <option value="fhr">胎心率 FHR (bpm)</option>
             </select>
           </div>
-          <!-- 離線原生 SVG 圖表容器，100% 不會因無網絡或沙盒而空白 -->
           <div id="twin-svg-chart-box" style="width: 100%; overflow-x: auto; background: #ffffff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 6px;"></div>
         </div>
 
@@ -1212,7 +1211,7 @@
       </div>
     </div>
 
-    <!-- 5. 超聲波影像多選上載彈窗（支援逐張刪除錯選檔案） -->
+    <!-- 5. 超聲波影像多選上載彈窗 -->
     <div id="modal-media-upload" class="modal-box hidden" style="max-width: 460px;">
       <div class="modal-header">
         <h3 style="font-size: 14px; font-weight: 800;">📸 多選上載超聲波相片 / 短片</h3>
@@ -1279,7 +1278,7 @@
       </form>
     </div>
 
-    <!-- 7. 多戶口家庭即時雲端同步設定彈窗（參考《家庭用品助理》Firebase Realtime DB 架構） -->
+    <!-- 7. 多戶口家庭即時雲端同步設定彈窗（已鎖定 homestocktake Firebase 網址） -->
     <div id="modal-sync" class="modal-box hidden" style="max-width: 480px;">
       <div class="modal-header">
         <h3 style="font-size: 14px; font-weight: 800;">☁️ 多戶口家庭雲端同步設定</h3>
@@ -1288,11 +1287,11 @@
       <div class="modal-body" style="display: flex; flex-direction: column; gap: 10px; font-size: 12px;">
         <div style="background: var(--sky-50); border: 1px solid var(--sky-200); border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="margin-bottom: 6px;">
-            <strong style="color: var(--sky-700);">👨‍👩‍👧‍👦 多戶口共同編輯與即時同步</strong>
-            <span id="cloud-mode-badge" class="badge" style="background: var(--emerald-100); color: var(--emerald-800);">智能合併已啟用</span>
+            <strong style="color: var(--sky-700);">👨‍👩‍👧‍👦 已預設綁定專屬 Firebase 雲端</strong>
+            <span id="cloud-mode-badge" class="badge" style="background: var(--emerald-100); color: var(--emerald-800);">homestocktake 已鎖定</span>
           </div>
           <p style="font-size: 11px; color: #334155; margin-bottom: 8px;">
-            支援多個家庭成員（媽媽、爸爸、家人）同時使用，任何戶口新增、修改或刪除紀錄後會自動合併同步，<strong>平時無更動不會背景耗電轉圈</strong>。
+            已內建鎖定你的 Firebase Realtime Database，任何家庭成員打開網頁輸入相同的「家庭共享同步碼」即可共同編輯並即時同步。
           </p>
 
           <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -1305,9 +1304,8 @@
               <input type="text" id="sync-code-input" placeholder="例如：MCMA-2027-LOVE" style="font-weight: 700;">
             </div>
             <div>
-              <label class="label-sm">3. Firebase Realtime Database 網址 (選填，與《家庭用品助理》相同設定)</label>
-              <input type="text" id="sync-firebase-url" placeholder="https://你的專案-default-rtdb.firebaseio.com">
-              <span style="font-size: 10px; color: var(--text-muted); display: block; margin-top: 2px;">若留空則自動使用內建多節點雲端通道；填入 Firebase 網址則使用專屬私有資料庫。</span>
+              <label class="label-sm">3. 已鎖定的 Firebase Realtime Database 網址</label>
+              <input type="text" id="sync-firebase-url" readonly style="background: #e2e8f0; color: #475569; font-size: 11px;">
             </div>
             <div style="display: flex; gap: 6px; margin-top: 4px;">
               <button onclick="saveSyncSettings()" class="btn btn-sky" style="flex: 1;">儲存設定並立即同步</button>
@@ -1516,9 +1514,9 @@
     let tempMedImage = '';
 
     // =========================================================================
-    // 3. 多戶口家庭雲端同步引擎 (參考《家庭用品助理》Firebase Realtime DB + 智能合併)
-    //    核心原則：有更新才同步，平時絕不背景無故轉圈
+    // 3. 多戶口家庭雲端同步引擎（已鎖定 homestocktake Firebase Realtime Database）
     // =========================================================================
+    const LOCKED_FIREBASE_URL = 'https://homestocktake-default-rtdb.asia-southeast1.firebasedatabase.app';
     let isSyncingNow = false;
     let lastSyncedSignature = '';
 
@@ -1530,12 +1528,10 @@
       } catch (e) {}
 
       const familyCode = urlParams.get('family') || saved.familyCode || 'MCMA-2027-LOVE';
-      const firebaseUrl = urlParams.get('fb') || saved.firebaseUrl || '';
+      const firebaseUrl = LOCKED_FIREBASE_URL;
       const userName = saved.userName || '家人';
 
-      if (urlParams.get('family') || urlParams.get('fb')) {
-        localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify({ familyCode, firebaseUrl, userName }));
-      }
+      localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify({ familyCode, firebaseUrl, userName }));
       return { familyCode, firebaseUrl, userName };
     }
 
@@ -1547,7 +1543,7 @@
       dot.className = 'sync-dot' + (mode === 'syncing' ? ' syncing' : mode === 'offline' ? ' offline' : '');
     }
 
-    // 多戶口項目級智能合併（每個戶口修改/新增/刪除皆保留最新狀態，互不覆蓋）
+    // 多戶口項目級智能合併
     function mergeArrayById(localArr = [], remoteArr = [], deletedSet = new Set()) {
       const map = new Map();
       [...localArr, ...remoteArr].forEach(item => {
@@ -1604,69 +1600,31 @@
       return clone;
     }
 
-    // 支援 Firebase Realtime Database REST API（與家庭用品助理相同）＋ 內建免費雲端備援通道
     async function fetchRemoteState(cfg) {
       const safeKey = 'mcma_family_' + cfg.familyCode.replace(/[^a-zA-Z0-9_-]/g, '_');
-
-      // 1. 優先使用用戶設定的 Firebase Realtime Database
-      if (cfg.firebaseUrl && cfg.firebaseUrl.startsWith('http')) {
-        const cleanFb = cfg.firebaseUrl.replace(/\/+$/, '');
-        try {
-          const res = await fetch(`${cleanFb}/mcma_rooms/${safeKey}.json?t=${Date.now()}`, { cache: 'no-store' });
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.twinMeasurements) return data;
-          }
-        } catch (e) {}
-      }
-
-      // 2. 備援：雙節點雲端通道
-      const fallbacks = [
-        `https://kvdb.io/A9xK2mP7vL4qR8nT3wZ6yB/${safeKey}`,
-        `https://kvdb.io/DrT8vN2xQ9mK4pL7wZ1yC/${safeKey}`
-      ];
-      for (const url of fallbacks) {
-        try {
-          const res = await fetch(`${url}?t=${Date.now()}`, { cache: 'no-store' });
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.twinMeasurements) return data;
-          }
-        } catch (e) {}
-      }
+      const cleanFb = LOCKED_FIREBASE_URL.replace(/\/+$/, '');
+      try {
+        const res = await fetch(`${cleanFb}/mcma_rooms/${safeKey}.json?t=${Date.now()}`, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.twinMeasurements) return data;
+        }
+      } catch (e) {}
       return null;
     }
 
     async function pushRemoteState(cfg, payloadObj) {
       const safeKey = 'mcma_family_' + cfg.familyCode.replace(/[^a-zA-Z0-9_-]/g, '_');
       const bodyStr = JSON.stringify(buildCloudSafePayload(payloadObj));
-
-      if (cfg.firebaseUrl && cfg.firebaseUrl.startsWith('http')) {
-        const cleanFb = cfg.firebaseUrl.replace(/\/+$/, '');
-        try {
-          const res = await fetch(`${cleanFb}/mcma_rooms/${safeKey}.json`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: bodyStr
-          });
-          if (res.ok) return true;
-        } catch (e) {}
-      }
-
-      const fallbacks = [
-        `https://kvdb.io/A9xK2mP7vL4qR8nT3wZ6yB/${safeKey}`,
-        `https://kvdb.io/DrT8vN2xQ9mK4pL7wZ1yC/${safeKey}`
-      ];
-      for (const url of fallbacks) {
-        try {
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: bodyStr
-          });
-          if (res.ok) return true;
-        } catch (e) {}
-      }
+      const cleanFb = LOCKED_FIREBASE_URL.replace(/\/+$/, '');
+      try {
+        const res = await fetch(`${cleanFb}/mcma_rooms/${safeKey}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: bodyStr
+        });
+        if (res.ok) return true;
+      } catch (e) {}
       return false;
     }
 
@@ -1678,7 +1636,6 @@
       updateLocalMetaDisplay();
     }
 
-    // 只有資料真正發生更動時才呼叫此函式進行儲存與雲端同步
     async function persistAndSync() {
       const cfg = getSyncConfig();
       appState.updatedAt = Date.now();
@@ -1694,7 +1651,6 @@
 
     async function syncWithCloud(showToastMsg = false, hasLocalChanges = false) {
       if (isSyncingNow) return;
-      // 若沒有本地更動且非手動觸發，先檢查簽名避免無意義重複寫入
       const currentSig = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}`;
       if (!hasLocalChanges && !showToastMsg && lastSyncedSignature === currentSig && appState.updatedAt > 0) {
         return;
@@ -1731,11 +1687,11 @@
             const who = remote.lastEditor ? ` (${remote.lastEditor})` : '';
             showToast(`🔄 已同步家庭成員${who}的最新更新`);
           } else if (showToastMsg) {
-            showToast('✅ 多戶口家庭資料已即時同步完成');
+            showToast('✅ 已與 homestocktake Firebase 即時同步');
           }
         } else {
           setSyncUI('offline', '已存本機');
-          if (showToastMsg) showToast('ℹ️ 目前為離線狀態，資料已安全永久儲存於本機');
+          if (showToastMsg) showToast('ℹ️ 暫未能連接雲端，資料已安全儲存於本機');
         }
       } finally {
         isSyncingNow = false;
@@ -1746,7 +1702,7 @@
       const cfg = getSyncConfig();
       document.getElementById('sync-user-name').value = cfg.userName;
       document.getElementById('sync-code-input').value = cfg.familyCode;
-      document.getElementById('sync-firebase-url').value = cfg.firebaseUrl;
+      document.getElementById('sync-firebase-url').value = LOCKED_FIREBASE_URL;
       updateLocalMetaDisplay();
       openModal('modal-sync');
     }
@@ -1754,9 +1710,8 @@
     async function saveSyncSettings() {
       const userName = document.getElementById('sync-user-name').value.trim() || '家人';
       const familyCode = document.getElementById('sync-code-input').value.trim() || 'MCMA-2027-LOVE';
-      const firebaseUrl = document.getElementById('sync-firebase-url').value.trim();
 
-      localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify({ userName, familyCode, firebaseUrl }));
+      localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify({ userName, familyCode, firebaseUrl: LOCKED_FIREBASE_URL }));
       lastSyncedSignature = '';
       closeAllModals();
       await syncWithCloud(true, true);
@@ -1765,8 +1720,7 @@
     function copySyncLink() {
       const cfg = getSyncConfig();
       const baseUrl = window.location.href.split('?')[0];
-      let shareUrl = `${baseUrl}?family=${encodeURIComponent(cfg.familyCode)}`;
-      if (cfg.firebaseUrl) shareUrl += `&fb=${encodeURIComponent(cfg.firebaseUrl)}`;
+      const shareUrl = `${baseUrl}?family=${encodeURIComponent(cfg.familyCode)}`;
 
       const inp = document.createElement('input');
       inp.value = shareUrl;
@@ -1774,7 +1728,7 @@
       inp.select();
       document.execCommand('copy');
       document.body.removeChild(inp);
-      showToast('🔗 已複製家庭共享連結！傳送給家人開啟即可共同編輯同步');
+      showToast('🔗 已複製家庭共享連結！傳送給家人打開即自動連線');
     }
 
     function updateLocalMetaDisplay() {
@@ -1810,7 +1764,7 @@
             appState = { ...DEFAULT_STATE, ...imported };
             await persistAndSync();
             closeAllModals();
-            showToast('✅ 成功匯入備份並同步至所有家庭戶口');
+            showToast('✅ 成功匯入備份並同步至 Firebase');
           } else {
             showToast('❌ 備份檔案格式不正確');
           }
@@ -1822,7 +1776,7 @@
     }
 
     // =========================================================================
-    // 4. 分頁切換（動態顯示當前分頁，徹底消除每頁下方大量空白）+ 左右滑動支援
+    // 4. 分頁切換 + 左右滑動支援
     // =========================================================================
     function switchTab(index) {
       if (index < 0 || index > 3) return;
@@ -1873,7 +1827,7 @@
     }
 
     // =========================================================================
-    // 5. 主頁雙胎卡片與原生 SVG 成長曲線圖（離線/沙盒 100% 正常顯示）
+    // 5. 主頁雙胎卡片與原生 SVG 成長曲線圖
     // =========================================================================
     function renderAll() {
       renderHeader();
@@ -1989,7 +1943,6 @@
       openModal('modal-twin');
     }
 
-    // 純原生 SVG 成長曲線圖（不依賴任何外部 JS 庫，在沙盒與斷網下 100% 繪製）
     function renderTwinSvgChart() {
       const box = document.getElementById('twin-svg-chart-box');
       const metric = document.getElementById('twin-chart-metric').value;
@@ -2050,7 +2003,6 @@
       const getX = (idx) => padL + (points.length === 1 ? plotW / 2 : (idx / (points.length - 1)) * plotW);
       const getY = (val) => padT + plotH - ((val - minVal) / Math.max(1, maxVal - minVal)) * plotH;
 
-      // P10-P90 區間多邊形
       const upperPts = points.map((pt, i) => `${getX(i)},${getY(pt.std.p90)}`).join(' ');
       const lowerPts = [...points].reverse().map((pt, i) => `${getX(points.length - 1 - i)},${getY(pt.std.p10)}`).join(' ');
       const bandPolygon = `${upperPts} ${lowerPts}`;
@@ -2146,7 +2098,7 @@
     }
 
     // =========================================================================
-    // 6. 互動月曆（支援工作更期 + 5類覆診色條 + 跨日住院日期範圍）
+    // 6. 互動月曆
     // =========================================================================
     const CATEGORY_CLASS = {
       '公立覆診': 'cat-public',
@@ -2402,7 +2354,7 @@
     }
 
     // =========================================================================
-    // 7. 母體狀況、用藥清單與本機鬧鐘（00–59分、防休眠、音頻解鎖）
+    // 7. 母體狀況、用藥清單與本機鬧鐘
     // =========================================================================
     function renderMaternalTab() {
       const today = getTodayStr();
@@ -2605,7 +2557,7 @@
       await persistAndSync();
     }
 
-    // --- 本機鬧鐘完整解決方案（00-59分、iOS AudioContext 解鎖、WakeLock 防休眠、循環響鬧、ICS日曆匯出） ---
+    // --- 本機鬧鐘完整解決方案 ---
     let sharedAudioCtx = null;
     let alarmRingInterval = null;
     let wakeLockObj = null;
@@ -2776,7 +2728,6 @@
       `).join('');
     }
 
-    // 每 2 秒精準檢查一次秒數與分鐘，絕不漏響
     setInterval(() => {
       const now = new Date();
       const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -2797,7 +2748,7 @@
     }, 2000);
 
     // =========================================================================
-    // 8. 病史、天使BB紀念冊與超聲波影像庫（支援個別刪除錯選相片/檔案）
+    // 8. 病史、天使BB紀念冊與超聲波影像庫
     // =========================================================================
     function renderHistoryAndGalleryTab() {
       const mhList = document.getElementById('medical-history-list');
@@ -2945,7 +2896,6 @@
       renderAngelGallery();
     }
 
-    // 多選上載超聲波影像（支援選取後預覽並逐張按 ✕ 刪除錯選檔案）
     function openMediaUploadModal(targetDefault) {
       tempPendingTwinMedia = [];
       document.getElementById('mu-target').value = targetDefault || 'BOTH';
@@ -3036,7 +2986,7 @@
     }
 
     // =========================================================================
-    // 9. 安全運動建議（位於最後一頁）
+    // 9. 安全運動建議
     // =========================================================================
     function renderExerciseTab() {
       const ga = getGestationalAgeForDate(new Date());
@@ -3077,7 +3027,7 @@
     }
 
     // =========================================================================
-    // 10. 彈窗與時間選單初始化 (00–23時, 00–59分)
+    // 10. 彈窗與時間選單初始化
     // =========================================================================
     function openModal(modalId) {
       document.getElementById('modal-backdrop').classList.remove('hidden');
@@ -3144,7 +3094,6 @@
       switchTab(0);
       renderAll();
 
-      // 啟動時從 IndexedDB 自動回復最新本機資料
       const idbState = await readFromIDB();
       if (idbState && idbState.twinMeasurements && (idbState.updatedAt || 0) > (appState.updatedAt || 0)) {
         appState = { ...DEFAULT_STATE, ...idbState };
@@ -3152,7 +3101,6 @@
         renderAll();
       }
 
-      // 僅在打開網頁或切回前景時檢查一次同步，平時不無故轉圈
       syncWithCloud(false, false);
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) syncWithCloud(false, false);
