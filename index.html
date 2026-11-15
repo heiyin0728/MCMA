@@ -2663,26 +2663,32 @@
     }
 
     function addLocalAlarm() {
-  ensureAudioUnlocked();
-  const hour = document.getElementById('alarm-hour').value;
-  const min = document.getElementById('alarm-min').value;
-  const label = document.getElementById('alarm-label').value.trim() || '服藥 / 安胎提醒';
-  const timeStr = `${hour}:${min}`;
+      ensureAudioUnlocked();
+      const hour = document.getElementById('alarm-hour').value;
+      const min = document.getElementById('alarm-min').value;
+      const label = document.getElementById('alarm-label').value.trim() || '服藥 / 安胎提醒';
+      const timeStr = `${hour}:${min}`;
 
-  localAlarms.push({
-    id: 'al-' + Date.now(),
-    time: timeStr,
-    label,
-    enabled: true,
-    lastTriggeredDate: ''
-  });
-  document.getElementById('alarm-label').value = '';
-  saveLocalAlarms();
+      localAlarms.push({
+        id: 'al-' + Date.now(),
+        time: timeStr,
+        label,
+        enabled: true,
+        lastTriggeredDate: ''
+      });
+      document.getElementById('alarm-label').value = '';
+      saveLocalAlarms();
 
-  // 新增後立即自動跳轉呼叫 iOS 捷徑寫入 iPhone 原生時鐘 App
-  triggerIosShortcutAlarm(timeStr, label);
-}
+      // 新增後立即自動跳轉呼叫 iOS 捷徑寫入 iPhone 原生時鐘 App
+      triggerIosShortcutAlarm(timeStr, label);
+    }
 
+    function triggerIosShortcutAlarm(timeStr, labelStr) {
+      const todayStr = getTodayStr();
+      const payload = `${todayStr} ${timeStr}|${labelStr || 'MCMA提醒'}`;
+      const shortcutUrl = `shortcuts://run-shortcut?name=${encodeURIComponent('MCMA 設鬧鐘')}&input=text&text=${encodeURIComponent(payload)}`;
+      window.location.href = shortcutUrl;
+    }
 
     function estimateAlarmFromImage(e) {
       const file = e.target.files[0];
