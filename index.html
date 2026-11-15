@@ -155,6 +155,50 @@
       overflow: hidden;
     }
 
+    /* 影像分類篩選按鈕列 */
+    .filter-pill-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .filter-pill {
+      padding: 5px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      transition: all 0.15s;
+    }
+    .filter-pill.active {
+      background: var(--rose-600);
+      color: #ffffff;
+      border-color: var(--rose-600);
+    }
+
+    /* 更期按鈕組（含刪除按鈕） */
+    .shift-chip-wrap {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+    .shift-chip-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .shift-chip-del {
+      padding: 6px 7px;
+      font-size: 10px;
+      font-weight: 800;
+      background: rgba(15, 23, 42, 0.12);
+      color: inherit;
+    }
+
     .grid-resp-2 {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -762,7 +806,7 @@
     <!-- ==================== 分頁 0：主頁概覽 ==================== -->
     <section id="tab-0" class="tab-panel">
       <div class="grid-2" style="margin-bottom: 12px;">
-        <!-- BB A 卡片（帶入當日胎兒A各自週數） -->
+        <!-- BB A 卡片（主頁只顯示即時推算A胎兒即日週數，最後產檢週數於點擊內頁同時顯示） -->
         <div onclick="openTwinModal('A')" class="twin-card twin-card-a">
           <div class="flex-between" style="margin-bottom: 6px;">
             <div class="flex-center" style="min-width: 0;">
@@ -780,7 +824,7 @@
           <div id="twin-A-summary"></div>
         </div>
 
-        <!-- BB B 卡片（帶入當日胎兒B各自週數） -->
+        <!-- BB B 卡片（主頁只顯示即時推算B胎兒即日週數，最後產檢週數於點擊內頁同時顯示） -->
         <div onclick="openTwinModal('B')" class="twin-card twin-card-b">
           <div class="flex-between" style="margin-bottom: 6px;">
             <div class="flex-center" style="min-width: 0;">
@@ -1030,15 +1074,17 @@
         </div>
       </div>
 
-      <!-- 全庫所有上載影像時序總覽（嚴格兩張卡片並排顯示於頁面範圍內） -->
+      <!-- 全庫所有上載影像時序總覽（上部加入分類頁面按鈕，嚴格兩張卡片並排顯示於頁面範圍內） -->
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div>
             <h3 style="font-size: 14px; font-weight: 800;">🗂️ 全庫上載影像時序總覽</h3>
-            <p style="font-size: 11px; color: var(--text-muted);">自動彙整所有位置上載的相片縮圖（依加入時序排列），可編輯分類並點擊放大左右滑動瀏覽</p>
+            <p style="font-size: 11px; color: var(--text-muted);">自動彙整所有位置上載的相片縮圖（依加入時序排列），可點擊分類按鈕篩選及放大瀏覽</p>
           </div>
           <span id="all-media-count-badge" class="badge" style="background: var(--rose-100); color: var(--rose-700);">0 個</span>
         </div>
+        <!-- 分類篩選按鈕列 -->
+        <div id="all-media-category-tabs" class="filter-pill-bar"></div>
         <div id="all-media-timeline-grid" class="media-grid-2"></div>
       </div>
     </section>
@@ -1093,11 +1139,12 @@
   <!-- ==================== 彈出視窗群 ==================== -->
   <div id="modal-backdrop" onclick="handleBackdropClick(event)" class="modal-backdrop hidden">
 
-    <!-- 1. 胎兒成長曲線（彈窗內支援左右滑動切換瀏覽大孖/細孖頁面） -->
+    <!-- 1. 胎兒成長曲線（內頁同時顯示當日推算週數 + 最後產檢日期週數，並支援左右滑動切換瀏覽大/細孖） -->
     <div id="modal-twin" class="modal-box hidden">
       <div class="modal-header">
-        <div class="flex-center" style="flex-wrap: wrap;">
+        <div class="flex-center" style="flex-wrap: wrap; gap: 6px;">
           <span id="twin-modal-badge" class="badge">BB A</span>
+          <span id="twin-modal-lastscan-badge" class="badge" style="background: #f1f5f9; color: #334155;">最後產檢：計算中</span>
           <h3 style="font-size: 14px; font-weight: 800;">成長數據與 MCMA 標準線性對比</h3>
           <button type="button" onclick="toggleTwinModalSide()" class="btn btn-soft" style="padding: 3px 8px; font-size: 11px;">⇄ 切換大/細孖</button>
         </div>
@@ -1156,7 +1203,7 @@
               </div>
               <div>
                 <label class="label-sm">FHR 胎心率 (bpm)</label>
-                <input type="number" id="tm-fhr" placeholder="132">
+                <input type="number" step="1" id="tm-fhr" placeholder="132">
               </div>
               <div>
                 <label class="label-sm">EFW 預估體重 (g)</label>
@@ -1194,7 +1241,7 @@
       </div>
     </div>
 
-    <!-- 2. 月曆單日詳情與跨日住院編輯彈窗 -->
+    <!-- 2. 月曆單日詳情與跨日住院編輯彈窗（含工作更期自訂加入/刪減管理） -->
     <div id="modal-calendar-day" class="modal-box hidden">
       <div class="modal-header">
         <div>
@@ -1205,18 +1252,23 @@
       </div>
       <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px;">
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
-          <label class="label-sm">💼 當日工作更期</label>
-          <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px;" id="shift-selector-btns">
-            <button type="button" onclick="setDayShift('')" class="btn btn-soft shift-opt">無/未定</button>
-            <button type="button" onclick="setDayShift('早更')" class="btn shift-opt" style="background:var(--sky-100); color:var(--sky-700);">早更</button>
-            <button type="button" onclick="setDayShift('中更')" class="btn shift-opt" style="background:var(--amber-100); color:var(--amber-800);">中更</button>
-            <button type="button" onclick="setDayShift('夜更')" class="btn shift-opt" style="background:#e0e7ff; color:#3730a3;">夜更</button>
-            <button type="button" onclick="setDayShift('放假')" class="btn shift-opt" style="background:var(--emerald-100); color:var(--emerald-800);">放假</button>
-            <button type="button" onclick="setDayShift('病假')" class="btn shift-opt" style="background:var(--rose-100); color:var(--rose-700);">病假</button>
+          <div class="flex-between" style="margin-bottom: 6px;">
+            <label class="label-sm" style="margin-bottom: 0;">💼 當日工作更期</label>
+            <button type="button" onclick="toggleShiftManagerMode()" id="shift-manage-toggle-btn" class="btn btn-soft" style="padding: 3px 8px; font-size: 10.5px;">⚙️ 管理更期按鈕</button>
+          </div>
+          <!-- 動態更期按鈕列表（支援單擊套用、管理模式下可刪除或加入新更期） -->
+          <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px;" id="shift-selector-btns"></div>
+          <!-- 新增自訂更期選項欄位 -->
+          <div id="shift-preset-add-row" class="hidden" style="background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 6px; margin-bottom: 6px;">
+            <div style="font-size: 10.5px; color: var(--text-muted); margin-bottom: 4px;">加入常用更期按鈕（會同步至所有家庭成員）：</div>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="new-shift-preset-input" placeholder="輸入新更期名稱 (如：通宵更 / 補假)">
+              <button type="button" onclick="addShiftPreset()" class="btn btn-teal" style="white-space: nowrap;">+ 加入按鈕</button>
+            </div>
           </div>
           <div style="display: flex; gap: 6px;">
-            <input type="text" id="custom-shift-input" placeholder="或輸入自訂更期...">
-            <button type="button" onclick="setDayShift(document.getElementById('custom-shift-input').value.trim())" class="btn btn-dark">確定</button>
+            <input type="text" id="custom-shift-input" placeholder="或直接輸入當日單次更期...">
+            <button type="button" onclick="setDayShift(document.getElementById('custom-shift-input').value.trim())" class="btn btn-dark" style="white-space: nowrap;">確定套用</button>
           </div>
         </div>
 
@@ -1517,33 +1569,47 @@
       return { weeks, days, totalDays: diffDays, label: `${weeks}週${days}日` };
     }
 
-    // 精準計算大孖 / 細孖各自在「當日」的週日數（依據最新超聲波週數順推至當日）
-    function getTwinLiveGestationalLabel(twinId) {
-      const list = [...(appState.twinMeasurements[twinId] || [])]
-        .filter(x => x.date && x.usGa)
+    // 精準取得胎兒最後產檢週數與當日即時推算週數（供主頁卡片及內頁分別使用）
+    function getTwinGestationalInfo(twinId) {
+      const allSorted = [...(appState.twinMeasurements[twinId] || [])]
+        .filter(x => x.date)
         .sort((a, b) => b.date.localeCompare(a.date));
-      const latest = list[0];
-      if (latest) {
-        const match = latest.usGa.match(/(\d+)\s*[w週]\s*(\d+)\s*[d日]?/i);
-        if (match) {
-          const baseWeeks = parseInt(match[1], 10);
-          const baseDays = parseInt(match[2], 10);
-          const p = latest.date.split('-');
-          const scanMs = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getTime();
-          const now = new Date();
-          const todayMs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-          const elapsedDays = Math.max(0, Math.floor((todayMs - scanMs) / MS_PER_DAY));
-          const total = baseWeeks * 7 + baseDays + elapsedDays;
-          return `當日 ${Math.floor(total / 7)}週${total % 7}日`;
-        }
+
+      const withGa = allSorted.find(x => x.usGa && /(\d+)\s*[w週]\s*(\d+)\s*[d日]?/i.test(x.usGa));
+      if (withGa) {
+        const match = withGa.usGa.match(/(\d+)\s*[w週]\s*(\d+)\s*[d日]?/i);
+        const baseWeeks = parseInt(match[1], 10);
+        const baseDays = parseInt(match[2], 10);
+        const p = withGa.date.split('-');
+        const scanMs = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getTime();
+        const now = new Date();
+        const todayMs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const elapsedDays = Math.max(0, Math.floor((todayMs - scanMs) / MS_PER_DAY));
+        const total = baseWeeks * 7 + baseDays + elapsedDays;
+        return {
+          liveLabel: `當日 ${Math.floor(total / 7)}週${total % 7}日`,
+          lastScanGaLabel: `${baseWeeks}週${baseDays}日 (${withGa.usGa})`,
+          lastScanDate: withGa.date
+        };
       }
-      // 若尚未填寫該胎兒獨立超聲波週數，預設以 BB A 基準 7w2d (12/11/2026) / BB B 基準 7w0d (12/11/2026) 推算當日週數
+
+      // 若尚未填寫該胎兒獨立超聲波週數，預設以 BB A 7w2d (12/11/2026) / BB B 7w0d (12/11/2026) 推算
       const defaultScanMs = new Date(2026, 10, 12).getTime();
       const now = new Date();
       const todayMs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
       const elapsed = Math.max(0, Math.floor((todayMs - defaultScanMs) / MS_PER_DAY));
-      const baseTotal = (twinId === 'A' ? (7 * 7 + 2) : (7 * 7 + 0)) + elapsed;
-      return `當日 ${Math.floor(baseTotal / 7)}週${baseTotal % 7}日`;
+      const baseW = 7;
+      const baseD = twinId === 'A' ? 2 : 0;
+      const total = baseW * 7 + baseD + elapsed;
+      return {
+        liveLabel: `當日 ${Math.floor(total / 7)}週${total % 7}日`,
+        lastScanGaLabel: `${baseW}週${baseD}日 (${baseW}w${baseD}d)`,
+        lastScanDate: '2026-11-12'
+      };
+    }
+
+    function getTwinLiveGestationalLabel(twinId) {
+      return getTwinGestationalInfo(twinId).liveLabel;
     }
 
     function getTodayStr() {
@@ -1576,6 +1642,8 @@
     const IDB_NAME = 'MCMA_Guardian_DB';
     const IDB_STORE = 'app_snapshots';
 
+    const DEFAULT_SHIFT_PRESETS = ['早更', '中更', '夜更', '放假', '病假'];
+
     const DEFAULT_STATE = {
       updatedAt: 0,
       lastEditor: '',
@@ -1592,6 +1660,7 @@
           afi: '正常單羊膜囊', updatedAt: 1731378600000, updatedBy: '系統預設'
         }]
       },
+      shiftPresets: [...DEFAULT_SHIFT_PRESETS],
       shifts: { '2026-11-14': '放假', '2026-11-15': '放假', '2026-11-16': '早更' },
       events: [
         {
@@ -1687,7 +1756,13 @@
           const raw = localStorage.getItem(k);
           if (raw) {
             const parsed = JSON.parse(raw);
-            if (parsed && parsed.twinMeasurements) return { ...DEFAULT_STATE, ...parsed };
+            if (parsed && parsed.twinMeasurements) {
+              return {
+                ...DEFAULT_STATE,
+                ...parsed,
+                shiftPresets: Array.isArray(parsed.shiftPresets) ? parsed.shiftPresets : [...DEFAULT_SHIFT_PRESETS]
+              };
+            }
           }
         } catch (e) {}
       }
@@ -1701,6 +1776,8 @@
     let calMonth = new Date().getMonth();
     let selectedCalendarDate = getTodayStr();
     let currentTwinModalId = 'A';
+    let selectedMediaCategoryFilter = 'ALL';
+    let isShiftManageMode = false;
 
     let tempEventMedia = [];
     let tempMaternalMedia = [];
@@ -1756,17 +1833,21 @@
     function smartMergeStates(local, remote) {
       if (!remote || !remote.twinMeasurements) return { state: local, changed: false };
       const deletedSet = new Set([...(local.deletedIds || []), ...(remote.deletedIds || [])]);
+      const isRemoteNewer = (remote.updatedAt || 0) > (local.updatedAt || 0);
 
       const merged = {
         ...DEFAULT_STATE,
-        ...(remote.updatedAt > local.updatedAt ? remote : local),
+        ...(isRemoteNewer ? remote : local),
         updatedAt: Math.max(local.updatedAt || 0, remote.updatedAt || 0),
-        lastEditor: (remote.updatedAt || 0) > (local.updatedAt || 0) ? (remote.lastEditor || '') : (local.lastEditor || ''),
+        lastEditor: isRemoteNewer ? (remote.lastEditor || '') : (local.lastEditor || ''),
         deletedIds: Array.from(deletedSet),
-        twinAvatars: (remote.updatedAt || 0) > (local.updatedAt || 0)
+        shiftPresets: isRemoteNewer && Array.isArray(remote.shiftPresets)
+          ? remote.shiftPresets
+          : (Array.isArray(local.shiftPresets) ? local.shiftPresets : [...DEFAULT_SHIFT_PRESETS]),
+        twinAvatars: isRemoteNewer
           ? { ...local.twinAvatars, ...remote.twinAvatars }
           : { ...remote.twinAvatars, ...local.twinAvatars },
-        shifts: (remote.updatedAt || 0) > (local.updatedAt || 0)
+        shifts: isRemoteNewer
           ? { ...local.shifts, ...remote.shifts }
           : { ...remote.shifts, ...local.shifts },
         twinMeasurements: {
@@ -1977,7 +2058,11 @@
         try {
           const imported = JSON.parse(e.target.result);
           if (imported && imported.twinMeasurements) {
-            appState = { ...DEFAULT_STATE, ...imported };
+            appState = {
+              ...DEFAULT_STATE,
+              ...imported,
+              shiftPresets: Array.isArray(imported.shiftPresets) ? imported.shiftPresets : [...DEFAULT_SHIFT_PRESETS]
+            };
             await persistAndSync();
             closeAllModals();
             showToast('✅ 成功匯入備份並同步至 Firebase');
@@ -2133,7 +2218,7 @@
     }
 
     // =========================================================================
-    // 5. 主頁雙胎卡片（帶入當日胎兒A與胎兒B各自週數）與 SVG 成長曲線圖
+    // 5. 主頁雙胎卡片（即時推算A/B胎兒各自即日週數；內頁同時顯示最後產檢週數）
     // =========================================================================
     function renderAll() {
       renderHeader();
@@ -2157,9 +2242,10 @@
           avatarEl.src = appState.twinAvatars[id];
         }
 
-        // 帶入當日胎兒A同胎兒B各自週數
+        // 主頁胎兒卡片：即時推算 A / B 胎兒各自即日週數（由最後產檢日期週數推算）
+        const gaInfo = getTwinGestationalInfo(id);
         const liveGaEl = document.getElementById(`twin-${id}-live-ga`);
-        if (liveGaEl) liveGaEl.textContent = getTwinLiveGestationalLabel(id);
+        if (liveGaEl) liveGaEl.textContent = gaInfo.liveLabel;
 
         const list = [...(appState.twinMeasurements[id] || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const latest = list[0];
@@ -2170,6 +2256,7 @@
           return;
         }
 
+        // 主頁卡片僅顯示最後檢查日期與數據，最後產檢週數留待點擊進入內頁時同時顯示
         summaryEl.innerHTML = `
           <div class="flex-between" style="font-size: 11px; color: var(--text-muted);">
             <span>最後檢查：${formatDisplayDate(latest.date)}</span>
@@ -2236,10 +2323,17 @@
 
     function openTwinModal(twinId) {
       currentTwinModalId = twinId;
+      const gaInfo = getTwinGestationalInfo(twinId);
       const badge = document.getElementById('twin-modal-badge');
-      badge.textContent = twinId === 'A' ? `BB A (大孖 · ${getTwinLiveGestationalLabel('A')})` : `BB B (細孖 · ${getTwinLiveGestationalLabel('B')})`;
+      badge.textContent = twinId === 'A' ? `BB A (大孖 · ${gaInfo.liveLabel})` : `BB B (細孖 · ${gaInfo.liveLabel})`;
       badge.style.background = twinId === 'A' ? 'var(--sky-100)' : 'var(--pink-100)';
       badge.style.color = twinId === 'A' ? 'var(--sky-700)' : 'var(--pink-700)';
+
+      // 內頁同時顯示最後產檢日期的週數
+      const lastScanBadge = document.getElementById('twin-modal-lastscan-badge');
+      if (lastScanBadge) {
+        lastScanBadge.textContent = `最後產檢 (${formatShortDate(gaInfo.lastScanDate)})：${gaInfo.lastScanGaLabel}`;
+      }
 
       resetTwinMeasurementForm();
       renderTwinSvgChart();
@@ -2417,9 +2511,7 @@
       else appState.twinMeasurements[twinId].push(record);
 
       await persistAndSync();
-      resetTwinMeasurementForm();
-      renderTwinSvgChart();
-      renderTwinMeasurementsList(twinId);
+      openTwinModal(twinId);
       showToast(`✅ 已儲存 BB ${twinId} 數據並同步`);
     }
 
@@ -2427,8 +2519,7 @@
       appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
       appState.twinMeasurements[twinId] = appState.twinMeasurements[twinId].filter(x => x.id !== id);
       await persistAndSync();
-      renderTwinSvgChart();
-      renderTwinMeasurementsList(twinId);
+      openTwinModal(twinId);
     }
 
     function renderTwinMeasurementsList(twinId) {
@@ -2454,7 +2545,7 @@
     }
 
     // =========================================================================
-    // 6. 互動月曆（第一天星期一、最後一天星期日；本月深色、上下月淺色）
+    // 6. 互動月曆與工作更期自訂加入/刪減管理
     // =========================================================================
     const CATEGORY_CLASS = {
       '公立覆診': 'cat-public',
@@ -2555,8 +2646,86 @@
       }
     }
 
+    function getShiftStyle(name) {
+      if (name === '早更') return 'background:var(--sky-100); color:var(--sky-700);';
+      if (name === '中更') return 'background:var(--amber-100); color:var(--amber-800);';
+      if (name === '夜更') return 'background:#e0e7ff; color:#3730a3;';
+      if (name === '放假') return 'background:var(--emerald-100); color:var(--emerald-800);';
+      if (name === '病假') return 'background:var(--rose-100); color:var(--rose-700);';
+      return 'background:#f3e8ff; color:#6b21a8;';
+    }
+
+    function renderShiftPresetButtons() {
+      const container = document.getElementById('shift-selector-btns');
+      const addRow = document.getElementById('shift-preset-add-row');
+      const toggleBtn = document.getElementById('shift-manage-toggle-btn');
+      if (!container) return;
+
+      const presets = Array.isArray(appState.shiftPresets) ? appState.shiftPresets : [...DEFAULT_SHIFT_PRESETS];
+      if (toggleBtn) {
+        toggleBtn.textContent = isShiftManageMode ? '✓ 完成管理' : '⚙️ 管理更期按鈕';
+        toggleBtn.className = isShiftManageMode ? 'btn btn-rose' : 'btn btn-soft';
+      }
+      if (addRow) {
+        if (isShiftManageMode) addRow.classList.remove('hidden');
+        else addRow.classList.add('hidden');
+      }
+
+      let html = `
+        <div class="shift-chip-wrap" style="background:#f1f5f9; color:#334155;">
+          <button type="button" onclick="setDayShift('')" class="shift-chip-btn">清除/無更期</button>
+        </div>
+      `;
+
+      presets.forEach((name, idx) => {
+        const safeName = name.replace(/'/g, "\\'");
+        const styleStr = getShiftStyle(name);
+        html += `
+          <div class="shift-chip-wrap" style="${styleStr}">
+            <button type="button" onclick="setDayShift('${safeName}')" class="shift-chip-btn">${name}</button>
+            ${isShiftManageMode ? `<button type="button" onclick="removeShiftPreset(${idx})" class="shift-chip-del" title="刪除此更期按鈕">✕</button>` : ''}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function toggleShiftManagerMode() {
+      isShiftManageMode = !isShiftManageMode;
+      renderShiftPresetButtons();
+    }
+
+    async function addShiftPreset() {
+      const inp = document.getElementById('new-shift-preset-input');
+      const val = (inp.value || '').trim();
+      if (!val) {
+        showToast('⚠️ 請輸入要加入的更期名稱');
+        return;
+      }
+      if (!Array.isArray(appState.shiftPresets)) appState.shiftPresets = [...DEFAULT_SHIFT_PRESETS];
+      if (appState.shiftPresets.includes(val)) {
+        showToast('ℹ️ 此更期按鈕已存在');
+        return;
+      }
+      appState.shiftPresets.push(val);
+      inp.value = '';
+      await persistAndSync();
+      renderShiftPresetButtons();
+      showToast(`✅ 已加入常用更期「${val}」`);
+    }
+
+    async function removeShiftPreset(idx) {
+      if (!Array.isArray(appState.shiftPresets)) return;
+      const removed = appState.shiftPresets.splice(idx, 1)[0];
+      await persistAndSync();
+      renderShiftPresetButtons();
+      showToast(`🗑️ 已刪除更期按鈕「${removed}」`);
+    }
+
     function openCalendarDayModal(dateStr) {
       selectedCalendarDate = dateStr;
+      isShiftManageMode = false;
       const parts = dateStr.split('-');
       const ga = getGestationalAgeForDate(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
 
@@ -2564,6 +2733,7 @@
       document.getElementById('cal-modal-ga-subtitle').textContent = ga.totalDays >= 0 ? `當日孕週：${ga.label}` : '';
       document.getElementById('custom-shift-input').value = appState.shifts[dateStr] || '';
 
+      renderShiftPresetButtons();
       renderCalendarDayEvents(dateStr);
       resetEventFormForDate(dateStr);
       openModal('modal-calendar-day');
@@ -2573,7 +2743,7 @@
       if (!shiftVal) delete appState.shifts[selectedCalendarDate];
       else appState.shifts[selectedCalendarDate] = shiftVal;
       await persistAndSync();
-      openCalendarDayModal(selectedCalendarDate);
+      document.getElementById('custom-shift-input').value = appState.shifts[selectedCalendarDate] || '';
       showToast(`已更新 ${formatDisplayDate(selectedCalendarDate)} 更期並同步`);
     }
 
@@ -2987,7 +3157,7 @@
       await persistAndSync();
     }
 
-    // --- 本機鬧鐘與 iOS 捷徑串接（修復「找不到捷徑」編碼並支援自訂捷徑名稱） ---
+    // --- 本機鬧鐘與 iOS 捷徑串接 ---
     let sharedAudioCtx = null;
     let alarmRingInterval = null;
     let wakeLockObj = null;
@@ -3114,14 +3284,12 @@
       triggerIosShortcutAlarm(timeStr, label);
     }
 
-    // 修復 iOS Chrome / Safari 呼叫捷徑 URL Scheme 空格及剪貼簿雙重傳參
     function triggerIosShortcutAlarm(timeStr, labelStr) {
       const todayStr = getTodayStr();
       const cleanLabel = labelStr || 'MCMA提醒';
       const payload = `${todayStr} ${timeStr}|${cleanLabel}`;
       const shortcutName = getSavedShortcutName();
 
-      // 同時複製參數到剪貼簿，方便捷徑讀取「捷徑輸入」或「剪貼簿」
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(payload).catch(() => {});
       }
@@ -3261,7 +3429,7 @@
     }, 2000);
 
     // =========================================================================
-    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像時序總覽（兩張卡片並排）
+    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像時序總覽（含分類頁面按鈕）
     // =========================================================================
     function renderHistoryAndGalleryTab() {
       const mhList = document.getElementById('medical-history-list');
@@ -3331,6 +3499,7 @@
     }
 
     let cachedUnifiedMedia = [];
+    let cachedFilteredUnifiedMedia = [];
 
     function getUnifiedMediaList() {
       const unified = [];
@@ -3427,8 +3596,13 @@
       return unified;
     }
 
+    function setMediaCategoryFilter(cat) {
+      selectedMediaCategoryFilter = cat;
+      renderAllMediaTimeline();
+    }
+
     function openAllMediaLightbox(idx) {
-      const list = cachedUnifiedMedia.map(item => ({
+      const list = cachedFilteredUnifiedMedia.map(item => ({
         url: item.url,
         type: item.type,
         caption: `[${item.mediaCategory}] ${item.source} · ${item.caption}`
@@ -3475,18 +3649,45 @@
     function renderAllMediaTimeline() {
       const grid = document.getElementById('all-media-timeline-grid');
       const countBadge = document.getElementById('all-media-count-badge');
+      const tabsBar = document.getElementById('all-media-category-tabs');
       if (!grid) return;
 
       const unified = getUnifiedMediaList();
-      if (countBadge) countBadge.textContent = `${unified.length} 個檔案`;
+      const presetCats = ['超聲波', '轉介信', '藥單', '出院紀錄'];
+      const dynamicCats = Array.from(new Set([...presetCats, ...unified.map(x => x.mediaCategory).filter(Boolean)]));
 
-      if (unified.length === 0) {
-        grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:11.5px; color:#94a3b8; text-align:center; padding:16px 0;">目前尚未在任何位置上載相片或影片</p>`;
+      if (selectedMediaCategoryFilter !== 'ALL' && !dynamicCats.includes(selectedMediaCategoryFilter)) {
+        selectedMediaCategoryFilter = 'ALL';
+      }
+
+      if (tabsBar) {
+        const allCount = unified.length;
+        let tabsHtml = `<button type="button" onclick="setMediaCategoryFilter('ALL')" class="filter-pill ${selectedMediaCategoryFilter === 'ALL' ? 'active' : ''}">全部 (${allCount})</button>`;
+        dynamicCats.forEach(cat => {
+          const cnt = unified.filter(x => x.mediaCategory === cat).length;
+          const safeCat = cat.replace(/'/g, "\\'");
+          tabsHtml += `<button type="button" onclick="setMediaCategoryFilter('${safeCat}')" class="filter-pill ${selectedMediaCategoryFilter === cat ? 'active' : ''}">${cat} (${cnt})</button>`;
+        });
+        tabsBar.innerHTML = tabsHtml;
+      }
+
+      const filtered = selectedMediaCategoryFilter === 'ALL'
+        ? unified
+        : unified.filter(item => item.mediaCategory === selectedMediaCategoryFilter);
+      cachedFilteredUnifiedMedia = filtered;
+
+      if (countBadge) {
+        countBadge.textContent = selectedMediaCategoryFilter === 'ALL'
+          ? `${filtered.length} 個檔案`
+          : `${selectedMediaCategoryFilter}：${filtered.length} 個`;
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:11.5px; color:#94a3b8; text-align:center; padding:16px 0;">此分類暫無相片或影片檔案</p>`;
         return;
       }
 
-      const presetCats = ['超聲波', '轉介信', '藥單', '出院紀錄'];
-      grid.innerHTML = unified.map((item, idx) => {
+      grid.innerHTML = filtered.map((item, idx) => {
         const timeText = item.ts
           ? new Date(item.ts).toLocaleString('zh-HK', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
           : formatDisplayDate(item.date);
@@ -3508,7 +3709,7 @@
               ${isCustom ? `<option value="${item.mediaCategory}" selected>分類：${item.mediaCategory}</option>` : ''}
               <option value="CUSTOM">自訂分類...</option>
             </select>
-            <span style="font-size:9px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">#${unified.length - idx} · ${timeText}</span>
+            <span style="font-size:9px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">#${filtered.length - idx} · ${timeText}</span>
           </div>
         `;
       }).join('');
@@ -3875,7 +4076,11 @@
 
       const idbState = await readFromIDB();
       if (idbState && idbState.twinMeasurements && (idbState.updatedAt || 0) > (appState.updatedAt || 0)) {
-        appState = { ...DEFAULT_STATE, ...idbState };
+        appState = {
+          ...DEFAULT_STATE,
+          ...idbState,
+          shiftPresets: Array.isArray(idbState.shiftPresets) ? idbState.shiftPresets : [...DEFAULT_SHIFT_PRESETS]
+        };
         saveLocalOnly();
         renderAll();
       }
