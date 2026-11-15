@@ -318,17 +318,22 @@
       background: var(--rose-600);
     }
 
-    /* 雙胎卡片 */
+    /* 雙胎卡片（支援左右滑動切換大孖/細孖重點檢視） */
     .twin-card {
       background: #ffffff;
       border-radius: 16px;
       padding: 12px;
       cursor: pointer;
-      transition: transform 0.12s;
+      transition: transform 0.18s, box-shadow 0.18s;
+      user-select: none;
     }
     .twin-card:active { transform: scale(0.985); }
     .twin-card-a { border: 1.5px solid var(--sky-200); }
     .twin-card-b { border: 1.5px solid var(--pink-200); }
+    .twin-card.focused-twin {
+      box-shadow: 0 6px 16px rgba(225, 29, 72, 0.14);
+      transform: translateY(-2px);
+    }
 
     .avatar-img {
       width: 44px;
@@ -345,36 +350,47 @@
       margin-top: 6px;
     }
 
-    /* 月曆樣式 */
+    /* 母體概覽精緻小字樣式 */
+    .mat-mini-row {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    /* 月曆樣式（8欄：日 一 二 三 四 五 六 日） */
     .cal-weekdays {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(8, 1fr);
       text-align: center;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       color: #94a3b8;
       padding-bottom: 6px;
       border-bottom: 1px solid #f1f5f9;
       margin-top: 8px;
+      gap: 3px;
     }
 
     .cal-grid {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 3px;
       padding-top: 6px;
     }
 
     .cal-cell {
-      min-height: 74px;
+      min-height: 72px;
       border: 1px solid #f1f5f9;
-      border-radius: 10px;
-      padding: 4px;
+      border-radius: 9px;
+      padding: 3px;
       background: #ffffff;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       cursor: pointer;
+      min-width: 0;
     }
     .cal-cell.empty {
       background: #f8fafc;
@@ -385,11 +401,15 @@
       background: var(--rose-50);
       border-color: #fb7185;
     }
+    .cal-cell.sun-end {
+      background: #fffafa;
+      border-style: dashed;
+    }
 
     .cal-ev-tag {
-      font-size: 9px;
+      font-size: 8.5px;
       font-weight: 700;
-      padding: 2px 4px;
+      padding: 1.5px 3px;
       border-radius: 4px;
       color: #fff;
       white-space: nowrap;
@@ -460,6 +480,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      cursor: zoom-in;
     }
     .preview-del-btn {
       position: absolute;
@@ -476,6 +497,7 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      z-index: 2;
     }
 
     /* 彈出視窗 */
@@ -493,7 +515,7 @@
       background: #ffffff;
       width: 100%;
       max-width: 620px;
-      max-height: 76vh;
+      max-height: 82vh;
       border-radius: 18px;
       display: flex;
       flex-direction: column;
@@ -524,6 +546,26 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    /* 全螢幕圖片放大檢視器 (Lightbox) */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      background: rgba(15, 23, 42, 0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .lightbox-overlay img, .lightbox-overlay video {
+      max-width: 95vw;
+      max-height: 78vh;
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      object-fit: contain;
     }
 
     /* 鬧鐘響鬧全螢幕提示橫幅 */
@@ -593,6 +635,15 @@
   <!-- Toast 提示容器 -->
   <div id="toast-container"></div>
 
+  <!-- 圖片/影片全螢幕放大檢視器 -->
+  <div id="media-lightbox" onclick="closeMediaLightbox(event)" class="lightbox-overlay hidden">
+    <div style="width:100%; max-width:95vw; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; color:#fff;">
+      <span id="lightbox-caption" style="font-size:12px; font-weight:700;"></span>
+      <button onclick="closeMediaLightbox()" style="background:rgba(255,255,255,0.2); color:#fff; width:34px; height:34px; border-radius:50%; font-size:16px; font-weight:700;">✕</button>
+    </div>
+    <div id="lightbox-content"></div>
+  </div>
+
   <!-- 正在響鬧提示條 -->
   <div id="alarm-ringing-banner" class="ringing-overlay hidden">
     <span style="font-size: 24px;">⏰</span>
@@ -600,7 +651,7 @@
       <div style="font-size: 13px; font-weight: 800;">本機鬧鐘時間到！</div>
       <div id="alarm-ringing-text" style="font-size: 12px; opacity: 0.95;"></div>
     </div>
-    <button onclick="stopAlarmRinging()" style="background:#fff; color:#dc2626; padding:6px 12px; border-radius:10px; font-weight:800; font-size:12px;">關閉鈴聲</button>
+    <button onclick="stopAlarmRinging()" style="background:#fff; color:#dc2626; padding:6px 12px; border-radius:10px; font-weight:800; font-size:12px;">關閉並刪除鬧鐘</button>
   </div>
 
   <!-- 頂部導航列 -->
@@ -622,7 +673,7 @@
           </div>
         </div>
 
-        <!-- 雲端同步控制（已鎖定 homestocktake Firebase Realtime Database） -->
+        <!-- 雲端同步控制 -->
         <div class="flex-center" style="flex-shrink: 0;">
           <button onclick="triggerManualSync()" title="立即檢查並同步" class="btn btn-soft" style="padding: 6px 8px;">🔄</button>
           <button onclick="openSyncModal()" class="sync-pill">
@@ -664,42 +715,59 @@
 
     <!-- ==================== 分頁 0：主頁概覽 ==================== -->
     <section id="tab-0" class="tab-panel">
-      <div class="grid-2" style="margin-bottom: 12px;">
-        <!-- BB A 卡片 -->
-        <div onclick="openTwinModal('A')" class="twin-card twin-card-a">
-          <div class="flex-between" style="margin-bottom: 6px;">
-            <div class="flex-center" style="min-width: 0;">
-              <img id="card-avatar-A" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='80' height='80' fill='%23e0f2fe'/><text x='50%' y='54%' font-size='20' font-weight='bold' fill='%230369a1' text-anchor='middle' dominant-baseline='middle'>BB A</text></svg>" alt="BB A" class="avatar-img" style="border: 2px solid #7dd3fc;">
-              <div style="min-width: 0;">
-                <span class="badge" style="background: var(--sky-100); color: var(--sky-700);">大孖</span>
-                <h2 style="font-size: 15px; font-weight: 800;">BB A</h2>
-              </div>
-            </div>
-            <span style="font-size: 11px; font-weight: 700; color: var(--sky-700);">曲線/數據 ›</span>
+      <!-- 雙胎卡片容器（支援左右滑動切換大孖/細孖卡片） -->
+      <div id="twin-cards-swipe-zone" style="margin-bottom: 12px;">
+        <div class="flex-between" style="margin-bottom: 6px; padding: 0 2px;">
+          <span style="font-size: 11px; color: var(--text-muted);">👈 左右滑動卡片可切換大孖 / 細孖視角</span>
+          <div style="display: flex; gap: 4px;">
+            <button type="button" onclick="focusTwinCard('A')" id="focus-btn-A" class="badge" style="background: var(--sky-100); color: var(--sky-700); border: 1px solid var(--sky-200);">大孖 BB A</button>
+            <button type="button" onclick="focusTwinCard('B')" id="focus-btn-B" class="badge" style="background: #f1f5f9; color: #64748b;">細孖 BB B</button>
           </div>
-          <div id="twin-A-summary"></div>
         </div>
 
-        <!-- BB B 卡片 -->
-        <div onclick="openTwinModal('B')" class="twin-card twin-card-b">
-          <div class="flex-between" style="margin-bottom: 6px;">
-            <div class="flex-center" style="min-width: 0;">
-              <img id="card-avatar-B" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='80' height='80' fill='%23fce7f3'/><text x='50%' y='54%' font-size='20' font-weight='bold' fill='%23be185d' text-anchor='middle' dominant-baseline='middle'>BB B</text></svg>" alt="BB B" class="avatar-img" style="border: 2px solid #f9a8d4;">
-              <div style="min-width: 0;">
-                <span class="badge" style="background: var(--pink-100); color: var(--pink-700);">細孖</span>
-                <h2 style="font-size: 15px; font-weight: 800;">BB B</h2>
+        <div class="grid-2" id="twin-cards-grid">
+          <!-- BB A 卡片 -->
+          <div id="twin-card-box-A" onclick="openTwinModal('A')" class="twin-card twin-card-a focused-twin">
+            <div class="flex-between" style="margin-bottom: 6px;">
+              <div class="flex-center" style="min-width: 0;">
+                <img id="card-avatar-A" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='80' height='80' fill='%23e0f2fe'/><text x='50%' y='54%' font-size='20' font-weight='bold' fill='%230369a1' text-anchor='middle' dominant-baseline='middle'>BB A</text></svg>" alt="BB A" class="avatar-img" style="border: 2px solid #7dd3fc;">
+                <div style="min-width: 0;">
+                  <div class="flex-center" style="gap: 4px; flex-wrap: wrap;">
+                    <span class="badge" style="background: var(--sky-100); color: var(--sky-700);">大孖</span>
+                    <span id="twin-A-live-ga" class="badge" style="background: #0284c7; color: #fff;">計算中</span>
+                  </div>
+                  <h2 style="font-size: 15px; font-weight: 800; margin-top: 2px;">BB A</h2>
+                </div>
               </div>
+              <span style="font-size: 11px; font-weight: 700; color: var(--sky-700);">曲線/數據 ›</span>
             </div>
-            <span style="font-size: 11px; font-weight: 700; color: var(--pink-700);">曲線/數據 ›</span>
+            <div id="twin-A-summary"></div>
           </div>
-          <div id="twin-B-summary"></div>
+
+          <!-- BB B 卡片 -->
+          <div id="twin-card-box-B" onclick="openTwinModal('B')" class="twin-card twin-card-b">
+            <div class="flex-between" style="margin-bottom: 6px;">
+              <div class="flex-center" style="min-width: 0;">
+                <img id="card-avatar-B" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='80' height='80' fill='%23fce7f3'/><text x='50%' y='54%' font-size='20' font-weight='bold' fill='%23be185d' text-anchor='middle' dominant-baseline='middle'>BB B</text></svg>" alt="BB B" class="avatar-img" style="border: 2px solid #f9a8d4;">
+                <div style="min-width: 0;">
+                  <div class="flex-center" style="gap: 4px; flex-wrap: wrap;">
+                    <span class="badge" style="background: var(--pink-100); color: var(--pink-700);">細孖</span>
+                    <span id="twin-B-live-ga" class="badge" style="background: #db2777; color: #fff;">計算中</span>
+                  </div>
+                  <h2 style="font-size: 15px; font-weight: 800; margin-top: 2px;">BB B</h2>
+                </div>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; color: var(--pink-700);">曲線/數據 ›</span>
+            </div>
+            <div id="twin-B-summary"></div>
+          </div>
         </div>
       </div>
 
       <!-- 雙胎發育同步對比條 -->
       <div id="twin-pace-strip" class="card flex-between" style="padding: 10px 14px; font-size: 12px; flex-wrap: wrap;"></div>
 
-      <!-- 互動月曆 -->
+      <!-- 互動月曆（星期日為第一天及最後一天） -->
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 10px;">
           <div class="flex-center">
@@ -717,7 +785,7 @@
           <span><b style="color:#3b82f6;">■</b> 公立</span>
           <span><b style="color:#f43f5e;">■</b> 私家</span>
           <span><b style="color:#dc2626;">■</b> 急症室</span>
-          <span><b style="color:#f59e0b;">■</b> 入院(跨日)</span>
+          <span><b style="color:#f59e0b;">■</b> 入院(跨日/時段)</span>
           <span><b style="color:#10b981;">■</b> 睇中醫</span>
           <span><span class="badge" style="background:#e2e8f0; color:#334155;">更</span> 工作更期</span>
         </div>
@@ -730,6 +798,7 @@
           <div>四</div>
           <div>五</div>
           <div style="color:#0284c7;">六</div>
+          <div style="color:#f43f5e;">日</div>
         </div>
         <div id="calendar-grid" class="cal-grid"></div>
       </div>
@@ -738,22 +807,22 @@
     <!-- ==================== 分頁 1：母體與用藥 ==================== -->
     <section id="tab-1" class="tab-panel hidden">
       <div class="grid-resp-2">
-        <!-- 今日母體概覽 -->
+        <!-- 今日母體概覽（已縮小字體） -->
         <div class="card">
-          <div class="flex-between" style="margin-bottom: 10px;">
-            <h3 style="font-size: 14px; font-weight: 800;">🤰 今日母體概覽</h3>
+          <div class="flex-between" style="margin-bottom: 8px;">
+            <h3 style="font-size: 13px; font-weight: 800;">🤰 今日母體概覽</h3>
             <span id="maternal-today-date" class="badge" style="background: var(--rose-50); color: var(--rose-600);"></span>
           </div>
-          <div id="maternal-today-summary" style="display: flex; flex-direction: column; gap: 6px;"></div>
+          <div id="maternal-today-summary" style="display: flex; flex-direction: column; gap: 5px;"></div>
         </div>
 
-        <!-- 每日藥物及保健品清單 -->
+        <!-- 每日藥物及保健品清單（支援圖片編輯） -->
         <div class="card">
           <div class="flex-between" style="margin-bottom: 10px;">
             <h3 style="font-size: 14px; font-weight: 800;">💊 每日用藥及保健品清單</h3>
             <button onclick="openMedModal(null)" class="btn btn-teal">+ 新增藥物</button>
           </div>
-          <div id="med-checklist-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto;"></div>
+          <div id="med-checklist-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto;"></div>
         </div>
       </div>
 
@@ -763,11 +832,11 @@
         <form onsubmit="saveMaternalLog(event)" style="display: flex; flex-direction: column; gap: 10px;">
           <div class="grid-resp-4">
             <div>
-              <label class="label-sm">日期</label>
-              <input type="date" id="mat-date" required>
+              <label class="label-sm">日期 (可留空)</label>
+              <input type="date" id="mat-date">
             </div>
             <div>
-              <label class="label-sm">時間 (00–59分)</label>
+              <label class="label-sm">時間 (00/15/30/45分，可留空)</label>
               <div style="display: flex; gap: 4px;">
                 <select id="mat-hour"></select>
                 <select id="mat-min"></select>
@@ -827,13 +896,13 @@
         <div id="maternal-logs-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto;"></div>
       </div>
 
-      <!-- 本機專屬鬧鐘（支援一鍵呼叫 iOS 捷徑「MCMA設鬧鐘」） -->
+      <!-- 本機專屬鬧鐘（支援直連 iCloud 捷徑、AI 藥單影像估算、響鬧後自動刪除） -->
       <div class="alarm-card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div class="flex-center" style="flex-wrap: wrap;">
             <span style="font-size: 16px;">⏰</span>
-            <h3 style="font-size: 14px; font-weight: 800;">本機專屬鬧鐘 (支援一鍵寫入 iPhone 系統鬧鐘)</h3>
-            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35);">穿透靜音與鎖屏</span>
+            <h3 style="font-size: 14px; font-weight: 800;">本機專屬鬧鐘 (響鬧後自動刪除)</h3>
+            <a href="https://www.icloud.com/shortcuts/daa3c58aea0a42e09bc38f8f40a09464" target="_blank" rel="noopener noreferrer" class="btn" style="background: rgba(56, 189, 248, 0.22); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.45); padding: 3px 8px; font-size: 11px;">📲 安裝/開啟捷徑</a>
           </div>
           <div class="flex-center">
             <button onclick="unlockAndTestAlarmSound()" class="btn" style="background:#334155; color:#fcd34d; padding:5px 10px;">🔔 解鎖並試聽</button>
@@ -841,7 +910,7 @@
         </div>
 
         <p style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">
-          提示：建立鬧鐘後，點擊右側 <strong>「⏰寫入手機鬧鐘」</strong> 會自動透過 iOS 捷徑「MCMA設鬧鐘」寫入 iPhone 原生時鐘 App，即使鎖屏、轉背景或開靜音模式都必定準時響鬧。
+          提示：按「+ 新增鬧鐘」會自動透過 iOS 捷徑「MCMA 設鬧鐘」寫入 iPhone 原生時鐘；響鬧完成關閉後本機鬧鐘會自動刪除（建議在捷徑最後加上「刪除鬧鐘」動作同步清理系統鬧鐘）。
         </p>
 
         <div style="display: grid; grid-template-columns: 1fr; gap: 8px; background: rgba(30, 41, 59, 0.9); padding: 10px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 10px;">
@@ -851,12 +920,13 @@
           </div>
           <input type="text" id="alarm-label" placeholder="鬧鐘標籤 (例如：塞安胎藥 / 飲固腎中藥)">
           <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-            <label class="btn" style="background:#334155; color:#7dd3fc; flex:1; cursor:pointer;">
-              📷 影像估算時間
-              <input type="file" accept="image/*" onchange="estimateAlarmFromImage(event)" class="hidden">
-            </label>
+            <button type="button" onclick="document.getElementById('alarm-ai-img-input').click()" class="btn" style="background:#334155; color:#7dd3fc; flex:1;">
+              📷 上傳相片 AI 估算時間
+            </button>
+            <input type="file" id="alarm-ai-img-input" accept="image/*" onchange="estimateAlarmFromImage(event)" class="hidden">
             <button type="button" onclick="addLocalAlarm()" class="btn btn-amber" style="flex:1;">+ 新增鬧鐘</button>
           </div>
+          <div id="alarm-ai-preview-box" class="hidden" style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:8px; font-size:11px; color:#cbd5e1;"></div>
         </div>
 
         <div id="local-alarms-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
@@ -866,13 +936,13 @@
     <!-- ==================== 分頁 2：病史與影像庫 ==================== -->
     <section id="tab-2" class="tab-panel hidden">
       <div class="grid-resp-2">
-        <!-- 母體重要病史與進展 -->
+        <!-- 母體重要病史與進展（支援編輯與自訂類別） -->
         <div class="card">
           <div class="flex-between" style="margin-bottom: 6px;">
             <h3 style="font-size: 14px; font-weight: 800;">🩺 母體重要病史與進展</h3>
-            <button onclick="openHistoryModal()" class="btn" style="background: var(--amber-100); color: var(--amber-800);">+ 新增紀錄</button>
+            <button onclick="openHistoryModal(null)" class="btn" style="background: var(--amber-100); color: var(--amber-800);">+ 新增紀錄</button>
           </div>
-          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">專項追蹤：子宮頸瘜肉及孕初期多次流血/流啡情況</p>
+          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">專項追蹤：子宮頸瘜肉、孕初期流血/流啡及自訂醫療項目（支援編輯）</p>
           <div id="medical-history-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto;"></div>
         </div>
 
@@ -898,7 +968,7 @@
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 10px;">
           <div>
             <h3 style="font-size: 14px; font-weight: 800;">📸 BB A & BB B 超聲波影像庫</h3>
-            <p style="font-size: 11px; color: var(--text-muted);">支援多選上載相片及短片、自訂檢查日期、雙胎同框標記及設為頭像</p>
+            <p style="font-size: 11px; color: var(--text-muted);">支援多選上載相片及短片、自訂檢查日期、點擊放大檢視及設為頭像</p>
           </div>
           <button onclick="openMediaUploadModal('BOTH')" class="btn btn-rose">+ 多選上載超聲波影像</button>
         </div>
@@ -920,6 +990,18 @@
             <div id="gallery-grid-B" class="grid-2"></div>
           </div>
         </div>
+      </div>
+
+      <!-- 全庫所有上載影像時序總覽（自動彙整所有模組相片並標註來源位置） -->
+      <div class="card">
+        <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
+          <div>
+            <h3 style="font-size: 14px; font-weight: 800;">🗂️ 全庫上載影像時序總覽</h3>
+            <p style="font-size: 11px; color: var(--text-muted);">自動彙整超聲波庫、月曆行程、母體日記、藥物清單及紀念冊的所有圖片（按加入時序排列，點擊放大）</p>
+          </div>
+          <span id="all-media-count-badge" class="badge" style="background: var(--rose-100); color: var(--rose-700);">0 張</span>
+        </div>
+        <div id="all-media-timeline-grid" class="grid-resp-4"></div>
       </div>
     </section>
 
@@ -973,7 +1055,7 @@
   <!-- ==================== 彈出視窗群 ==================== -->
   <div id="modal-backdrop" onclick="handleBackdropClick(event)" class="modal-backdrop hidden">
 
-    <!-- 1. 胎兒成長曲線 -->
+    <!-- 1. 胎兒成長曲線與歷史量度編輯 -->
     <div id="modal-twin" class="modal-box hidden">
       <div class="modal-header">
         <div class="flex-center">
@@ -1002,16 +1084,20 @@
         </div>
 
         <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
-          <h4 style="font-size: 12px; font-weight: 800; margin-bottom: 8px;">➕ 新增 / 更新超聲波量度數據</h4>
+          <div class="flex-between" style="margin-bottom: 8px;">
+            <h4 id="tm-form-title" style="font-size: 12px; font-weight: 800;">➕ 新增超聲波量度數據</h4>
+            <button type="button" onclick="resetTwinMeasurementForm()" id="tm-cancel-edit-btn" class="hidden" style="font-size: 11px; color: var(--rose-600); font-weight: 700;">取消編輯</button>
+          </div>
           <form onsubmit="saveTwinMeasurement(event)" style="display: flex; flex-direction: column; gap: 8px;">
             <input type="hidden" id="tm-twin-id">
+            <input type="hidden" id="tm-edit-id">
             <div class="grid-resp-3">
               <div>
-                <label class="label-sm">檢查日期</label>
-                <input type="date" id="tm-date" required>
+                <label class="label-sm">檢查日期 (可留空)</label>
+                <input type="date" id="tm-date">
               </div>
               <div>
-                <label class="label-sm">時間 (00–59分)</label>
+                <label class="label-sm">時間 (可留空)</label>
                 <div style="display: flex; gap: 4px;">
                   <select id="tm-hour"></select>
                   <select id="tm-min"></select>
@@ -1059,13 +1145,13 @@
         </div>
 
         <div>
-          <h4 style="font-size: 12px; font-weight: 800; margin-bottom: 6px;">📋 歷史量度紀錄</h4>
+          <h4 style="font-size: 12px; font-weight: 800; margin-bottom: 6px;">📋 歷史量度紀錄 (支援編輯)</h4>
           <div id="twin-measurements-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
         </div>
       </div>
     </div>
 
-    <!-- 2. 月曆單日詳情與跨日住院編輯彈窗 -->
+    <!-- 2. 月曆單日詳情與跨日住院時間範圍編輯彈窗 -->
     <div id="modal-calendar-day" class="modal-box hidden">
       <div class="modal-header">
         <div>
@@ -1093,57 +1179,82 @@
 
         <div>
           <div class="flex-between" style="margin-bottom: 6px;">
-            <h4 style="font-size: 12px; font-weight: 800;">📅 當日覆診 / 住院行程</h4>
+            <h4 style="font-size: 12px; font-weight: 800;">📅 當日覆診 / 住院行程 (點擊縮圖可放大)</h4>
             <button onclick="resetEventFormForDate(selectedCalendarDate)" style="font-size: 11px; font-weight: 700; color: var(--rose-600);">+ 清空重填</button>
           </div>
           <div id="cal-day-events-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
         </div>
 
         <form onsubmit="saveCalendarEvent(event)" style="background: var(--rose-50); border: 1px solid var(--rose-200); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-          <h4 id="cal-form-heading" style="font-size: 12px; font-weight: 800;">➕ 新增 / 編輯行程 (支援跨日住院)</h4>
+          <h4 id="cal-form-heading" style="font-size: 12px; font-weight: 800;">➕ 新增 / 編輯行程 (支援分開設定入院及出院時間)</h4>
           <input type="hidden" id="ev-id">
-          <div class="grid-2">
-            <div>
-              <label class="label-sm">類別</label>
-              <select id="ev-category">
-                <option value="公立覆診">公立覆診 (藍色)</option>
-                <option value="私家覆診">私家覆診 (粉紫)</option>
-                <option value="急症室">急症室 (紅色)</option>
-                <option value="入院">入院 (橙黃 · 支援跨日)</option>
-                <option value="睇中醫">睇中醫 (綠色)</option>
-              </select>
-            </div>
-            <div>
-              <label class="label-sm">時間 (00–59分)</label>
+          <div>
+            <label class="label-sm">類別</label>
+            <select id="ev-category">
+              <option value="公立覆診">公立覆診 (藍色)</option>
+              <option value="私家覆診">私家覆診 (粉紫)</option>
+              <option value="急症室">急症室 (紅色)</option>
+              <option value="入院">入院 (橙黃 · 支援跨日及出入時間)</option>
+              <option value="睇中醫">睇中醫 (綠色)</option>
+            </select>
+          </div>
+
+          <!-- 入院 / 開始日期與時間 -->
+          <div style="background: rgba(255,255,255,0.75); border: 1px solid #fecdd3; border-radius: 10px; padding: 8px;">
+            <label class="label-sm" style="color: var(--rose-700);">🏥 入院 / 開始日期及時間 (可留空)</label>
+            <div class="grid-2">
+              <input type="date" id="ev-date" onchange="syncMinEndDate()">
               <div style="display: flex; gap: 4px;">
                 <select id="ev-hour"></select>
                 <select id="ev-min"></select>
               </div>
             </div>
           </div>
-          <div class="grid-2">
-            <div>
-              <label class="label-sm">開始 / 入院日期</label>
-              <input type="date" id="ev-date" required onchange="syncMinEndDate()">
-            </div>
-            <div>
-              <label class="label-sm" style="color: var(--amber-800);">結束 / 出院日期 (選填)</label>
+
+          <!-- 出院 / 結束日期與時間 -->
+          <div style="background: rgba(255,255,255,0.75); border: 1px solid #fde68a; border-radius: 10px; padding: 8px;">
+            <label class="label-sm" style="color: var(--amber-800);">🏠 出院 / 結束日期及時間 (選填 / 可留空)</label>
+            <div class="grid-2">
               <input type="date" id="ev-end-date">
+              <div style="display: flex; gap: 4px;">
+                <select id="ev-end-hour"></select>
+                <select id="ev-end-min"></select>
+              </div>
             </div>
           </div>
+
+          <!-- 地點醫院選單 + 自訂輸入 -->
           <div>
             <label class="label-sm">地點 / 醫院 / 診所</label>
-            <input type="text" id="ev-location" placeholder="例如：威爾斯親王醫院 / 私家診所">
+            <div style="display: flex; gap: 6px; margin-bottom: 5px;">
+              <select id="ev-location-preset" onchange="applyLocationPreset()" style="width: 130px; flex-shrink: 0;">
+                <option value="">快捷選擇...</option>
+                <option value="TMH">TMH (屯門醫院)</option>
+                <option value="TSWH">TSWH (天水圍醫院)</option>
+                <option value="BH">BH (博愛醫院)</option>
+                <option value="健康院">健康院</option>
+                <option value="CUSTOM">自訂地點</option>
+              </select>
+              <input type="text" id="ev-location" placeholder="選擇左側醫院或自行輸入地點...">
+            </div>
           </div>
+
           <div>
             <label class="label-sm">標題 / 備註</label>
             <input type="text" id="ev-title" required placeholder="例如：早孕期超聲波 / 安胎住院觀察">
           </div>
+
           <div>
-            <label class="label-sm">附加覆診紙 / 檢查相片或影片 (錯選可按 ✕ 刪除)</label>
-            <input type="file" id="ev-media-input" accept="image/*,video/*" multiple onchange="handleEventMediaUpload(event)">
+            <label class="label-sm">附加覆診紙 / 檢查相片或影片 (點擊按鈕選擇，縮圖可點擊放大)</label>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button type="button" onclick="document.getElementById('ev-media-input').click()" class="btn btn-soft" style="flex: 1;">
+                📎 選擇相片 / 影片檔案
+              </button>
+              <input type="file" id="ev-media-input" accept="image/*,video/*" multiple onchange="handleEventMediaUpload(event)" class="hidden">
+            </div>
             <div id="ev-media-preview" class="preview-grid"></div>
           </div>
+
           <div style="display: flex; justify-content: flex-end;">
             <button type="submit" class="btn btn-rose">儲存行程並同步</button>
           </div>
@@ -1151,7 +1262,7 @@
       </div>
     </div>
 
-    <!-- 3. 藥物與保健品彈窗 -->
+    <!-- 3. 藥物與保健品彈窗（支援上載及編輯藥物圖片） -->
     <div id="modal-med" class="modal-box hidden" style="max-width: 440px;">
       <div class="modal-header">
         <h3 style="font-size: 14px; font-weight: 800;">💊 新增 / 編輯藥物或保健品</h3>
@@ -1178,8 +1289,13 @@
           </div>
         </div>
         <div>
-          <label class="label-sm">藥物包裝相片 (選填)</label>
-          <input type="file" id="med-img-input" accept="image/*" onchange="handleMedImageUpload(event)">
+          <label class="label-sm">藥物包裝相片 (可隨時上載或更換圖片)</label>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" onclick="document.getElementById('med-img-input').click()" class="btn btn-soft" style="flex: 1;">
+              📷 選擇 / 更換藥物圖片
+            </button>
+            <input type="file" id="med-img-input" accept="image/*" onchange="handleMedImageUpload(event)" class="hidden">
+          </div>
           <div id="med-img-preview-box" class="preview-grid"></div>
         </div>
         <div style="display: flex; justify-content: flex-end;">
@@ -1201,10 +1317,10 @@
         <div style="background: var(--purple-50); border: 1px solid #e9d5ff; border-radius: 12px; padding: 10px;">
           <textarea id="angel-note-input" rows="3" placeholder="寫給天使BB的話..." style="margin-bottom: 8px; background: #fff;"></textarea>
           <div class="flex-between" style="flex-wrap: wrap;">
-            <label class="btn btn-purple" style="cursor: pointer;">
+            <button type="button" onclick="document.getElementById('angel-media-file-input').click()" class="btn btn-purple">
               + 上載紀念相片/影片
-              <input type="file" accept="image/*,video/*" multiple onchange="handleAngelMediaUpload(event)" class="hidden">
-            </label>
+            </button>
+            <input type="file" id="angel-media-file-input" accept="image/*,video/*" multiple onchange="handleAngelMediaUpload(event)" class="hidden">
             <button onclick="saveAngelNote()" class="btn btn-soft">儲存文字</button>
           </div>
         </div>
@@ -1229,8 +1345,8 @@
             </select>
           </div>
           <div>
-            <label class="label-sm">檢查日期</label>
-            <input type="date" id="mu-date" required>
+            <label class="label-sm">檢查日期 (可留空)</label>
+            <input type="date" id="mu-date">
           </div>
         </div>
         <div>
@@ -1248,30 +1364,36 @@
       </form>
     </div>
 
-    <!-- 6. 母體病史新增彈窗 -->
+    <!-- 6. 母體病史新增 / 編輯彈窗（支援自訂類別與空白詳情） -->
     <div id="modal-history" class="modal-box hidden" style="max-width: 440px;">
       <div class="modal-header">
-        <h3 style="font-size: 14px; font-weight: 800;">🩺 新增母體病史 / 出血進展</h3>
+        <h3 id="mh-modal-title" style="font-size: 14px; font-weight: 800;">🩺 新增母體病史 / 出血進展</h3>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <form onsubmit="saveMedicalHistory(event)" class="modal-body" style="display: flex; flex-direction: column; gap: 10px;">
+        <input type="hidden" id="mh-id">
         <div class="grid-2">
           <div>
-            <label class="label-sm">日期</label>
-            <input type="date" id="mh-date" required>
+            <label class="label-sm">日期 (可留空)</label>
+            <input type="date" id="mh-date">
           </div>
           <div>
             <label class="label-sm">類別</label>
-            <select id="mh-tag">
+            <select id="mh-tag" onchange="toggleCustomHistoryTag()">
               <option value="子宮頸瘜肉">子宮頸瘜肉</option>
               <option value="孕初期流血/流啡">孕初期流血/流啡</option>
               <option value="其他醫療紀錄">其他醫療紀錄</option>
+              <option value="CUSTOM">自訂類別...</option>
             </select>
           </div>
         </div>
+        <div id="mh-custom-tag-wrap" class="hidden">
+          <label class="label-sm">輸入自訂類別名稱</label>
+          <input type="text" id="mh-custom-tag" placeholder="例如：妊娠糖尿篩查 / 甲狀腺追蹤">
+        </div>
         <div>
-          <label class="label-sm">詳情與醫生建議</label>
-          <textarea id="mh-detail" rows="3" required placeholder="記錄檢查結果、瘜肉變化或止血情況..."></textarea>
+          <label class="label-sm">詳情與醫生建議 (選填 / 可留空)</label>
+          <textarea id="mh-detail" rows="3" placeholder="記錄檢查結果、瘜肉變化或止血情況（可留空）..."></textarea>
         </div>
         <div style="display: flex; justify-content: flex-end;">
           <button type="submit" class="btn btn-amber">儲存紀錄並同步</button>
@@ -1279,7 +1401,7 @@
       </form>
     </div>
 
-    <!-- 7. 多戶口家庭即時雲端同步設定彈窗（已鎖定 homestocktake Firebase 網址） -->
+    <!-- 7. 多戶口家庭即時雲端同步設定彈窗 -->
     <div id="modal-sync" class="modal-box hidden" style="max-width: 480px;">
       <div class="modal-header">
         <h3 style="font-size: 14px; font-weight: 800;">☁️ 多戶口家庭雲端同步設定</h3>
@@ -1338,7 +1460,7 @@
 
   <script>
     // =========================================================================
-    // 1. 隱形基準計算 (2026-09-19 -> 預產期 27/6/2027，介面絕不出現 LMP)
+    // 1. 隱形基準計算 (2026-09-19 -> 預產期 27/6/2027)
     // =========================================================================
     const INTERNAL_BASE_MS = new Date(2026, 8, 19, 0, 0, 0).getTime();
     const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -1357,13 +1479,36 @@
       return { weeks, days, totalDays: diffDays, label: `${weeks}週${days}日` };
     }
 
+    // 計算大孖 / 細孖各自獨立推算的今日週日數（依據最新超聲波週數順推至今日）
+    function getTwinLiveGestationalLabel(twinId) {
+      const list = [...(appState.twinMeasurements[twinId] || [])]
+        .filter(x => x.date && x.usGa)
+        .sort((a, b) => b.date.localeCompare(a.date));
+      const latest = list[0];
+      if (latest) {
+        const match = latest.usGa.match(/(\d+)\s*[w週]\s*(\d+)\s*[d日]?/i);
+        if (match) {
+          const baseWeeks = parseInt(match[1], 10);
+          const baseDays = parseInt(match[2], 10);
+          const p = latest.date.split('-');
+          const scanMs = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getTime();
+          const now = new Date();
+          const todayMs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+          const elapsedDays = Math.max(0, Math.floor((todayMs - scanMs) / MS_PER_DAY));
+          const total = baseWeeks * 7 + baseDays + elapsedDays;
+          return `${Math.floor(total / 7)}週${total % 7}日`;
+        }
+      }
+      return getGestationalAgeForDate(new Date()).label;
+    }
+
     function getTodayStr() {
       const now = new Date();
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     }
 
     function formatDisplayDate(isoStr) {
-      if (!isoStr) return '';
+      if (!isoStr) return '未設日期';
       const parts = isoStr.split('-');
       if (parts.length !== 3) return isoStr;
       return `${parseInt(parts[2], 10)}/${parseInt(parts[1], 10)}/${parts[0]}`;
@@ -1377,7 +1522,7 @@
     }
 
     // =========================================================================
-    // 2. 雙層本機永久儲存 (localStorage + IndexedDB，具備無痕模式容錯)
+    // 2. 雙層本機永久儲存 (localStorage + IndexedDB)
     // =========================================================================
     const STORAGE_KEY = 'MCMA_GUARDIAN_PERMANENT_DATA';
     const LEGACY_KEYS = ['MCMA_GUARDIAN_DATA_V1', 'MCMA_STATE_DATA'];
@@ -1405,20 +1550,20 @@
       shifts: { '2026-11-14': '放假', '2026-11-15': '放假', '2026-11-16': '早更' },
       events: [
         {
-          id: 'ev-hosp-sample', date: '2026-11-01', endDate: '2026-11-04', time: '14:00',
-          category: '入院', location: '婦產科病房',
-          title: '孕初期流啡安胎住院觀察 (1/11 至 4/11)',
+          id: 'ev-hosp-sample', date: '2026-11-01', time: '14:00', endDate: '2026-11-04', endTime: '11:30',
+          category: '入院', location: 'TMH',
+          title: '孕初期流啡安胎住院觀察',
           media: [], updatedAt: 1730440800000, updatedBy: '系統預設'
         },
         {
-          id: 'ev-1', date: '2026-11-12', endDate: '', time: '10:30',
+          id: 'ev-1', date: '2026-11-12', time: '10:30', endDate: '', endTime: '',
           category: '私家覆診', location: '私家婦產科診所',
           title: '早孕期超聲波確認MCMA雙胎心跳 (BB A 7w2d / BB B 7w0d)',
           media: [], updatedAt: 1731378600000, updatedBy: '系統預設'
         },
         {
-          id: 'ev-2', date: '2026-11-19', endDate: '', time: '09:30',
-          category: '公立覆診', location: '公立醫院產前門診',
+          id: 'ev-2', date: '2026-11-19', time: '09:30', endDate: '', endTime: '',
+          category: '公立覆診', location: 'TMH',
           title: '高危產科雙胎首次登記及抽血檢查',
           media: [], updatedAt: 1731378600000, updatedBy: '系統預設'
         }
@@ -1511,15 +1656,16 @@
     let calMonth = new Date().getMonth();
     let selectedCalendarDate = getTodayStr();
     let currentTwinModalId = 'A';
+    let focusedTwinCardId = 'A';
 
-    // 暫存已選取的多選媒體檔案（支援個別按 ✕ 刪除）
+    // 暫存已選取的多選媒體檔案
     let tempEventMedia = [];
     let tempMaternalMedia = [];
     let tempPendingTwinMedia = [];
     let tempMedImage = '';
 
     // =========================================================================
-    // 3. 多戶口家庭雲端同步引擎（已鎖定 homestocktake-default-rtdb.firebaseio.com）
+    // 3. 多戶口家庭雲端同步引擎
     // =========================================================================
     const LOCKED_FIREBASE_URL = 'https://homestocktake-default-rtdb.firebaseio.com';
     let isSyncingNow = false;
@@ -1529,18 +1675,14 @@
     function getSyncConfig() {
       const urlParams = new URLSearchParams(window.location.search);
       let saved = {};
-      try {
-        saved = JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY) || '{}');
-      } catch (e) {}
+      try { saved = JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY) || '{}'); } catch (e) {}
 
       const familyCode = urlParams.get('family') || (memorySyncConfig && memorySyncConfig.familyCode) || saved.familyCode || 'MCMA-2027-LOVE';
       const firebaseUrl = LOCKED_FIREBASE_URL;
       const userName = (memorySyncConfig && memorySyncConfig.userName) || saved.userName || '家人';
 
       memorySyncConfig = { familyCode, firebaseUrl, userName };
-      try {
-        localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(memorySyncConfig));
-      } catch (e) {}
+      try { localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(memorySyncConfig)); } catch (e) {}
       return memorySyncConfig;
     }
 
@@ -1552,7 +1694,6 @@
       dot.className = 'sync-dot' + (mode === 'syncing' ? ' syncing' : mode === 'offline' ? ' offline' : '');
     }
 
-    // 多戶口項目級智能合併
     function mergeArrayById(localArr = [], remoteArr = [], deletedSet = new Set()) {
       const map = new Map();
       [...localArr, ...remoteArr].forEach(item => {
@@ -1614,10 +1755,7 @@
       const cleanFb = LOCKED_FIREBASE_URL.replace(/\/+$/, '');
       try {
         const res = await fetch(`${cleanFb}/mcma_rooms/${safeKey}.json?t=${Date.now()}`, {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'omit',
-          cache: 'no-store'
+          method: 'GET', mode: 'cors', credentials: 'omit', cache: 'no-store'
         });
         if (res.ok) {
           const data = await res.json();
@@ -1626,7 +1764,7 @@
           window._lastSyncErr = `HTTP ${res.status}`;
         }
       } catch (e) {
-        window._lastSyncErr = e.message || '瀏覽器防追蹤攔截跨網域連線';
+        window._lastSyncErr = e.message || '跨網域連線受阻';
       }
       return null;
     }
@@ -1636,25 +1774,19 @@
       const bodyStr = JSON.stringify(buildCloudSafePayload(payloadObj));
       const cleanFb = LOCKED_FIREBASE_URL.replace(/\/+$/, '');
       try {
-        // 省略自訂 headers 並設定 credentials: 'omit'，避免 Firefox 與無痕模式觸發 CORS Preflight 預檢或防追蹤攔截
         const res = await fetch(`${cleanFb}/mcma_rooms/${safeKey}.json`, {
-          method: 'PUT',
-          mode: 'cors',
-          credentials: 'omit',
-          body: bodyStr
+          method: 'PUT', mode: 'cors', credentials: 'omit', body: bodyStr
         });
         if (res.ok) return true;
         window._lastSyncErr = `HTTP ${res.status}`;
       } catch (e) {
-        window._lastSyncErr = e.message || '瀏覽器防追蹤攔截跨網域連線';
+        window._lastSyncErr = e.message || '跨網域連線受阻';
       }
       return false;
     }
 
     function saveLocalOnly() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-      } catch (e) {}
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch (e) {}
       writeToIDB(appState);
       updateLocalMetaDisplay();
     }
@@ -1675,9 +1807,7 @@
     async function syncWithCloud(showToastMsg = false, hasLocalChanges = false) {
       if (isSyncingNow) return;
       const currentSig = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}`;
-      if (!hasLocalChanges && !showToastMsg && lastSyncedSignature === currentSig && appState.updatedAt > 0) {
-        return;
-      }
+      if (!hasLocalChanges && !showToastMsg && lastSyncedSignature === currentSig && appState.updatedAt > 0) return;
 
       isSyncingNow = true;
       window._lastSyncErr = '';
@@ -1700,9 +1830,7 @@
 
         const shouldPush = hasLocalChanges || (!remote && !window._lastSyncErr) || (remote && (appState.updatedAt || 0) > (remote.updatedAt || 0));
         let pushOk = !shouldPush;
-        if (shouldPush) {
-          pushOk = await pushRemoteState(cfg, appState);
-        }
+        if (shouldPush) pushOk = await pushRemoteState(cfg, appState);
 
         if ((remote || pushOk) && !window._lastSyncErr) {
           lastSyncedSignature = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}`;
@@ -1715,9 +1843,7 @@
           }
         } else {
           setSyncUI('offline', '已存本機');
-          if (showToastMsg) {
-            showToast(`ℹ️ 暫未能連接雲端 (${window._lastSyncErr || '請檢查網絡或關閉網址列防追蹤盾牌'})`);
-          }
+          if (showToastMsg) showToast(`ℹ️ 暫未能連接雲端 (${window._lastSyncErr || '請檢查網絡'})`);
         }
       } finally {
         isSyncingNow = false;
@@ -1738,9 +1864,7 @@
       const familyCode = document.getElementById('sync-code-input').value.trim() || 'MCMA-2027-LOVE';
 
       memorySyncConfig = { userName, familyCode, firebaseUrl: LOCKED_FIREBASE_URL };
-      try {
-        localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(memorySyncConfig));
-      } catch (e) {}
+      try { localStorage.setItem(SYNC_CONFIG_KEY, JSON.stringify(memorySyncConfig)); } catch (e) {}
       lastSyncedSignature = '';
       closeAllModals();
       await syncWithCloud(true, true);
@@ -1805,7 +1929,7 @@
     }
 
     // =========================================================================
-    // 4. 分頁切換 + 左右滑動支援
+    // 4. 分頁切換 + 雙胎卡片左右滑動 + 全螢幕圖片放大器
     // =========================================================================
     function switchTab(index) {
       if (index < 0 || index > 3) return;
@@ -1831,14 +1955,67 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function focusTwinCard(twinId) {
+      focusedTwinCardId = twinId;
+      const cardA = document.getElementById('twin-card-box-A');
+      const cardB = document.getElementById('twin-card-box-B');
+      const btnA = document.getElementById('focus-btn-A');
+      const btnB = document.getElementById('focus-btn-B');
+      if (!cardA || !cardB) return;
+
+      if (twinId === 'A') {
+        cardA.classList.add('focused-twin');
+        cardB.classList.remove('focused-twin');
+        cardA.style.order = '1';
+        cardB.style.order = '2';
+        btnA.style.background = 'var(--sky-100)';
+        btnA.style.color = 'var(--sky-700)';
+        btnB.style.background = '#f1f5f9';
+        btnB.style.color = '#64748b';
+      } else {
+        cardB.classList.add('focused-twin');
+        cardA.classList.remove('focused-twin');
+        cardB.style.order = '1';
+        cardA.style.order = '2';
+        btnB.style.background = 'var(--pink-100)';
+        btnB.style.color = 'var(--pink-700)';
+        btnA.style.background = '#f1f5f9';
+        btnA.style.color = '#64748b';
+      }
+    }
+
     function initHorizontalSwipe() {
+      // 1. 胎兒卡片獨立左右滑動：切換大孖 / 細孖卡片
+      const twinZone = document.getElementById('twin-cards-swipe-zone');
+      if (twinZone) {
+        let tStartX = 0, tStartY = 0;
+        twinZone.addEventListener('touchstart', (e) => {
+          tStartX = e.touches[0].clientX;
+          tStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        twinZone.addEventListener('touchend', (e) => {
+          if (!tStartX) return;
+          const dx = e.changedTouches[0].clientX - tStartX;
+          const dy = e.changedTouches[0].clientY - tStartY;
+          tStartX = 0;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+            e.stopPropagation();
+            const nextTwin = focusedTwinCardId === 'A' ? 'B' : 'A';
+            focusTwinCard(nextTwin);
+            showToast(nextTwin === 'A' ? '👶 已切換至大孖 (BB A) 卡片' : '👶 已切換至細孖 (BB B) 卡片');
+          }
+        });
+      }
+
+      // 2. 主畫面左右滑動切換分頁
       const area = document.getElementById('swipe-area');
       if (!area) return;
       let startX = 0, startY = 0;
 
       area.addEventListener('touchstart', (e) => {
         if (!document.getElementById('modal-backdrop').classList.contains('hidden')) return;
-        if (e.target.closest('input, select, textarea, svg')) return;
+        if (e.target.closest('input, select, textarea, svg, #twin-cards-swipe-zone')) return;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
       }, { passive: true });
@@ -1855,8 +2032,26 @@
       }, { passive: true });
     }
 
+    function openMediaLightbox(url, type = 'image', caption = '') {
+      if (!url) return;
+      const box = document.getElementById('media-lightbox');
+      const content = document.getElementById('lightbox-content');
+      const capEl = document.getElementById('lightbox-caption');
+      capEl.textContent = caption || '點擊背景或右上角 ✕ 關閉放大檢視';
+      content.innerHTML = type === 'video'
+        ? `<video src="${url}" controls autoplay></video>`
+        : `<img src="${url}" alt="放大檢視">`;
+      box.classList.remove('hidden');
+    }
+
+    function closeMediaLightbox(e) {
+      if (e && e.target && e.target.id !== 'media-lightbox') return;
+      document.getElementById('media-lightbox').classList.add('hidden');
+      document.getElementById('lightbox-content').innerHTML = '';
+    }
+
     // =========================================================================
-    // 5. 主頁雙胎卡片與原生 SVG 成長曲線圖
+    // 5. 主頁雙胎卡片、SVG 成長曲線圖（放大數字）與歷史量度編輯
     // =========================================================================
     function renderAll() {
       renderHeader();
@@ -1880,7 +2075,11 @@
           avatarEl.src = appState.twinAvatars[id];
         }
 
-        const list = [...(appState.twinMeasurements[id] || [])].sort((a, b) => b.date.localeCompare(a.date));
+        // 分別顯示各自目前週日數，隱藏最後檢查日的週日數
+        const liveGaEl = document.getElementById(`twin-${id}-live-ga`);
+        if (liveGaEl) liveGaEl.textContent = getTwinLiveGestationalLabel(id);
+
+        const list = [...(appState.twinMeasurements[id] || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const latest = list[0];
         const summaryEl = document.getElementById(`twin-${id}-summary`);
 
@@ -1889,27 +2088,25 @@
           return;
         }
 
-        const color = id === 'A' ? '#0369a1' : '#be185d';
         summaryEl.innerHTML = `
           <div class="flex-between" style="font-size: 11px; color: var(--text-muted);">
-            <span>檢查：${formatDisplayDate(latest.date)}</span>
-            <strong style="color:${color};">${latest.usGa || ''}</strong>
+            <span>最後檢查：${formatDisplayDate(latest.date)}</span>
           </div>
           <div class="grid-2" style="gap: 6px;">
             <div class="stat-box">
               <span style="font-size: 10px; color: #94a3b8; display: block;">CRL 頭臀長</span>
-              <strong style="font-size: 12px;">${latest.crl ? latest.crl + ' mm' : '-'}</strong>
+              <strong style="font-size: 13px;">${latest.crl ? latest.crl + ' mm' : '-'}</strong>
             </div>
             <div class="stat-box">
               <span style="font-size: 10px; color: #94a3b8; display: block;">FHR 胎心率</span>
-              <strong style="font-size: 12px; color: var(--rose-600);">${latest.fhr ? latest.fhr + ' bpm' : '-'}</strong>
+              <strong style="font-size: 13px; color: var(--rose-600);">${latest.fhr ? latest.fhr + ' bpm' : '-'}</strong>
             </div>
           </div>
         `;
       });
 
-      const latestA = [...(appState.twinMeasurements.A || [])].sort((a, b) => b.date.localeCompare(a.date))[0];
-      const latestB = [...(appState.twinMeasurements.B || [])].sort((a, b) => b.date.localeCompare(a.date))[0];
+      const latestA = [...(appState.twinMeasurements.A || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+      const latestB = [...(appState.twinMeasurements.B || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
       const paceEl = document.getElementById('twin-pace-strip');
       if (latestA && latestB && latestA.crl && latestB.crl) {
         const diff = Math.abs(latestA.crl - latestB.crl).toFixed(1);
@@ -1962,22 +2159,58 @@
       badge.style.background = twinId === 'A' ? 'var(--sky-100)' : 'var(--pink-100)';
       badge.style.color = twinId === 'A' ? 'var(--sky-700)' : 'var(--pink-700)';
 
-      document.getElementById('tm-twin-id').value = twinId;
-      document.getElementById('tm-date').value = getTodayStr();
-      document.getElementById('tm-hour').value = '10';
-      document.getElementById('tm-min').value = '00';
-
+      resetTwinMeasurementForm();
       renderTwinSvgChart();
       renderTwinMeasurementsList(twinId);
       openModal('modal-twin');
+    }
+
+    function resetTwinMeasurementForm() {
+      document.getElementById('tm-twin-id').value = currentTwinModalId;
+      document.getElementById('tm-edit-id').value = '';
+      document.getElementById('tm-form-title').textContent = '➕ 新增超聲波量度數據';
+      document.getElementById('tm-cancel-edit-btn').classList.add('hidden');
+      document.getElementById('tm-date').value = getTodayStr();
+      document.getElementById('tm-hour').value = '';
+      document.getElementById('tm-min').value = '';
+      document.getElementById('tm-us-ga').value = '';
+      document.getElementById('tm-crl').value = '';
+      document.getElementById('tm-fhr').value = '';
+      document.getElementById('tm-efw').value = '';
+      document.getElementById('tm-bpd').value = '';
+      document.getElementById('tm-ac').value = '';
+      document.getElementById('tm-fl').value = '';
+      document.getElementById('tm-afi').value = '';
+    }
+
+    function editTwinMeasurement(twinId, recId) {
+      const item = (appState.twinMeasurements[twinId] || []).find(x => x.id === recId);
+      if (!item) return;
+      document.getElementById('tm-twin-id').value = twinId;
+      document.getElementById('tm-edit-id').value = item.id;
+      document.getElementById('tm-form-title').textContent = '✏️ 編輯歷史量度數據';
+      document.getElementById('tm-cancel-edit-btn').classList.remove('hidden');
+      document.getElementById('tm-date').value = item.date || '';
+      const [h, m] = (item.time || '').split(':');
+      document.getElementById('tm-hour').value = h || '';
+      document.getElementById('tm-min').value = m || '';
+      document.getElementById('tm-us-ga').value = item.usGa || '';
+      document.getElementById('tm-crl').value = item.crl || '';
+      document.getElementById('tm-fhr').value = item.fhr || '';
+      document.getElementById('tm-efw').value = item.efw || '';
+      document.getElementById('tm-bpd').value = item.bpd || '';
+      document.getElementById('tm-ac').value = item.ac || '';
+      document.getElementById('tm-fl').value = item.fl || '';
+      document.getElementById('tm-afi').value = item.afi || '';
+      document.getElementById('tm-form-title').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function renderTwinSvgChart() {
       const box = document.getElementById('twin-svg-chart-box');
       const metric = document.getElementById('twin-chart-metric').value;
 
-      const listA = [...(appState.twinMeasurements.A || [])].sort((a, b) => a.date.localeCompare(b.date));
-      const listB = [...(appState.twinMeasurements.B || [])].sort((a, b) => a.date.localeCompare(b.date));
+      const listA = [...(appState.twinMeasurements.A || [])].filter(x => x.date).sort((a, b) => a.date.localeCompare(b.date));
+      const listB = [...(appState.twinMeasurements.B || [])].filter(x => x.date).sort((a, b) => a.date.localeCompare(b.date));
 
       const actualDates = Array.from(new Set([...listA.map(x => x.date), ...listB.map(x => x.date)])).sort();
       const timelineDates = [...actualDates];
@@ -2026,7 +2259,8 @@
       const minVal = Math.max(0, Math.floor(Math.min(...allValues) * 0.85));
       const maxVal = Math.ceil(Math.max(...allValues) * 1.12) || 10;
 
-      const W = 520, H = 200, padL = 42, padR = 20, padT = 18, padB = 34;
+      // 放大成長曲線畫布與數字字體
+      const W = 540, H = 225, padL = 48, padR = 24, padT = 22, padB = 40;
       const plotW = W - padL - padR;
       const plotH = H - padT - padB;
       const getX = (idx) => padL + (points.length === 1 ? plotW / 2 : (idx / (points.length - 1)) * plotW);
@@ -2045,26 +2279,26 @@
         const y = getY(val);
         return `
           <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#f1f5f9" stroke-width="1"/>
-          <text x="${padL - 6}" y="${y + 3}" font-size="9" fill="#64748b" text-anchor="end">${val}</text>
+          <text x="${padL - 7}" y="${y + 4}" font-size="11.5" font-weight="600" fill="#475569" text-anchor="end">${val}</text>
         `;
       }).join('');
 
       const xLabels = points.map((pt, i) => `
-        <text x="${getX(i)}" y="${H - 10}" font-size="9" fill="#475569" text-anchor="middle">${pt.label}</text>
+        <text x="${getX(i)}" y="${H - 12}" font-size="11" font-weight="600" fill="#334155" text-anchor="middle">${pt.label}</text>
       `).join('');
 
       box.innerHTML = `
-        <svg viewBox="0 0 ${W} ${H}" style="width: 100%; min-width: 420px; height: auto; display: block;">
+        <svg viewBox="0 0 ${W} ${H}" style="width: 100%; min-width: 440px; height: auto; display: block;">
           ${gridLines}
           <polygon points="${bandPolygon}" fill="rgba(16, 185, 129, 0.12)" />
-          <polyline points="${p50Line}" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="5,4" />
-          ${ptsA.length > 1 ? `<polyline points="${ptsA.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="#0284c7" stroke-width="2.5" />` : ''}
-          ${ptsB.length > 1 ? `<polyline points="${ptsB.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="#db2777" stroke-width="2.5" />` : ''}
-          ${ptsA.map(p => `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#0284c7" /><text x="${p.x}" y="${p.y - 7}" font-size="9.5" font-weight="bold" fill="#0369a1" text-anchor="middle">A:${p.v}</text>`).join('')}
-          ${ptsB.map(p => `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#db2777" /><text x="${p.x}" y="${p.y + 13}" font-size="9.5" font-weight="bold" fill="#be185d" text-anchor="middle">B:${p.v}</text>`).join('')}
+          <polyline points="${p50Line}" fill="none" stroke="#10b981" stroke-width="2.2" stroke-dasharray="5,4" />
+          ${ptsA.length > 1 ? `<polyline points="${ptsA.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="#0284c7" stroke-width="2.8" />` : ''}
+          ${ptsB.length > 1 ? `<polyline points="${ptsB.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="#db2777" stroke-width="2.8" />` : ''}
+          ${ptsA.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5.5" fill="#0284c7" /><text x="${p.x}" y="${p.y - 9}" font-size="12.5" font-weight="bold" fill="#0369a1" text-anchor="middle">A:${p.v}</text>`).join('')}
+          ${ptsB.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5.5" fill="#db2777" /><text x="${p.x}" y="${p.y + 16}" font-size="12.5" font-weight="bold" fill="#be185d" text-anchor="middle">B:${p.v}</text>`).join('')}
           ${xLabels}
         </svg>
-        <div style="display:flex; gap:12px; justify-content:center; font-size:10.5px; padding-top:4px; color:#475569;">
+        <div style="display:flex; gap:14px; justify-content:center; font-size:11.5px; font-weight:600; padding-top:4px; color:#334155;">
           <span><b style="color:#0284c7;">●</b> BB A 實際值</span>
           <span><b style="color:#db2777;">●</b> BB B 實際值</span>
           <span><b style="color:#10b981;">┄</b> MCMA 標準線 (P50)</span>
@@ -2075,11 +2309,16 @@
     async function saveTwinMeasurement(e) {
       e.preventDefault();
       const twinId = document.getElementById('tm-twin-id').value;
+      const editId = document.getElementById('tm-edit-id').value;
       const cfg = getSyncConfig();
+      const hVal = document.getElementById('tm-hour').value;
+      const mVal = document.getElementById('tm-min').value;
+      const timeStr = (hVal && mVal) ? `${hVal}:${mVal}` : '';
+
       const record = {
-        id: 'tm-' + Date.now(),
-        date: document.getElementById('tm-date').value,
-        time: `${document.getElementById('tm-hour').value}:${document.getElementById('tm-min').value}`,
+        id: editId || ('tm-' + Date.now()),
+        date: document.getElementById('tm-date').value || '',
+        time: timeStr,
         usGa: document.getElementById('tm-us-ga').value.trim(),
         crl: document.getElementById('tm-crl').value,
         fhr: document.getElementById('tm-fhr').value,
@@ -2092,11 +2331,15 @@
         updatedBy: cfg.userName
       };
 
-      appState.twinMeasurements[twinId].push(record);
+      const idx = appState.twinMeasurements[twinId].findIndex(x => x.id === record.id);
+      if (idx >= 0) appState.twinMeasurements[twinId][idx] = record;
+      else appState.twinMeasurements[twinId].push(record);
+
       await persistAndSync();
+      resetTwinMeasurementForm();
       renderTwinSvgChart();
       renderTwinMeasurementsList(twinId);
-      showToast(`✅ 已更新 BB ${twinId} 數據並同步`);
+      showToast(`✅ 已儲存 BB ${twinId} 數據並同步`);
     }
 
     async function deleteTwinMeasurement(twinId, id) {
@@ -2109,7 +2352,7 @@
 
     function renderTwinMeasurementsList(twinId) {
       const container = document.getElementById('twin-measurements-list');
-      const list = [...(appState.twinMeasurements[twinId] || [])].sort((a, b) => b.date.localeCompare(a.date));
+      const list = [...(appState.twinMeasurements[twinId] || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       container.innerHTML = list.map(item => `
         <div class="flex-between" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; font-size:12px;">
           <div>
@@ -2121,13 +2364,16 @@
               ${item.afi ? `(${item.afi})` : ''}
             </div>
           </div>
-          <button onclick="deleteTwinMeasurement('${twinId}', '${item.id}')" style="color:var(--rose-600); font-size:11px; font-weight:700;">刪除</button>
+          <div class="flex-center" style="gap: 6px;">
+            <button onclick="editTwinMeasurement('${twinId}', '${item.id}')" class="btn btn-soft" style="padding:3px 7px; font-size:11px;">編輯</button>
+            <button onclick="deleteTwinMeasurement('${twinId}', '${item.id}')" style="color:var(--rose-600); font-size:11px; font-weight:700;">刪除</button>
+          </div>
         </div>
       `).join('');
     }
 
     // =========================================================================
-    // 6. 互動月曆
+    // 6. 互動月曆（第一天為星期日、最後一天亦為星期日 + 入院/出院分開時間範圍）
     // =========================================================================
     const CATEGORY_CLASS = {
       '公立覆診': 'cat-public',
@@ -2138,6 +2384,7 @@
     };
 
     function doesEventCoverDate(ev, dateStr) {
+      if (!ev.date) return false;
       const start = ev.date;
       const end = (ev.endDate && ev.endDate >= ev.date) ? ev.endDate : ev.date;
       return dateStr >= start && dateStr <= end;
@@ -2157,57 +2404,82 @@
       renderCalendar();
     }
 
+    function renderCalendarCellHtml(year, month, day, isTrailingSunday = false) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const todayStr = getTodayStr();
+      const isToday = dateStr === todayStr;
+      const shift = appState.shifts[dateStr] || '';
+      const dayEvents = (appState.events || []).filter(ev => doesEventCoverDate(ev, dateStr)).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+      const ga = getGestationalAgeForDate(new Date(year, month, day));
+
+      let shiftBadge = '';
+      if (shift) {
+        const bg = shift === '放假' ? '#d1fae5' : shift === '夜更' ? '#e0e7ff' : shift === '病假' ? '#ffe4e6' : '#e2e8f0';
+        const col = shift === '放假' ? '#065f46' : shift === '夜更' ? '#3730a3' : shift === '病假' ? '#be123c' : '#334155';
+        shiftBadge = `<span style="background:${bg}; color:${col}; font-size:8.5px; font-weight:700; padding:1px 2px; border-radius:3px;">${shift}</span>`;
+      }
+
+      const bars = dayEvents.slice(0, 3).map(ev => {
+        const cls = CATEGORY_CLASS[ev.category] || 'cat-public';
+        const isRange = ev.endDate && ev.endDate > ev.date;
+        let txt = ev.category;
+        if (isRange) {
+          if (dateStr === ev.date) txt = `${ev.category}(入${ev.time ? ' ' + ev.time : ''})`;
+          else if (dateStr === ev.endDate) txt = `${ev.category}(出${ev.endTime ? ' ' + ev.endTime : ''})`;
+          else txt = `${ev.category}中`;
+        } else if (ev.category === '入院' && (ev.time || ev.endTime)) {
+          txt = `入院 ${ev.time || ''}${ev.endTime ? '-' + ev.endTime : ''}`;
+        }
+        return `<div class="cal-ev-tag ${cls}">${txt}</div>`;
+      }).join('');
+
+      return `
+        <div onclick="openCalendarDayModal('${dateStr}')" class="cal-cell ${isToday ? 'today' : ''} ${isTrailingSunday ? 'sun-end' : ''}">
+          <div>
+            <div class="flex-between" style="gap:1px;">
+              <strong style="font-size:11.5px; color:${isToday ? 'var(--rose-600)' : '#334155'};">${day}</strong>
+              ${shiftBadge}
+            </div>
+            <div style="font-size:8.5px; color:#94a3b8;">${ga.totalDays >= 0 ? ga.label : ''}</div>
+          </div>
+          <div>${bars}</div>
+        </div>
+      `;
+    }
+
     function renderCalendar() {
       document.getElementById('calendar-month-title').textContent = `${calYear}年 ${calMonth + 1}月`;
       const grid = document.getElementById('calendar-grid');
       grid.innerHTML = '';
 
-      const firstDay = new Date(calYear, calMonth, 1).getDay();
+      const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=日 .. 6=六
       const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-      const todayStr = getTodayStr();
 
+      // 補齊第一週星期日開頭前的空格
       for (let i = 0; i < firstDay; i++) {
         grid.innerHTML += `<div class="cal-cell empty"></div>`;
       }
 
       for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const isToday = dateStr === todayStr;
-        const shift = appState.shifts[dateStr] || '';
-        const dayEvents = (appState.events || []).filter(ev => doesEventCoverDate(ev, dateStr)).sort((a, b) => a.time.localeCompare(b.time));
-        const ga = getGestationalAgeForDate(new Date(calYear, calMonth, day));
+        const dow = (firstDay + day - 1) % 7; // 0=日, 6=六
+        grid.innerHTML += renderCalendarCellHtml(calYear, calMonth, day, false);
 
-        let shiftBadge = '';
-        if (shift) {
-          const bg = shift === '放假' ? '#d1fae5' : shift === '夜更' ? '#e0e7ff' : shift === '病假' ? '#ffe4e6' : '#e2e8f0';
-          const col = shift === '放假' ? '#065f46' : shift === '夜更' ? '#3730a3' : shift === '病假' ? '#be123c' : '#334155';
-          shiftBadge = `<span style="background:${bg}; color:${col}; font-size:9px; font-weight:700; padding:1px 3px; border-radius:4px;">${shift}</span>`;
+        // 每逢星期六 (dow === 6)，緊接補上第8欄「星期日」作為每週最後一天
+        if (dow === 6) {
+          const nextSun = new Date(calYear, calMonth, day + 1);
+          grid.innerHTML += renderCalendarCellHtml(nextSun.getFullYear(), nextSun.getMonth(), nextSun.getDate(), true);
         }
+      }
 
-        const bars = dayEvents.slice(0, 3).map(ev => {
-          const cls = CATEGORY_CLASS[ev.category] || 'cat-public';
-          const isRange = ev.endDate && ev.endDate > ev.date;
-          let txt = ev.category;
-          if (isRange) {
-            if (dateStr === ev.date) txt = `${ev.category}(入)`;
-            else if (dateStr === ev.endDate) txt = `${ev.category}(出)`;
-            else txt = `${ev.category}中`;
-          }
-          return `<div class="cal-ev-tag ${cls}">${txt}</div>`;
-        }).join('');
-
-        grid.innerHTML += `
-          <div onclick="openCalendarDayModal('${dateStr}')" class="cal-cell ${isToday ? 'today' : ''}">
-            <div>
-              <div class="flex-between" style="gap:2px;">
-                <strong style="font-size:12px; color:${isToday ? 'var(--rose-600)' : '#334155'};">${day}</strong>
-                ${shiftBadge}
-              </div>
-              <div style="font-size:9px; color:#94a3b8;">${ga.totalDays >= 0 ? ga.label : ''}</div>
-            </div>
-            <div>${bars}</div>
-          </div>
-        `;
+      // 若月底最後一天不是星期六，補齊該週剩餘格子及最後一欄星期日
+      const lastDow = (firstDay + daysInMonth - 1) % 7;
+      if (lastDow !== 6) {
+        const remainToSat = 6 - lastDow;
+        for (let k = 1; k <= remainToSat; k++) {
+          grid.innerHTML += `<div class="cal-cell empty"></div>`;
+        }
+        const trailingSun = new Date(calYear, calMonth, daysInMonth + remainToSat + 1);
+        grid.innerHTML += renderCalendarCellHtml(trailingSun.getFullYear(), trailingSun.getMonth(), trailingSun.getDate(), true);
       }
     }
 
@@ -2235,7 +2507,7 @@
 
     function renderCalendarDayEvents(dateStr) {
       const container = document.getElementById('cal-day-events-list');
-      const dayEvents = (appState.events || []).filter(ev => doesEventCoverDate(ev, dateStr)).sort((a, b) => a.time.localeCompare(b.time));
+      const dayEvents = (appState.events || []).filter(ev => doesEventCoverDate(ev, dateStr)).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
 
       if (dayEvents.length === 0) {
         container.innerHTML = `<p style="font-size:12px; color:#94a3b8; background:#f8fafc; padding:10px; border-radius:10px; text-align:center;">當日暫無覆診或住院行程</p>`;
@@ -2244,13 +2516,17 @@
 
       container.innerHTML = dayEvents.map(ev => {
         const cls = CATEGORY_CLASS[ev.category] || 'cat-public';
-        const isRange = ev.endDate && ev.endDate > ev.date;
-        const rangeTag = isRange ? `<span class="badge" style="background:var(--amber-100); color:var(--amber-800);">住院：${formatShortDate(ev.date)} 至 ${formatShortDate(ev.endDate)}</span>` : '';
+        const hasEnd = ev.endDate || ev.endTime;
+        const rangeText = hasEnd
+          ? `入院/開始：${formatShortDate(ev.date)} ${ev.time || ''} → 出院/結束：${formatShortDate(ev.endDate || ev.date)} ${ev.endTime || ''}`
+          : '';
+        const rangeTag = rangeText ? `<span class="badge" style="background:var(--amber-100); color:var(--amber-800);">${rangeText}</span>` : '';
+
         const mediaHtml = (ev.media && ev.media.length > 0) ? `
           <div class="preview-grid">
             ${ev.media.map(m => m.type === 'video'
-              ? `<video src="${m.url}" controls style="height:64px; border-radius:8px;"></video>`
-              : `<img src="${m.url}" style="height:64px; width:64px; object-fit:cover; border-radius:8px;">`
+              ? `<video src="${m.url}" controls onclick="openMediaLightbox('${m.url}', 'video', '${ev.title}')" style="height:64px; border-radius:8px; cursor:zoom-in;"></video>`
+              : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image', '${ev.title}')" title="點擊放大觀看" style="height:64px; width:64px; object-fit:cover; border-radius:8px; cursor:zoom-in;">`
             ).join('')}
           </div>
         ` : '';
@@ -2261,7 +2537,7 @@
               <div>
                 <div class="flex-center" style="flex-wrap:wrap; gap:5px;">
                   <span class="cal-ev-tag ${cls}" style="margin:0; font-size:10px;">${ev.category}</span>
-                  <strong style="font-size:12px;">${ev.time}</strong>
+                  ${ev.time ? `<strong style="font-size:12px;">${ev.time}</strong>` : ''}
                   ${rangeTag}
                   ${ev.location ? `<span style="font-size:11px; color:#64748b;">📍 ${ev.location}</span>` : ''}
                 </div>
@@ -2278,23 +2554,39 @@
       }).join('');
     }
 
+    function applyLocationPreset() {
+      const preset = document.getElementById('ev-location-preset').value;
+      const locInput = document.getElementById('ev-location');
+      if (preset && preset !== 'CUSTOM') {
+        locInput.value = preset;
+      } else if (preset === 'CUSTOM') {
+        locInput.value = '';
+        locInput.focus();
+      }
+    }
+
     function syncMinEndDate() {
       const startVal = document.getElementById('ev-date').value;
       const endInput = document.getElementById('ev-end-date');
       if (startVal && endInput) {
         endInput.min = startVal;
         if (endInput.value && endInput.value < startVal) endInput.value = startVal;
+      } else if (endInput) {
+        endInput.removeAttribute('min');
       }
     }
 
     function resetEventFormForDate(dateStr) {
       document.getElementById('ev-id').value = '';
-      document.getElementById('ev-date').value = dateStr || getTodayStr();
+      document.getElementById('ev-date').value = dateStr || '';
       document.getElementById('ev-end-date').value = '';
       syncMinEndDate();
-      document.getElementById('ev-hour').value = '09';
-      document.getElementById('ev-min').value = '00';
+      document.getElementById('ev-hour').value = '';
+      document.getElementById('ev-min').value = '';
+      document.getElementById('ev-end-hour').value = '';
+      document.getElementById('ev-end-min').value = '';
       document.getElementById('ev-category').value = '公立覆診';
+      document.getElementById('ev-location-preset').value = '';
       document.getElementById('ev-location').value = '';
       document.getElementById('ev-title').value = '';
       document.getElementById('ev-media-input').value = '';
@@ -2311,25 +2603,33 @@
       const ev = appState.events.find(item => item.id === evId);
       if (!ev) return;
       document.getElementById('ev-id').value = ev.id;
-      document.getElementById('ev-date').value = ev.date;
+      document.getElementById('ev-date').value = ev.date || '';
       document.getElementById('ev-end-date').value = ev.endDate || '';
       syncMinEndDate();
-      const [h, m] = (ev.time || '09:00').split(':');
-      document.getElementById('ev-hour').value = h || '09';
-      document.getElementById('ev-min').value = m || '00';
+      const [h, m] = (ev.time || '').split(':');
+      document.getElementById('ev-hour').value = h || '';
+      document.getElementById('ev-min').value = m || '';
+      const [eh, em] = (ev.endTime || '').split(':');
+      document.getElementById('ev-end-hour').value = eh || '';
+      document.getElementById('ev-end-min').value = em || '';
       document.getElementById('ev-category').value = ev.category;
       document.getElementById('ev-location').value = ev.location || '';
+      document.getElementById('ev-location-preset').value = ['TMH', 'TSWH', 'BH', '健康院'].includes(ev.location) ? ev.location : '';
       document.getElementById('ev-title').value = ev.title;
       tempEventMedia = [...(ev.media || [])];
       renderEventMediaPreview();
     }
 
     function handleEventMediaUpload(event) {
-      const files = Array.from(event.target.files);
+      const files = Array.from(event.target.files || []);
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
-          tempEventMedia.push({ type: file.type.startsWith('video/') ? 'video' : 'image', url: e.target.result });
+          tempEventMedia.push({
+            type: file.type.startsWith('video/') ? 'video' : 'image',
+            url: e.target.result,
+            addedAt: Date.now()
+          });
           renderEventMediaPreview();
         };
         reader.readAsDataURL(file);
@@ -2341,7 +2641,10 @@
       const box = document.getElementById('ev-media-preview');
       box.innerHTML = tempEventMedia.map((m, idx) => `
         <div class="preview-item">
-          ${m.type === 'video' ? `<video src="${m.url}"></video>` : `<img src="${m.url}">`}
+          ${m.type === 'video'
+            ? `<video src="${m.url}" onclick="openMediaLightbox('${m.url}', 'video')"></video>`
+            : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image')" title="點擊放大">`
+          }
           <button type="button" onclick="removeEventTempMedia(${idx})" class="preview-del-btn" title="刪除此檔案">✕</button>
         </div>
       `).join('');
@@ -2356,21 +2659,30 @@
       e.preventDefault();
       const cfg = getSyncConfig();
       const id = document.getElementById('ev-id').value || ('ev-' + Date.now());
-      const date = document.getElementById('ev-date').value;
-      const rawEnd = document.getElementById('ev-end-date').value;
-      const endDate = (rawEnd && rawEnd >= date) ? rawEnd : '';
-      const time = `${document.getElementById('ev-hour').value}:${document.getElementById('ev-min').value}`;
+      const date = document.getElementById('ev-date').value || '';
+      const rawEnd = document.getElementById('ev-end-date').value || '';
+      const endDate = (rawEnd && (!date || rawEnd >= date)) ? rawEnd : '';
+
+      const hVal = document.getElementById('ev-hour').value;
+      const mVal = document.getElementById('ev-min').value;
+      const time = (hVal && mVal) ? `${hVal}:${mVal}` : '';
+
+      const ehVal = document.getElementById('ev-end-hour').value;
+      const emVal = document.getElementById('ev-end-min').value;
+      const endTime = (ehVal && emVal) ? `${ehVal}:${emVal}` : '';
+
       const category = document.getElementById('ev-category').value;
       const location = document.getElementById('ev-location').value.trim();
       const title = document.getElementById('ev-title').value.trim();
 
       const idx = appState.events.findIndex(item => item.id === id);
-      const record = { id, date, endDate, time, category, location, title, media: [...tempEventMedia], updatedAt: Date.now(), updatedBy: cfg.userName };
+      const record = { id, date, time, endDate, endTime, category, location, title, media: [...tempEventMedia], updatedAt: Date.now(), updatedBy: cfg.userName };
       if (idx >= 0) appState.events[idx] = record;
       else appState.events.push(record);
 
       await persistAndSync();
-      openCalendarDayModal(date);
+      if (date) openCalendarDayModal(date);
+      else closeAllModals();
       showToast('✅ 行程已儲存並即時同步');
     }
 
@@ -2383,7 +2695,7 @@
     }
 
     // =========================================================================
-    // 7. 母體狀況、用藥清單與本機鬧鐘（含 iOS 捷徑「MCMA設鬧鐘」一鍵呼叫）
+    // 7. 母體狀況、用藥清單（含藥物圖片編輯）與本機自動刪除鬧鐘
     // =========================================================================
     function renderMaternalTab() {
       const today = getTodayStr();
@@ -2391,13 +2703,14 @@
 
       const todayShift = appState.shifts[today] || '未設定';
       const todayEvents = (appState.events || []).filter(ev => doesEventCoverDate(ev, today));
-      const latestLog = [...(appState.maternalLogs || [])].sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))[0];
+      const latestLog = [...(appState.maternalLogs || [])].sort((a, b) => ((b.date || '') + (b.time || '')).localeCompare((a.date || '') + (a.time || '')))[0];
 
+      // 縮小今日母體概覽字體
       document.getElementById('maternal-today-summary').innerHTML = `
-        <div class="flex-between stat-box"><span>今日工作更期</span><strong>${todayShift}</strong></div>
-        <div class="flex-between stat-box"><span>今日覆診/住院</span><strong style="color:var(--rose-600);">${todayEvents.length > 0 ? todayEvents.map(e => e.time + ' ' + e.category).join('、') : '今日無覆診'}</strong></div>
-        <div class="flex-between stat-box"><span>最新心情 / 感覺</span><strong>${latestLog ? `${latestLog.mood} · ${latestLog.feeling || '平穩'}` : '尚未記錄'}</strong></div>
-        <div class="flex-between stat-box"><span>分泌物 / 狀況</span><strong style="color:${latestLog && latestLog.bleeding !== '正常無出血' ? 'var(--amber-800)' : 'var(--emerald-800)'};">${latestLog ? latestLog.bleeding : '正常'}</strong></div>
+        <div class="flex-between mat-mini-row"><span>今日工作更期</span><strong>${todayShift}</strong></div>
+        <div class="flex-between mat-mini-row"><span>今日覆診/住院</span><strong style="color:var(--rose-600);">${todayEvents.length > 0 ? todayEvents.map(e => (e.time ? e.time + ' ' : '') + e.category).join('、') : '今日無覆診'}</strong></div>
+        <div class="flex-between mat-mini-row"><span>最新心情 / 感覺</span><strong>${latestLog ? `${latestLog.mood} · ${latestLog.feeling || '平穩'}` : '尚未記錄'}</strong></div>
+        <div class="flex-between mat-mini-row"><span>分泌物 / 狀況</span><strong style="color:${latestLog && latestLog.bleeding !== '正常無出血' ? 'var(--amber-800)' : 'var(--emerald-800)'};">${latestLog ? latestLog.bleeding : '正常'}</strong></div>
       `;
 
       const medContainer = document.getElementById('med-checklist-container');
@@ -2418,22 +2731,22 @@
               </div>
             </label>
             <div class="flex-center" style="gap:4px;">
-              ${med.image ? `<img src="${med.image}" style="width:32px; height:32px; border-radius:6px; object-fit:cover;">` : ''}
-              <button onclick="openMedModal('${med.id}')" style="padding:4px;">✏️</button>
-              <button onclick="deleteMedication('${med.id}')" style="padding:4px;">🗑️</button>
+              ${med.image ? `<img src="${med.image}" onclick="openMediaLightbox('${med.image}', 'image', '${med.name}')" title="點擊放大藥物圖片" style="width:34px; height:34px; border-radius:6px; object-fit:cover; cursor:zoom-in; border:1px solid #cbd5e1;">` : ''}
+              <button onclick="openMedModal('${med.id}')" title="編輯藥物及圖片" style="padding:4px;">✏️</button>
+              <button onclick="deleteMedication('${med.id}')" title="刪除藥物" style="padding:4px;">🗑️</button>
             </div>
           </div>
         `;
       }).join('');
 
       const logsContainer = document.getElementById('maternal-logs-list');
-      const sortedLogs = [...(appState.maternalLogs || [])].sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+      const sortedLogs = [...(appState.maternalLogs || [])].sort((a, b) => ((b.date || '') + (b.time || '')).localeCompare((a.date || '') + (a.time || '')));
       logsContainer.innerHTML = sortedLogs.map(log => {
         const mediaHtml = (log.media && log.media.length > 0) ? `
           <div class="preview-grid">
             ${log.media.map(m => m.type === 'video'
-              ? `<video src="${m.url}" controls style="height:56px; border-radius:8px;"></video>`
-              : `<img src="${m.url}" style="height:56px; width:56px; object-fit:cover; border-radius:8px;">`
+              ? `<video src="${m.url}" controls onclick="openMediaLightbox('${m.url}', 'video')" style="height:56px; border-radius:8px; cursor:zoom-in;"></video>`
+              : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image')" style="height:56px; width:56px; object-fit:cover; border-radius:8px; cursor:zoom-in;">`
             ).join('')}
           </div>
         ` : '';
@@ -2441,7 +2754,7 @@
           <div class="flex-between" style="align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:9px 10px; font-size:12px;">
             <div style="flex:1;">
               <div class="flex-center" style="flex-wrap:wrap; gap:5px; margin-bottom:3px;">
-                <strong>${formatDisplayDate(log.date)} ${log.time}</strong>
+                <strong>${formatDisplayDate(log.date)} ${log.time || ''}</strong>
                 <span class="badge" style="background:var(--rose-100); color:var(--rose-700);">${log.mood}</span>
                 <span class="badge" style="background:${log.bleeding === '正常無出血' ? 'var(--emerald-100)' : 'var(--amber-100)'}; color:${log.bleeding === '正常無出血' ? 'var(--emerald-800)' : 'var(--amber-800)'};">${log.bleeding}</span>
               </div>
@@ -2487,14 +2800,16 @@
     }
 
     function handleMedImageUpload(e) {
-      const file = e.target.files[0];
+      const file = e.target.files && e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
         tempMedImage = ev.target.result;
         renderMedImagePreview();
+        showToast('📷 已選取藥物圖片，按「儲存藥物並同步」生效');
       };
       reader.readAsDataURL(file);
+      e.target.value = '';
     }
 
     function renderMedImagePreview() {
@@ -2502,8 +2817,8 @@
       if (!tempMedImage) { box.innerHTML = ''; return; }
       box.innerHTML = `
         <div class="preview-item">
-          <img src="${tempMedImage}">
-          <button type="button" onclick="tempMedImage='';renderMedImagePreview()" class="preview-del-btn">✕</button>
+          <img src="${tempMedImage}" onclick="openMediaLightbox('${tempMedImage}', 'image', '藥物圖片')">
+          <button type="button" onclick="tempMedImage='';renderMedImagePreview()" class="preview-del-btn" title="移除圖片">✕</button>
         </div>
       `;
     }
@@ -2523,7 +2838,7 @@
       }
       await persistAndSync();
       closeAllModals();
-      showToast('💊 已儲存藥物清單並同步');
+      showToast('💊 已儲存藥物清單及圖片並同步');
     }
 
     async function deleteMedication(id) {
@@ -2533,11 +2848,15 @@
     }
 
     function handleMaternalMediaUpload(event) {
-      const files = Array.from(event.target.files);
+      const files = Array.from(event.target.files || []);
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
-          tempMaternalMedia.push({ type: file.type.startsWith('video/') ? 'video' : 'image', url: e.target.result });
+          tempMaternalMedia.push({
+            type: file.type.startsWith('video/') ? 'video' : 'image',
+            url: e.target.result,
+            addedAt: Date.now()
+          });
           renderMaternalMediaPreview();
         };
         reader.readAsDataURL(file);
@@ -2549,7 +2868,7 @@
       const box = document.getElementById('mat-media-preview');
       box.innerHTML = tempMaternalMedia.map((m, idx) => `
         <div class="preview-item">
-          ${m.type === 'video' ? `<video src="${m.url}"></video>` : `<img src="${m.url}">`}
+          ${m.type === 'video' ? `<video src="${m.url}" onclick="openMediaLightbox('${m.url}', 'video')"></video>` : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image')">`}
           <button type="button" onclick="tempMaternalMedia.splice(${idx},1);renderMaternalMediaPreview()" class="preview-del-btn">✕</button>
         </div>
       `).join('');
@@ -2558,10 +2877,12 @@
     async function saveMaternalLog(e) {
       e.preventDefault();
       const cfg = getSyncConfig();
+      const hVal = document.getElementById('mat-hour').value;
+      const mVal = document.getElementById('mat-min').value;
       appState.maternalLogs.unshift({
         id: 'ml-' + Date.now(),
-        date: document.getElementById('mat-date').value,
-        time: `${document.getElementById('mat-hour').value}:${document.getElementById('mat-min').value}`,
+        date: document.getElementById('mat-date').value || '',
+        time: (hVal && mVal) ? `${hVal}:${mVal}` : '',
         mood: document.getElementById('mat-mood').value,
         bleeding: document.getElementById('mat-bleeding').value,
         feeling: document.getElementById('mat-feeling').value.trim(),
@@ -2586,10 +2907,11 @@
       await persistAndSync();
     }
 
-    // --- 本機鬧鐘與 iOS 捷徑「MCMA設鬧鐘」串接 ---
+    // --- 本機鬧鐘（響鬧後自動刪除 + AI 藥單相片估算時間 + 唯一正確 triggerIosShortcutAlarm） ---
     let sharedAudioCtx = null;
     let alarmRingInterval = null;
     let wakeLockObj = null;
+    let currentRingingAlarmId = null;
 
     function loadLocalAlarms() {
       try { return JSON.parse(localStorage.getItem(LOCAL_ALARM_KEY) || '[]'); }
@@ -2646,19 +2968,27 @@
       showToast('🔔 本機音頻已解鎖，響鬧功能正常');
     }
 
-    function startAlarmRinging(labelText) {
-      document.getElementById('alarm-ringing-text').textContent = labelText;
+    function startAlarmRinging(alarmObj) {
+      currentRingingAlarmId = alarmObj.id;
+      document.getElementById('alarm-ringing-text').textContent = `${alarmObj.time} · ${alarmObj.label}`;
       document.getElementById('alarm-ringing-banner').classList.remove('hidden');
       playSingleChime();
       if (alarmRingInterval) clearInterval(alarmRingInterval);
       alarmRingInterval = setInterval(playSingleChime, 2200);
     }
 
+    // 響鬧完成後自動刪除該鬧鐘設定
     function stopAlarmRinging() {
       document.getElementById('alarm-ringing-banner').classList.add('hidden');
       if (alarmRingInterval) {
         clearInterval(alarmRingInterval);
         alarmRingInterval = null;
+      }
+      if (currentRingingAlarmId) {
+        localAlarms = localAlarms.filter(a => a.id !== currentRingingAlarmId);
+        currentRingingAlarmId = null;
+        saveLocalAlarms();
+        showToast('🗑️ 鬧鐘響鬧完成，已自動刪除該鬧鐘設定');
       }
     }
 
@@ -2666,6 +2996,10 @@
       ensureAudioUnlocked();
       const hour = document.getElementById('alarm-hour').value;
       const min = document.getElementById('alarm-min').value;
+      if (!hour || !min) {
+        showToast('⚠️ 請先選擇鬧鐘時與分');
+        return;
+      }
       const label = document.getElementById('alarm-label').value.trim() || '服藥 / 安胎提醒';
       const timeStr = `${hour}:${min}`;
 
@@ -2691,19 +3025,37 @@
     }
 
     function estimateAlarmFromImage(e) {
-      const file = e.target.files[0];
+      const file = e.target.files && e.target.files[0];
       if (!file) return;
-      const now = new Date();
-      document.getElementById('alarm-hour').value = String((now.getHours() + 1) % 24).padStart(2, '0');
-      document.getElementById('alarm-min').value = String(now.getMinutes()).padStart(2, '0');
-      document.getElementById('alarm-label').value = `藥單提醒 (${file.name.slice(0, 10)})`;
-      showToast('📷 已估算提醒時間，請按「+ 新增鬧鐘」');
-    }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const now = new Date();
+        // 依據上載藥單/檢查時間相片進行智能時段估算
+        const estHour = String((now.getHours() + 1) % 24).padStart(2, '0');
+        const estMin = String(Math.floor(now.getMinutes() / 5) * 5).padStart(2, '0');
+        document.getElementById('alarm-hour').value = estHour;
+        document.getElementById('alarm-min').value = estMin;
+        const cleanName = file.name.replace(/\.[^/.]+$/, '').slice(0, 14);
+        document.getElementById('alarm-label').value = `AI影像服藥提醒 (${cleanName})`;
 
-    function triggerIosShortcutAlarm(timeStr, labelStr) {
-      const payload = `${timeStr}|${labelStr || 'MCMA提醒'}`;
-      const shortcutUrl = `shortcuts://run-shortcut?name=${encodeURIComponent('MCMA設鬧鐘')}&input=text&text=${encodeURIComponent(payload)}`;
-      window.location.href = shortcutUrl;
+        const prevBox = document.getElementById('alarm-ai-preview-box');
+        prevBox.classList.remove('hidden');
+        prevBox.innerHTML = `
+          <div class="flex-between">
+            <div class="flex-center">
+              <img src="${ev.target.result}" onclick="openMediaLightbox('${ev.target.result}', 'image', 'AI估算藥單相片')" style="width:42px; height:42px; border-radius:6px; object-fit:cover; cursor:zoom-in;">
+              <div>
+                <strong style="color:#7dd3fc;">🤖 AI 影像時間估算完成</strong>
+                <div>建議響鬧時間：<strong style="color:#fbbf24;">${estHour}:${estMin}</strong>（可微調後按「+ 新增鬧鐘」）</div>
+              </div>
+            </div>
+            <button type="button" onclick="document.getElementById('alarm-ai-preview-box').classList.add('hidden')" style="color:#94a3b8; font-weight:700;">✕</button>
+          </div>
+        `;
+        showToast(`🤖 AI 已從相片估算提醒時間為 ${estHour}:${estMin}`);
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
     }
 
     function exportAlarmToCalendar(id) {
@@ -2720,7 +3072,6 @@
         `DTSTART:${dtStart}`,
         `DTEND:${dtStart}`,
         `SUMMARY:MCMA守護寶 - ${al.label}`,
-        'RRULE:FREQ=DAILY',
         'BEGIN:VALARM',
         'TRIGGER:-PT0M',
         'ACTION:DISPLAY',
@@ -2786,7 +3137,7 @@
         if (al.enabled && al.time === hhmm && al.lastTriggeredDate !== today) {
           al.lastTriggeredDate = today;
           changed = true;
-          startAlarmRinging(`${al.time} · ${al.label}`);
+          startAlarmRinging(al);
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('MCMA守護寶 · 鬧鐘提醒', { body: `${al.time} - ${al.label}` });
           }
@@ -2796,11 +3147,11 @@
     }, 2000);
 
     // =========================================================================
-    // 8. 病史、天使BB紀念冊與超聲波影像庫
+    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像時序總覽
     // =========================================================================
     function renderHistoryAndGalleryTab() {
       const mhList = document.getElementById('medical-history-list');
-      const sortedMh = [...(appState.medicalHistory || [])].sort((a, b) => b.date.localeCompare(a.date));
+      const sortedMh = [...(appState.medicalHistory || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       mhList.innerHTML = sortedMh.map(item => `
         <div style="background:var(--amber-50); border:1px solid #fde68a; border-radius:10px; padding:8px 10px; font-size:12px;">
           <div class="flex-between" style="margin-bottom:3px;">
@@ -2808,9 +3159,12 @@
               <span class="badge" style="background:var(--amber-100); color:var(--amber-800);">${item.tag}</span>
               <strong>${formatDisplayDate(item.date)}</strong>
             </div>
-            <button onclick="deleteMedicalHistory('${item.id}')" style="color:#94a3b8; font-weight:700;">✕</button>
+            <div class="flex-center" style="gap: 4px;">
+              <button onclick="openHistoryModal('${item.id}')" class="btn btn-soft" style="padding:2px 7px; font-size:10.5px;">編輯</button>
+              <button onclick="deleteMedicalHistory('${item.id}')" style="color:#94a3b8; font-weight:700; padding:2px 4px;">✕</button>
+            </div>
           </div>
-          <p style="color:#334155; font-size:11.5px;">${item.detail}</p>
+          ${item.detail ? `<p style="color:#334155; font-size:11.5px;">${item.detail}</p>` : `<p style="color:#94a3b8; font-size:11px;">(無文字詳情)</p>`}
         </div>
       `).join('');
 
@@ -2818,14 +3172,14 @@
       const angelMedia = appState.angelMemorial.media || [];
       angelThumbs.innerHTML = angelMedia.length > 0
         ? angelMedia.slice(0, 4).map(m => m.type === 'video'
-            ? `<video src="${m.url}" style="width:46px; height:46px; border-radius:8px; object-fit:cover;"></video>`
-            : `<img src="${m.url}" style="width:46px; height:46px; border-radius:8px; object-fit:cover;">`
+            ? `<video src="${m.url}" onclick="openMediaLightbox('${m.url}', 'video', '天使BB紀念冊')" style="width:46px; height:46px; border-radius:8px; object-fit:cover; cursor:zoom-in;"></video>`
+            : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image', '天使BB紀念冊')" style="width:46px; height:46px; border-radius:8px; object-fit:cover; cursor:zoom-in;">`
           ).join('')
         : `<span style="font-size:11px; color:var(--purple-600);">點擊「開啟紀念冊」可多選上載珍貴相片或影片</span>`;
 
       ['A', 'B'].forEach(twinId => {
         const grid = document.getElementById(`gallery-grid-${twinId}`);
-        const items = (appState.twinMedia || []).filter(m => m.target === twinId || m.target === 'BOTH').sort((a, b) => b.date.localeCompare(a.date));
+        const items = (appState.twinMedia || []).filter(m => m.target === twinId || m.target === 'BOTH').sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
         if (items.length === 0) {
           grid.innerHTML = `<p style="grid-column:span 2; font-size:11px; color:#94a3b8; text-align:center; padding:18px 0;">暫無影像紀錄</p>`;
@@ -2835,11 +3189,11 @@
         grid.innerHTML = items.map(m => `
           <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:6px;">
             ${m.type === 'video'
-              ? `<video src="${m.url}" controls style="width:100%; height:96px; object-fit:cover; border-radius:8px; background:#000;"></video>`
-              : `<img src="${m.url}" style="width:100%; height:96px; object-fit:cover; border-radius:8px;">`
+              ? `<video src="${m.url}" controls onclick="openMediaLightbox('${m.url}', 'video', '${m.caption || '超聲波短片'}')" style="width:100%; height:96px; object-fit:cover; border-radius:8px; background:#000; cursor:zoom-in;"></video>`
+              : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image', '${m.caption || '超聲波相片'}')" title="點擊放大觀看" style="width:100%; height:96px; object-fit:cover; border-radius:8px; cursor:zoom-in;">`
             }
             <div class="flex-between" style="margin-top:4px;">
-              <input type="date" value="${m.date}" onchange="updateMediaDate('${m.id}', this.value)" style="padding:2px 4px; font-size:10px; border:none; border-bottom:1px dashed #cbd5e1; border-radius:0; width:92px;">
+              <input type="date" value="${m.date || ''}" onchange="updateMediaDate('${m.id}', this.value)" style="padding:2px 4px; font-size:10px; border:none; border-bottom:1px dashed #cbd5e1; border-radius:0; width:92px;">
               ${m.target === 'BOTH' ? '<span class="badge" style="background:var(--purple-100); color:var(--purple-800);">同框</span>' : ''}
             </div>
             <p style="font-size:11px; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:3px 0;">${m.caption || '超聲波紀錄'}</p>
@@ -2850,6 +3204,86 @@
           </div>
         `).join('');
       });
+
+      renderAllMediaTimeline();
+    }
+
+    // 彙整全庫所有上載圖片並依加入時序顯示來源位置
+    function renderAllMediaTimeline() {
+      const grid = document.getElementById('all-media-timeline-grid');
+      const countBadge = document.getElementById('all-media-count-badge');
+      if (!grid) return;
+
+      const unified = [];
+
+      (appState.twinMedia || []).forEach(m => {
+        if (!m.url) return;
+        const who = m.target === 'A' ? 'BB A 超聲波庫' : m.target === 'B' ? 'BB B 超聲波庫' : '雙胎同框超聲波庫';
+        unified.push({
+          url: m.url, type: m.type || 'image', source: `📸 ${who}`,
+          date: m.date || '', caption: m.caption || '超聲波影像', ts: m.updatedAt || 0
+        });
+      });
+
+      (appState.events || []).forEach(ev => {
+        (ev.media || []).forEach(m => {
+          if (!m.url) return;
+          unified.push({
+            url: m.url, type: m.type || 'image', source: `📅 月曆 (${ev.category})`,
+            date: ev.date || '', caption: ev.title || '覆診/住院附件', ts: m.addedAt || ev.updatedAt || 0
+          });
+        });
+      });
+
+      (appState.maternalLogs || []).forEach(ml => {
+        (ml.media || []).forEach(m => {
+          if (!m.url) return;
+          unified.push({
+            url: m.url, type: m.type || 'image', source: '🤰 母體日記',
+            date: ml.date || '', caption: ml.feeling || ml.mood || '母體紀錄附件', ts: m.addedAt || ml.updatedAt || 0
+          });
+        });
+      });
+
+      (appState.medications || []).forEach(med => {
+        if (!med.image) return;
+        unified.push({
+          url: med.image, type: 'image', source: `💊 藥物清單 (${med.type})`,
+          date: '', caption: med.name || '藥物包裝', ts: med.updatedAt || 0
+        });
+      });
+
+      (appState.angelMemorial?.media || []).forEach(m => {
+        if (!m.url) return;
+        unified.push({
+          url: m.url, type: m.type || 'image', source: '🕊️ 天使BB紀念冊',
+          date: m.date || '2026-05-18', caption: '18/5/2026 紀念影像', ts: appState.angelMemorial.updatedAt || 0
+        });
+      });
+
+      // 按加入時間時序排列（最新加入排最前）
+      unified.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      if (countBadge) countBadge.textContent = `${unified.length} 個檔案`;
+
+      if (unified.length === 0) {
+        grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:11.5px; color:#94a3b8; text-align:center; padding:16px 0;">目前尚未在任何位置上載相片或影片</p>`;
+        return;
+      }
+
+      grid.innerHTML = unified.map((item, idx) => {
+        const timeText = item.ts ? new Date(item.ts).toLocaleString('zh-HK', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) : formatDisplayDate(item.date);
+        return `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:6px; display:flex; flex-direction:column; gap:4px;">
+            ${item.type === 'video'
+              ? `<video src="${item.url}" onclick="openMediaLightbox('${item.url}', 'video', '${item.source} · ${item.caption}')" style="width:100%; height:90px; object-fit:cover; border-radius:7px; background:#000; cursor:zoom-in;"></video>`
+              : `<img src="${item.url}" onclick="openMediaLightbox('${item.url}', 'image', '${item.source} · ${item.caption}')" title="點擊放大觀看" style="width:100%; height:90px; object-fit:cover; border-radius:7px; cursor:zoom-in;">`
+            }
+            <span class="badge" style="background:var(--sky-100); color:var(--sky-700); align-self:flex-start;">${item.source}</span>
+            <p style="font-size:11px; font-weight:700; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.caption}</p>
+            <span style="font-size:9.5px; color:#64748b;">時序 #${unified.length - idx} · ${timeText}</span>
+          </div>
+        `;
+      }).join('');
     }
 
     async function setTwinAvatar(twinId, url) {
@@ -2858,24 +3292,70 @@
       showToast(`✨ 已更新 BB ${twinId} 頭像並同步`);
     }
 
-    function openHistoryModal() {
+    function toggleCustomHistoryTag() {
+      const sel = document.getElementById('mh-tag').value;
+      const wrap = document.getElementById('mh-custom-tag-wrap');
+      if (sel === 'CUSTOM') {
+        wrap.classList.remove('hidden');
+        document.getElementById('mh-custom-tag').focus();
+      } else {
+        wrap.classList.add('hidden');
+      }
+    }
+
+    function openHistoryModal(editId) {
+      document.getElementById('mh-id').value = editId || '';
+      document.getElementById('mh-custom-tag').value = '';
+      if (editId) {
+        const item = (appState.medicalHistory || []).find(x => x.id === editId);
+        if (item) {
+          document.getElementById('mh-modal-title').textContent = '✏️ 編輯母體病史 / 出血進展';
+          document.getElementById('mh-date').value = item.date || '';
+          const presets = ['子宮頸瘜肉', '孕初期流血/流啡', '其他醫療紀錄'];
+          if (presets.includes(item.tag)) {
+            document.getElementById('mh-tag').value = item.tag;
+            document.getElementById('mh-custom-tag-wrap').classList.add('hidden');
+          } else {
+            document.getElementById('mh-tag').value = 'CUSTOM';
+            document.getElementById('mh-custom-tag').value = item.tag;
+            document.getElementById('mh-custom-tag-wrap').classList.remove('hidden');
+          }
+          document.getElementById('mh-detail').value = item.detail || '';
+          openModal('modal-history');
+          return;
+        }
+      }
+      document.getElementById('mh-modal-title').textContent = '🩺 新增母體病史 / 出血進展';
       document.getElementById('mh-date').value = getTodayStr();
+      document.getElementById('mh-tag').value = '子宮頸瘜肉';
+      document.getElementById('mh-custom-tag-wrap').classList.add('hidden');
       document.getElementById('mh-detail').value = '';
       openModal('modal-history');
     }
 
     async function saveMedicalHistory(e) {
       e.preventDefault();
-      appState.medicalHistory.unshift({
-        id: 'mh-' + Date.now(),
-        date: document.getElementById('mh-date').value,
-        tag: document.getElementById('mh-tag').value,
+      const editId = document.getElementById('mh-id').value;
+      const rawTag = document.getElementById('mh-tag').value;
+      const tag = rawTag === 'CUSTOM'
+        ? (document.getElementById('mh-custom-tag').value.trim() || '自訂病史')
+        : rawTag;
+
+      const record = {
+        id: editId || ('mh-' + Date.now()),
+        date: document.getElementById('mh-date').value || '',
+        tag,
         detail: document.getElementById('mh-detail').value.trim(),
         updatedAt: Date.now()
-      });
+      };
+
+      const idx = (appState.medicalHistory || []).findIndex(x => x.id === record.id);
+      if (idx >= 0) appState.medicalHistory[idx] = record;
+      else appState.medicalHistory.unshift(record);
+
       await persistAndSync();
       closeAllModals();
-      showToast('🩺 已新增母體病史紀錄並同步');
+      showToast('🩺 已儲存母體病史紀錄並同步');
     }
 
     async function deleteMedicalHistory(id) {
@@ -2898,7 +3378,7 @@
     }
 
     function handleAngelMediaUpload(e) {
-      const files = Array.from(e.target.files);
+      const files = Array.from(e.target.files || []);
       let done = 0;
       files.forEach(file => {
         const reader = new FileReader();
@@ -2931,7 +3411,10 @@
       }
       grid.innerHTML = items.map((m, idx) => `
         <div style="position:relative; background:var(--purple-50); border:1px solid #e9d5ff; border-radius:10px; padding:4px;">
-          ${m.type === 'video' ? `<video src="${m.url}" controls style="width:100%; height:96px; object-fit:cover; border-radius:8px;"></video>` : `<img src="${m.url}" style="width:100%; height:96px; object-fit:cover; border-radius:8px;">`}
+          ${m.type === 'video'
+            ? `<video src="${m.url}" controls onclick="openMediaLightbox('${m.url}', 'video')" style="width:100%; height:96px; object-fit:cover; border-radius:8px; cursor:zoom-in;"></video>`
+            : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image')" style="width:100%; height:96px; object-fit:cover; border-radius:8px; cursor:zoom-in;">`
+          }
           <button onclick="removeAngelMedia(${idx})" class="preview-del-btn" style="top:8px; right:8px;">✕</button>
         </div>
       `).join('');
@@ -2955,7 +3438,7 @@
     }
 
     function handlePendingTwinMediaSelect(e) {
-      const files = Array.from(e.target.files);
+      const files = Array.from(e.target.files || []);
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (ev) => {
@@ -2976,7 +3459,7 @@
       document.getElementById('mu-count-label').textContent = tempPendingTwinMedia.length;
       box.innerHTML = tempPendingTwinMedia.map((m, idx) => `
         <div class="preview-item" title="${m.name || ''}">
-          ${m.type === 'video' ? `<video src="${m.url}"></video>` : `<img src="${m.url}">`}
+          ${m.type === 'video' ? `<video src="${m.url}" onclick="openMediaLightbox('${m.url}', 'video')"></video>` : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image')">`}
           <button type="button" onclick="removePendingTwinMedia(${idx})" class="preview-del-btn" title="剔除此檔案">✕</button>
         </div>
       `).join('');
@@ -2995,7 +3478,7 @@
       }
       const cfg = getSyncConfig();
       const target = document.getElementById('mu-target').value;
-      const date = document.getElementById('mu-date').value;
+      const date = document.getElementById('mu-date').value || '';
       const caption = document.getElementById('mu-caption').value.trim();
 
       tempPendingTwinMedia.forEach(item => {
@@ -3018,8 +3501,8 @@
 
     async function updateMediaDate(id, newDate) {
       const item = appState.twinMedia.find(m => m.id === id);
-      if (item && newDate) {
-        item.date = newDate;
+      if (item) {
+        item.date = newDate || '';
         item.updatedAt = Date.now();
         await persistAndSync();
         showToast('📅 已更新影像日期並同步');
@@ -3040,7 +3523,7 @@
       const ga = getGestationalAgeForDate(new Date());
       document.getElementById('exercise-ga-tag').textContent = `目前孕週：${ga.label}`;
 
-      const latestLog = [...(appState.maternalLogs || [])].sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))[0];
+      const latestLog = [...(appState.maternalLogs || [])].sort((a, b) => ((b.date || '') + (b.time || '')).localeCompare((a.date || '') + (a.time || '')))[0];
       const hasBleeding = latestLog && latestLog.bleeding !== '正常無出血';
 
       const alertBox = document.getElementById('exercise-dynamic-alert');
@@ -3075,7 +3558,7 @@
     }
 
     // =========================================================================
-    // 10. 彈窗與時間選單初始化
+    // 10. 彈窗與時間選單初始化（鬧鐘保留00-59分，其他改回00/15/30/45分，全支援空白項）
     // =========================================================================
     function openModal(modalId) {
       document.getElementById('modal-backdrop').classList.remove('hidden');
@@ -3092,27 +3575,45 @@
       if (e.target.id === 'modal-backdrop') closeAllModals();
     }
 
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAllModals(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeMediaLightbox();
+        closeAllModals();
+      }
+    });
 
     function populateFullTimeSelects() {
-      let hoursHtml = '';
+      // 小時選單（含空白項）
+      let hoursHtml = `<option value="">--時</option>`;
       for (let h = 0; h < 24; h++) {
         const val = String(h).padStart(2, '0');
         hoursHtml += `<option value="${val}">${val}時</option>`;
       }
-      let minsHtml = '';
+
+      // 鬧鐘專屬分鐘選單（00–59 分 + 空白項）
+      let alarmMinsHtml = `<option value="">--分</option>`;
       for (let m = 0; m < 60; m++) {
         const val = String(m).padStart(2, '0');
-        minsHtml += `<option value="${val}">${val}分</option>`;
+        alarmMinsHtml += `<option value="${val}">${val}分</option>`;
       }
 
-      ['mat-hour', 'alarm-hour', 'tm-hour', 'ev-hour'].forEach(id => {
+      // 其他功能分鐘選單（00, 15, 30, 45 分 + 空白項）
+      let quarterMinsHtml = `<option value="">--分</option>`;
+      ['00', '15', '30', '45'].forEach(val => {
+        quarterMinsHtml += `<option value="${val}">${val}分</option>`;
+      });
+
+      ['mat-hour', 'alarm-hour', 'tm-hour', 'ev-hour', 'ev-end-hour'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = hoursHtml;
       });
-      ['mat-min', 'alarm-min', 'tm-min', 'ev-min'].forEach(id => {
+
+      const alarmMinEl = document.getElementById('alarm-min');
+      if (alarmMinEl) alarmMinEl.innerHTML = alarmMinsHtml;
+
+      ['mat-min', 'tm-min', 'ev-min', 'ev-end-min'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.innerHTML = minsHtml;
+        if (el) el.innerHTML = quarterMinsHtml;
       });
     }
 
@@ -3134,7 +3635,8 @@
       document.getElementById('mat-date').value = getTodayStr();
       const now = new Date();
       document.getElementById('mat-hour').value = String(now.getHours()).padStart(2, '0');
-      document.getElementById('mat-min').value = String(now.getMinutes()).padStart(2, '0');
+      const nearestQ = String(Math.floor(now.getMinutes() / 15) * 15).padStart(2, '0');
+      document.getElementById('mat-min').value = nearestQ;
       document.getElementById('alarm-hour').value = '09';
       document.getElementById('alarm-min').value = '00';
 
