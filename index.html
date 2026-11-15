@@ -6,7 +6,7 @@
   <title>MCMA守護寶</title>
   <style>
     /* =========================================================================
-       100% 離線內嵌 CSS (完全不依賴外部 CDN，徹底解決 iOS 檔案預覽/沙盒變形問題)
+       100% 離線內嵌 CSS + 全解像度動態自適應佈局 (Responsive Fluid Grid)
        ========================================================================= */
     :root {
       --bg-page: #fdf8f9;
@@ -49,14 +49,19 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    html {
+      font-size: clamp(13px, 1.1vw + 10px, 15px);
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "PingFang HK", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
       background-color: var(--bg-page);
       color: var(--text-main);
       line-height: 1.45;
-      padding-bottom: 76px;
+      padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px));
       overscroll-behavior-y: contain;
       overflow-x: hidden;
+      width: 100%;
     }
 
     @media (min-width: 640px) {
@@ -65,7 +70,7 @@
 
     button, input, select, textarea {
       font-family: inherit;
-      font-size: 13px;
+      font-size: 0.92rem;
     }
 
     button {
@@ -77,6 +82,7 @@
     input[type="text"], input[type="number"], input[type="date"], select, textarea {
       width: 100%;
       max-width: 100%;
+      min-width: 0;
       border: 1px solid #cbd5e1;
       border-radius: 10px;
       padding: 7px 10px;
@@ -92,22 +98,24 @@
 
     .hidden { display: none !important; }
 
-    /* 容器與通用排版 */
+    /* 容器與動態自適應網格 */
     .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 12px;
       width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 clamp(10px, 2.5vw, 20px);
     }
 
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-light);
       border-radius: 16px;
-      padding: 14px;
+      padding: clamp(11px, 2vw, 16px);
       box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
       margin-bottom: 14px;
       overflow: hidden;
+      width: 100%;
+      min-width: 0;
     }
 
     .flex-between {
@@ -115,30 +123,37 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      min-width: 0;
     }
 
     .flex-center {
       display: flex;
       align-items: center;
       gap: 8px;
+      min-width: 0;
     }
 
     .grid-2 {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      gap: clamp(8px, 1.5vw, 12px);
+      width: 100%;
     }
 
-    /* 影像庫專用雙卡片並排網格 */
+    @media (max-width: 340px) {
+      .grid-2 { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    /* 影像庫動態自適應並排網格 */
     .media-grid-2 {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(138px, 46%), 1fr));
       gap: 8px;
       width: 100%;
     }
     @media (min-width: 768px) {
       .media-grid-2 {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
         gap: 10px;
       }
     }
@@ -165,7 +180,7 @@
     .media-filter-btn {
       padding: 5px 10px;
       border-radius: 99px;
-      font-size: 11px;
+      font-size: 0.78rem;
       font-weight: 700;
       background: #f1f5f9;
       color: #475569;
@@ -183,6 +198,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       gap: 12px;
+      width: 100%;
     }
     @media (min-width: 768px) {
       .grid-resp-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -192,6 +208,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       gap: 10px;
+      width: 100%;
     }
     @media (min-width: 640px) {
       .grid-resp-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -201,8 +218,12 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
+      width: 100%;
     }
-    @media (min-width: 640px) {
+    @media (max-width: 420px) {
+      .grid-resp-4 { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (min-width: 768px) {
       .grid-resp-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
 
@@ -234,7 +255,7 @@
       display: inline-block;
       padding: 2px 8px;
       border-radius: 99px;
-      font-size: 10.5px;
+      font-size: 0.75rem;
       font-weight: 700;
       background: var(--rose-100);
       color: var(--rose-700);
@@ -250,9 +271,10 @@
       border-radius: 12px;
       background: #f8fafc;
       border: 1px solid #cbd5e1;
-      font-size: 11px;
+      font-size: 0.78rem;
       font-weight: 600;
       color: #334155;
+      white-space: nowrap;
     }
 
     .sync-dot {
@@ -282,7 +304,7 @@
       padding: 8px 10px;
       border-radius: 12px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 0.92rem;
       color: var(--text-muted);
       transition: background 0.15s, color 0.15s;
     }
@@ -301,7 +323,7 @@
       background: rgba(255, 255, 255, 0.97);
       border-top: 1px solid var(--border-light);
       display: flex;
-      padding: 6px 8px;
+      padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
       gap: 4px;
     }
     @media (min-width: 640px) {
@@ -316,7 +338,7 @@
       gap: 2px;
       padding: 6px 4px;
       border-radius: 10px;
-      font-size: 11px;
+      font-size: 0.78rem;
       font-weight: 700;
       color: var(--text-muted);
     }
@@ -346,7 +368,7 @@
       background: #ffffff;
       border: 1px solid #d8b4fe;
       color: var(--purple-800);
-      font-size: 11px;
+      font-size: 0.78rem;
       font-weight: 700;
       white-space: nowrap;
     }
@@ -377,7 +399,7 @@
     .twin-card {
       background: #ffffff;
       border-radius: 16px;
-      padding: 11px;
+      padding: clamp(9px, 1.8vw, 14px);
       cursor: pointer;
       transition: transform 0.12s;
       min-width: 0;
@@ -387,8 +409,8 @@
     .twin-card-b { border: 1.5px solid var(--pink-200); }
 
     .avatar-img {
-      width: 40px;
-      height: 40px;
+      width: clamp(34px, 5vw, 44px);
+      height: clamp(34px, 5vw, 44px);
       border-radius: 50%;
       object-fit: cover;
       flex-shrink: 0;
@@ -399,14 +421,15 @@
       border-radius: 8px;
       padding: 6px 8px;
       margin-top: 6px;
+      min-width: 0;
     }
 
-    /* 今日母體概覽縮小字體專用樣式 */
+    /* 今日媽媽概覽縮小字體專用樣式 */
     .mat-mini-box {
       background: #f8fafc;
       border-radius: 8px;
-      padding: 5px 8px;
-      font-size: 11px;
+      padding: 6px 8px;
+      font-size: 0.8rem;
       line-height: 1.35;
     }
 
@@ -450,12 +473,17 @@
       justify-content: center;
     }
 
-    /* 月曆樣式 */
+    /* 月曆樣式（獨立左右滑動區） */
+    #calendar-swipe-zone {
+      touch-action: pan-y;
+      user-select: none;
+    }
+
     .cal-weekdays {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
       text-align: center;
-      font-size: 11px;
+      font-size: 0.78rem;
       font-weight: 700;
       color: #64748b;
       padding-bottom: 6px;
@@ -466,15 +494,15 @@
     .cal-grid {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 4px;
+      gap: clamp(2px, 0.6vw, 5px);
       padding-top: 6px;
     }
 
     .cal-cell {
-      min-height: 78px;
+      min-height: clamp(68px, 11vw, 92px);
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      padding: 4px;
+      padding: clamp(3px, 0.6vw, 6px);
       background: #ffffff;
       color: #1e293b;
       display: flex;
@@ -482,6 +510,7 @@
       justify-content: space-between;
       cursor: pointer;
       min-width: 0;
+      overflow: hidden;
     }
     .cal-cell.other-month {
       background: #f8fafc;
@@ -496,9 +525,9 @@
     }
 
     .cal-ev-tag {
-      font-size: 9px;
+      font-size: clamp(8.5px, 1.5vw, 10px);
       font-weight: 700;
-      padding: 2px 4px;
+      padding: 2px 3px;
       border-radius: 4px;
       color: #fff;
       white-space: nowrap;
@@ -520,10 +549,11 @@
       gap: 4px;
       padding: 7px 12px;
       border-radius: 10px;
-      font-size: 12px;
+      font-size: 0.85rem;
       font-weight: 700;
       transition: opacity 0.15s;
       text-decoration: none;
+      white-space: nowrap;
     }
     .btn:active { opacity: 0.85; }
     .btn-rose { background: var(--rose-600); color: #fff; }
@@ -565,6 +595,7 @@
       border: 1px solid #cbd5e1;
       overflow: hidden;
       background: #f1f5f9;
+      flex-shrink: 0;
     }
     .preview-item img, .preview-item video {
       width: 100%;
@@ -599,13 +630,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 12px;
+      padding: 10px;
     }
     .modal-box {
       background: #ffffff;
       width: 100%;
-      max-width: 620px;
-      max-height: 78vh;
+      max-width: 640px;
+      max-height: 84vh;
       border-radius: 18px;
       display: flex;
       flex-direction: column;
@@ -620,6 +651,7 @@
       justify-content: space-between;
       background: #ffffff;
       flex-shrink: 0;
+      gap: 8px;
     }
     .modal-body {
       padding: 14px 16px;
@@ -636,6 +668,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     /* 全螢幕圖片/影片燈箱 */
@@ -664,7 +697,7 @@
       border: 1px solid rgba(255, 255, 255, 0.3);
       padding: 7px 14px;
       border-radius: 99px;
-      font-size: 12px;
+      font-size: 0.85rem;
       font-weight: 700;
     }
 
@@ -683,7 +716,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      width: min(92vw, 420px);
+      width: min(92vw, 440px);
       animation: pulseRing 1s infinite alternate;
     }
     @keyframes pulseRing {
@@ -706,7 +739,7 @@
     .toast-msg {
       padding: 9px 14px;
       border-radius: 12px;
-      font-size: 12px;
+      font-size: 0.85rem;
       font-weight: 700;
       color: #ffffff;
       background: #1e293b;
@@ -718,7 +751,7 @@
       display: inline-block;
       padding: 2px 7px;
       border-radius: 6px;
-      font-size: 10px;
+      font-size: 0.72rem;
       font-weight: 700;
       max-width: 100%;
       overflow: hidden;
@@ -727,7 +760,7 @@
     }
     .label-sm {
       display: block;
-      font-size: 11px;
+      font-size: 0.78rem;
       font-weight: 700;
       color: #475569;
       margin-bottom: 4px;
@@ -743,15 +776,15 @@
   <div id="media-lightbox" onclick="closeMediaLightbox(event)" class="lightbox-overlay hidden">
     <div style="width:100%; max-width:94vw; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; color:#fff; gap:8px;">
       <div style="min-width:0;">
-        <div id="lightbox-caption" style="font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
-        <div id="lightbox-counter" style="font-size:10.5px; color:#cbd5e1;"></div>
+        <div id="lightbox-caption" style="font-size:0.85rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+        <div id="lightbox-counter" style="font-size:0.75rem; color:#cbd5e1;"></div>
       </div>
       <button onclick="closeMediaLightbox()" style="background:rgba(255,255,255,0.2); color:#fff; width:34px; height:34px; border-radius:50%; font-size:16px; font-weight:700; flex-shrink:0;">✕</button>
     </div>
     <div id="lightbox-content"></div>
     <div id="lightbox-nav-bar" style="display:flex; align-items:center; gap:14px; margin-top:12px;">
       <button type="button" onclick="stepMediaLightbox(-1)" class="lb-nav-btn">‹ 上一張</button>
-      <span style="font-size:11px; color:#cbd5e1;">👈 左右滑動切換 👉</span>
+      <span style="font-size:0.78rem; color:#cbd5e1;">👈 左右滑動切換 👉</span>
       <button type="button" onclick="stepMediaLightbox(1)" class="lb-nav-btn">下一張 ›</button>
     </div>
   </div>
@@ -760,10 +793,10 @@
   <div id="alarm-ringing-banner" class="ringing-overlay hidden">
     <span style="font-size: 24px;">⏰</span>
     <div style="flex: 1;">
-      <div style="font-size: 13px; font-weight: 800;">本機鬧鐘時間到！</div>
-      <div id="alarm-ringing-text" style="font-size: 12px; opacity: 0.95;"></div>
+      <div style="font-size: 0.9rem; font-weight: 800;">本機鬧鐘時間到！</div>
+      <div id="alarm-ringing-text" style="font-size: 0.85rem; opacity: 0.95;"></div>
     </div>
-    <button onclick="stopAlarmRinging()" style="background:#fff; color:#dc2626; padding:6px 12px; border-radius:10px; font-weight:800; font-size:12px;">關閉並刪除鬧鐘</button>
+    <button id="alarm-stop-btn" onclick="stopAlarmRinging()" style="background:#fff; color:#dc2626; padding:6px 12px; border-radius:10px; font-weight:800; font-size:0.85rem;">關閉鬧鐘</button>
   </div>
 
   <!-- 頂部導航列 -->
@@ -774,10 +807,10 @@
           <div class="brand-icon">♥</div>
           <div style="min-width: 0;">
             <div class="flex-center" style="flex-wrap: wrap; gap: 5px;">
-              <h1 style="font-size: 16px; font-weight: 800; color: #0f172a;">MCMA守護寶</h1>
+              <h1 style="font-size: 1.05rem; font-weight: 800; color: #0f172a;">MCMA守護寶</h1>
               <span id="header-ga-badge" class="ga-badge">LMP 計算中...</span>
             </div>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
               預產期：<strong id="header-edd-text" style="color: #334155;">27/6/2027</strong>
               <span style="margin: 0 4px; color: #cbd5e1;">|</span>
               <span style="color: var(--rose-600); font-weight: 600;">單絨毛膜單羊膜雙胎</span>
@@ -798,7 +831,7 @@
       <!-- 桌面版分頁標籤 -->
       <nav class="desktop-nav">
         <button onclick="switchTab(0)" data-tab="0" class="tab-btn active">🏠 主頁概覽</button>
-        <button onclick="switchTab(1)" data-tab="1" class="tab-btn">💊 母體與用藥</button>
+        <button onclick="switchTab(1)" data-tab="1" class="tab-btn">💊 守護媽媽</button>
         <button onclick="switchTab(2)" data-tab="2" class="tab-btn">🖼️ 病史與影像庫</button>
         <button onclick="switchTab(3)" data-tab="3" class="tab-btn">🧘‍♀️ 安全運動</button>
       </nav>
@@ -810,7 +843,7 @@
     <div class="banner-mcma">
       <div class="flex-center" style="flex: 1; min-width: 200px;">
         <span style="font-size: 16px;">🛡️</span>
-        <p style="font-size: 11.5px; color: #334155;">
+        <p style="font-size: 0.8rem; color: #334155;">
           <strong style="color: var(--rose-700);">MCMA高危守護：</strong>共用單一胎盤及羊膜囊，密切追蹤雙胎生長及臍帶狀況。
         </p>
       </div>
@@ -836,14 +869,14 @@
               <div style="min-width: 0;">
                 <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
                   <span class="badge" style="background: var(--sky-100); color: var(--sky-700);">大孖</span>
-                  <span style="font-size: 13px; font-weight: 800; color: #0f172a;">BB A</span>
+                  <span style="font-size: 0.92rem; font-weight: 800; color: #0f172a;">BB A</span>
                 </div>
                 <div style="margin-top: 3px;">
-                  <span id="twin-A-live-ga" class="badge" style="background: #0284c7; color: #fff; font-size: 10.5px;">即日計算中</span>
+                  <span id="twin-A-live-ga" class="badge" style="background: #0284c7; color: #fff;">即日計算中</span>
                 </div>
               </div>
             </div>
-            <span style="font-size: 10.5px; font-weight: 700; color: var(--sky-700); flex-shrink: 0; white-space: nowrap;">曲線 ›</span>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--sky-700); flex-shrink: 0; white-space: nowrap;">曲線 ›</span>
           </div>
           <div id="twin-A-summary"></div>
         </div>
@@ -856,28 +889,28 @@
               <div style="min-width: 0;">
                 <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
                   <span class="badge" style="background: var(--pink-100); color: var(--pink-700);">細孖</span>
-                  <span style="font-size: 13px; font-weight: 800; color: #0f172a;">BB B</span>
+                  <span style="font-size: 0.92rem; font-weight: 800; color: #0f172a;">BB B</span>
                 </div>
                 <div style="margin-top: 3px;">
-                  <span id="twin-B-live-ga" class="badge" style="background: #db2777; color: #fff; font-size: 10.5px;">即日計算中</span>
+                  <span id="twin-B-live-ga" class="badge" style="background: #db2777; color: #fff;">即日計算中</span>
                 </div>
               </div>
             </div>
-            <span style="font-size: 10.5px; font-weight: 700; color: var(--pink-700); flex-shrink: 0; white-space: nowrap;">曲線 ›</span>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--pink-700); flex-shrink: 0; white-space: nowrap;">曲線 ›</span>
           </div>
           <div id="twin-B-summary"></div>
         </div>
       </div>
 
       <!-- 雙胎發育同步對比條 -->
-      <div id="twin-pace-strip" class="card flex-between" style="padding: 10px 14px; font-size: 12px; flex-wrap: wrap;"></div>
+      <div id="twin-pace-strip" class="card flex-between" style="padding: 10px 14px; font-size: 0.85rem; flex-wrap: wrap;"></div>
 
-      <!-- 互動月曆 -->
-      <div class="card">
+      <!-- 互動月曆（獨立左右滑動區，不會誤觸主頁面分頁切換） -->
+      <div class="card" id="calendar-swipe-zone">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 10px;">
           <div class="flex-center">
             <button onclick="changeCalendarMonth(-1)" class="btn btn-soft" style="padding: 6px 10px;">‹</button>
-            <h3 id="calendar-month-title" style="font-size: 16px; font-weight: 800; min-width: 105px; text-align: center;">2026年 11月</h3>
+            <h3 id="calendar-month-title" style="font-size: 1.05rem; font-weight: 800; min-width: 105px; text-align: center;">2026年 11月</h3>
             <button onclick="changeCalendarMonth(1)" class="btn btn-soft" style="padding: 6px 10px;">›</button>
           </div>
           <div class="flex-center" style="flex-wrap: wrap;">
@@ -887,13 +920,14 @@
           </div>
         </div>
 
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;">
           <span><b style="color:#3b82f6;">■</b> 公立</span>
           <span><b style="color:#f43f5e;">■</b> 私家</span>
           <span><b style="color:#dc2626;">■</b> 急症室</span>
           <span><b style="color:#f59e0b;">■</b> 住院(跨日)</span>
           <span><b style="color:#10b981;">■</b> 睇中醫</span>
           <span><span class="badge" style="background:#e2e8f0; color:#334155;">更</span> 工作更期</span>
+          <span style="color:#64748b;">👈 月曆區域內左右滑動可切換月份 👉</span>
           <span id="gcal-auto-status-hint" style="color: var(--emerald-800); font-weight: 600;">· 已啟用自動匯出至老婆日曆</span>
         </div>
 
@@ -910,13 +944,13 @@
       </div>
     </section>
 
-    <!-- ==================== 分頁 1：母體與用藥 ==================== -->
+    <!-- ==================== 分頁 1：守護媽媽 ==================== -->
     <section id="tab-1" class="tab-panel hidden">
       <div class="grid-resp-2">
-        <!-- 今日母體概覽 -->
+        <!-- 今日媽媽概覽 -->
         <div class="card">
           <div class="flex-between" style="margin-bottom: 8px;">
-            <h3 style="font-size: 13px; font-weight: 800;">🤰 今日母體概覽</h3>
+            <h3 style="font-size: 0.95rem; font-weight: 800;">🤰 今日媽媽概覽</h3>
             <span id="maternal-today-date" class="badge" style="background: var(--rose-50); color: var(--rose-600);"></span>
           </div>
           <div id="maternal-today-summary" style="display: flex; flex-direction: column; gap: 5px;"></div>
@@ -925,17 +959,21 @@
         <!-- 每日藥物及保健品清單 -->
         <div class="card">
           <div class="flex-between" style="margin-bottom: 10px;">
-            <h3 style="font-size: 14px; font-weight: 800;">💊 每日用藥及保健品清單</h3>
+            <h3 style="font-size: 0.95rem; font-weight: 800;">💊 每日用藥及保健品清單</h3>
             <button onclick="openMedModal(null)" class="btn btn-teal">+ 新增藥物</button>
           </div>
           <div id="med-checklist-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto;"></div>
         </div>
       </div>
 
-      <!-- 記錄母體當刻活動、心情與身體狀況 -->
+      <!-- 記錄媽媽當刻活動、心情與身體狀況 -->
       <div class="card">
-        <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 10px;">📝 記錄母體當刻活動、心情與身體狀況</h3>
+        <div class="flex-between" style="margin-bottom: 10px;">
+          <h3 id="mat-form-heading" style="font-size: 0.95rem; font-weight: 800;">📝 記錄媽媽當刻活動、心情與身體狀況</h3>
+          <button type="button" id="mat-cancel-edit-btn" onclick="resetMaternalForm()" class="btn btn-soft-rose hidden" style="padding: 4px 10px; font-size: 0.78rem;">取消編輯</button>
+        </div>
         <form onsubmit="saveMaternalLog(event)" style="display: flex; flex-direction: column; gap: 10px;">
+          <input type="hidden" id="mat-edit-id">
           <div class="grid-resp-4">
             <div>
               <label class="label-sm">日期 (可留空)</label>
@@ -949,15 +987,17 @@
               </div>
             </div>
             <div>
-              <label class="label-sm">心情狀態 (預設空白)</label>
-              <select id="mat-mood">
+              <label class="label-sm">心情狀態 (預設空白 · 可自訂)</label>
+              <select id="mat-mood" onchange="toggleCustomMoodInput()">
                 <option value="">-- 空白 --</option>
                 <option value="😊 平靜安心">😊 平靜安心</option>
                 <option value="🥰 開心期待">🥰 開心期待</option>
                 <option value="😴 疲倦嗜睡">😴 疲倦嗜睡</option>
                 <option value="😰 緊張擔心">😰 緊張擔心</option>
                 <option value="😢 情緒低落">😢 情緒低落</option>
+                <option value="CUSTOM">✏️ 自訂心情狀態...</option>
               </select>
+              <input type="text" id="mat-mood-custom" class="hidden" placeholder="輸入自訂心情..." style="margin-top: 5px;">
             </div>
             <div>
               <label class="label-sm">分泌物 / 出血狀況 (預設空白)</label>
@@ -993,15 +1033,15 @@
           </div>
 
           <div style="display: flex; justify-content: flex-end;">
-            <button type="submit" class="btn btn-rose">儲存母體紀錄</button>
+            <button type="submit" id="mat-submit-btn" class="btn btn-rose">儲存媽媽紀錄</button>
           </div>
         </form>
       </div>
 
-      <!-- 過往母體紀錄 -->
+      <!-- 過往媽媽紀錄 -->
       <div class="card">
-        <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 10px;">📋 過往母體紀錄</h3>
-        <div id="maternal-logs-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto;"></div>
+        <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 10px;">📋 過往媽媽紀錄 (支援編輯)</h3>
+        <div id="maternal-logs-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto;"></div>
       </div>
 
       <!-- 本機專屬鬧鐘 -->
@@ -1009,26 +1049,30 @@
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div class="flex-center" style="flex-wrap: wrap;">
             <span style="font-size: 16px;">⏰</span>
-            <h3 style="font-size: 14px; font-weight: 800;">本機專屬鬧鐘 (響鬧後自動刪除)</h3>
-            <a href="https://www.icloud.com/shortcuts/daa3c58aea0a42e09bc38f8f40a09464" target="_blank" rel="noopener noreferrer" class="btn" style="background: rgba(56, 189, 248, 0.22); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.45); padding: 3px 8px; font-size: 11px;">📲 安裝/開啟捷徑</a>
+            <h3 style="font-size: 0.95rem; font-weight: 800;">本機專屬鬧鐘 (單次響鬧自動刪除 / 每日固定保留)</h3>
+            <a href="https://www.icloud.com/shortcuts/daa3c58aea0a42e09bc38f8f40a09464" target="_blank" rel="noopener noreferrer" class="btn" style="background: rgba(56, 189, 248, 0.22); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.45); padding: 3px 8px; font-size: 0.78rem;">📲 安裝/開啟捷徑</a>
           </div>
           <div class="flex-center">
             <button onclick="unlockAndTestAlarmSound()" class="btn" style="background:#334155; color:#fcd34d; padding:5px 10px;">🔔 解鎖並試聽</button>
           </div>
         </div>
 
-        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-size: 11px; color: #cbd5e1;">
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-size: 0.78rem; color: #cbd5e1;">
           <div class="flex-between" style="flex-wrap: wrap; gap: 6px;">
             <span>🔗 接駁捷徑名稱：<strong id="current-shortcut-name-label" style="color:#fbbf24;">MCMA 設鬧鐘</strong></span>
-            <button type="button" onclick="editShortcutName()" style="color:#7dd3fc; text-decoration:underline; font-size:11px;">修改捷徑名稱</button>
+            <button type="button" onclick="editShortcutName()" style="color:#7dd3fc; text-decoration:underline; font-size:0.78rem;">修改捷徑名稱</button>
           </div>
-          <div style="color:#94a3b8; margin-top:2px;">若捷徑 App 提示「找不到捷徑」，請核對捷徑 App 內的名稱（例如有無空格）或點擊上方「📲 安裝/開啟捷徑」。</div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr; gap: 8px; background: rgba(30, 41, 59, 0.9); padding: 10px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 10px;">
-          <div style="display: flex; gap: 6px;">
-            <select id="alarm-hour" style="flex:1;"></select>
-            <select id="alarm-min" style="flex:1;"></select>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <select id="alarm-hour" style="flex:1; min-width: 85px;"></select>
+            <select id="alarm-min" style="flex:1; min-width: 85px;"></select>
+            <select id="alarm-repeat" style="flex:1; min-width: 110px;">
+              <option value="----" selected>----</option>
+              <option value="單次響鬧">單次響鬧 (響後刪除)</option>
+              <option value="每日">每日 (每日同一時間)</option>
+            </select>
           </div>
           <input type="text" id="alarm-label" placeholder="鬧鐘標籤 (例如：塞安胎藥 / 飲固腎中藥)">
           <div style="display: flex; gap: 6px; flex-wrap: wrap;">
@@ -1038,7 +1082,7 @@
             <input type="file" id="alarm-ai-img-input" accept="image/*" onchange="estimateAlarmFromImage(event)" class="hidden">
             <button type="button" onclick="addLocalAlarm()" class="btn btn-amber" style="flex:1;">+ 新增鬧鐘並接駁捷徑</button>
           </div>
-          <div id="alarm-ai-preview-box" class="hidden" style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:8px; font-size:11px; color:#cbd5e1;"></div>
+          <div id="alarm-ai-preview-box" class="hidden" style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:8px; font-size:0.78rem; color:#cbd5e1;"></div>
         </div>
 
         <div id="local-alarms-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
@@ -1048,28 +1092,28 @@
     <!-- ==================== 分頁 2：病史與影像庫 ==================== -->
     <section id="tab-2" class="tab-panel hidden">
       <div class="grid-resp-2">
-        <!-- 母體重要病史與進展 -->
+        <!-- 媽媽重要病史與進展 -->
         <div class="card">
           <div class="flex-between" style="margin-bottom: 6px;">
-            <h3 style="font-size: 14px; font-weight: 800;">🩺 母體重要病史與進展</h3>
+            <h3 style="font-size: 0.95rem; font-weight: 800;">🩺 媽媽重要病史與進展</h3>
             <button onclick="openHistoryModal(null)" class="btn" style="background: var(--amber-100); color: var(--amber-800);">+ 新增紀錄</button>
           </div>
-          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">專項追蹤：子宮頸瘜肉、孕初期多次流血/流啡及自訂醫療紀錄（支援編輯）</p>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px;">專項追蹤：子宮頸瘜肉、孕初期多次流血/流啡及自訂醫療紀錄（支援編輯）</p>
           <div id="medical-history-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto;"></div>
         </div>
 
         <!-- 過往懷孕紀念（天使BB） -->
         <div class="card" style="background: linear-gradient(135deg, #faf5ff, #fdf2f8); border-color: #e9d5ff;">
           <div class="flex-between" style="margin-bottom: 8px;">
-            <h3 style="font-size: 14px; font-weight: 800; color: var(--purple-800);">🕊️ 過往懷孕紀念（天使BB）</h3>
+            <h3 style="font-size: 0.95rem; font-weight: 800; color: var(--purple-800);">🕊️ 過往懷孕紀念（天使BB）</h3>
             <button onclick="openAngelModal()" class="btn btn-purple">開啟紀念冊</button>
           </div>
-          <div style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 10px; border: 1px solid #f3e8ff; font-size: 12px;">
+          <div style="background: rgba(255,255,255,0.85); border-radius: 12px; padding: 10px; border: 1px solid #f3e8ff; font-size: 0.85rem;">
             <div class="flex-between" style="margin-bottom: 4px;">
               <strong style="color: var(--purple-800);">18/5/2026 (11週1日)</strong>
               <span class="badge" style="background: var(--purple-100); color: var(--purple-800);">永遠懷念</span>
             </div>
-            <p style="color: #475569; font-size: 11.5px;">我們的第一份小禮物，雖然提早化作小天使守護著我們，但你的愛一直陪伴著爸爸媽媽和現在的 MCMA 雙胞胎弟妹。</p>
+            <p style="color: #475569; font-size: 0.8rem;">我們的第一份小禮物，雖然提早化作小天使守護著我們，但你的愛一直陪伴著爸爸媽媽和現在的 MCMA 雙胞胎弟妹。</p>
             <div id="angel-preview-thumbs" style="display: flex; gap: 6px; margin-top: 8px; overflow-x: auto;"></div>
           </div>
         </div>
@@ -1079,8 +1123,8 @@
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 10px;">
           <div>
-            <h3 style="font-size: 14px; font-weight: 800;">📸 BB A & BB B 超聲波影像庫</h3>
-            <p style="font-size: 11px; color: var(--text-muted);">支援多選上載相片及短片、自訂檢查日期、雙胎同框標記及設為頭像</p>
+            <h3 style="font-size: 0.95rem; font-weight: 800;">📸 BB A & BB B 超聲波影像庫 (按自訂日期排序)</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted);">支援多選上載相片及短片、自訂檢查日期、雙胎同框標記及設為頭像</p>
           </div>
           <button onclick="openMediaUploadModal('BOTH')" class="btn btn-rose">+ 多選上載超聲波影像</button>
         </div>
@@ -1088,28 +1132,28 @@
         <div class="grid-resp-2">
           <div style="background: var(--sky-50); border: 1px solid var(--sky-200); border-radius: 14px; padding: 10px;">
             <div class="flex-between" style="margin-bottom: 8px;">
-              <h4 style="font-size: 13px; font-weight: 800; color: var(--sky-700);">👶 BB A (大孖) 影像紀錄</h4>
-              <button onclick="openMediaUploadModal('A')" style="font-size: 11px; font-weight: 700; color: var(--sky-700);">+ 上載給 BB A</button>
+              <h4 style="font-size: 0.9rem; font-weight: 800; color: var(--sky-700);">👶 BB A (大孖) 影像紀錄</h4>
+              <button onclick="openMediaUploadModal('A')" style="font-size: 0.78rem; font-weight: 700; color: var(--sky-700);">+ 上載給 BB A</button>
             </div>
             <div id="gallery-grid-A" class="media-grid-2"></div>
           </div>
 
           <div style="background: var(--pink-50); border: 1px solid var(--pink-200); border-radius: 14px; padding: 10px;">
             <div class="flex-between" style="margin-bottom: 8px;">
-              <h4 style="font-size: 13px; font-weight: 800; color: var(--pink-700);">👶 BB B (細孖) 影像紀錄</h4>
-              <button onclick="openMediaUploadModal('B')" style="font-size: 11px; font-weight: 700; color: var(--pink-700);">+ 上載給 BB B</button>
+              <h4 style="font-size: 0.9rem; font-weight: 800; color: var(--pink-700);">👶 BB B (細孖) 影像紀錄</h4>
+              <button onclick="openMediaUploadModal('B')" style="font-size: 0.78rem; font-weight: 700; color: var(--pink-700);">+ 上載給 BB B</button>
             </div>
             <div id="gallery-grid-B" class="media-grid-2"></div>
           </div>
         </div>
       </div>
 
-      <!-- 全庫所有上載影像時序總覽（支援直接編輯日期） -->
+      <!-- 全庫所有上載影像時序總覽（依自訂日期排序，日期與分類收納至編輯彈窗確認後生效） -->
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div>
-            <h3 style="font-size: 14px; font-weight: 800;">🗂️ 全庫上載影像時序總覽</h3>
-            <p style="font-size: 11px; color: var(--text-muted);">支援直接更改每張影像的日期、分類（更改分類後停留於「全部」）、編輯備註或刪除影像</p>
+            <h3 style="font-size: 0.95rem; font-weight: 800;">🗂️ 全庫上載影像總覽 (依自訂日期排序)</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted);">所有影像依「自訂日期」由新至舊排列；點擊「編輯」可修改自訂日期、分類與備註並按確定儲存</p>
           </div>
           <span id="all-media-count-badge" class="badge" style="background: var(--rose-100); color: var(--rose-700);">0 個</span>
         </div>
@@ -1126,18 +1170,18 @@
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 10px;">
           <div>
-            <h2 style="font-size: 15px; font-weight: 800;">🧘‍♀️ MCMA 個人化安全活動與運動建議</h2>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">根據目前孕週、單絨單羊雙胎特性、子宮頸瘜肉及近期母體出血狀況動態調整</p>
+            <h2 style="font-size: 1rem; font-weight: 800;">🧘‍♀️ MCMA 個人化安全活動與運動建議</h2>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">根據目前孕週、單絨單羊雙胎特性、子宮頸瘜肉及近期媽媽出血狀況動態調整</p>
           </div>
-          <span id="exercise-ga-tag" class="badge" style="background: var(--emerald-100); color: var(--emerald-800); font-size: 11px; padding: 4px 10px;"></span>
+          <span id="exercise-ga-tag" class="badge" style="background: var(--emerald-100); color: var(--emerald-800); font-size: 0.78rem; padding: 4px 10px;"></span>
         </div>
 
-        <div id="exercise-dynamic-alert" style="border-radius: 12px; padding: 10px 12px; font-size: 12px; margin-bottom: 12px;"></div>
+        <div id="exercise-dynamic-alert" style="border-radius: 12px; padding: 10px 12px; font-size: 0.85rem; margin-bottom: 12px;"></div>
         <div id="exercise-recommendations-grid" class="grid-resp-2" style="margin-bottom: 12px;"></div>
 
         <div style="background: var(--rose-50); border: 1px solid var(--rose-200); border-radius: 12px; padding: 12px;">
-          <h3 style="font-size: 13px; font-weight: 800; color: var(--rose-700); margin-bottom: 6px;">🚫 MCMA 雙胎及瘜肉病史絕對禁忌動作</h3>
-          <ul style="font-size: 12px; color: #881337; padding-left: 18px; display: flex; flex-direction: column; gap: 5px;">
+          <h3 style="font-size: 0.9rem; font-weight: 800; color: var(--rose-700); margin-bottom: 6px;">🚫 MCMA 雙胎及瘜肉病史絕對禁忌動作</h3>
+          <ul style="font-size: 0.85rem; color: #881337; padding-left: 18px; display: flex; flex-direction: column; gap: 5px;">
             <li><strong>嚴禁劇烈運動及跳躍：</strong>跑步、HIIT、有氧舞蹈、球類運動（易增加腹壓及臍帶纏繞風險）。</li>
             <li><strong>避免腹部受壓及深蹲負重：</strong>仰臥起坐、平板支撐、深蹲舉重、提重物（超過 3kg）。</li>
             <li><strong>出血或啡色分泌期間完全暫停散步：</strong>一旦出現流啡、鮮血或下腹緊痛，須立即轉為臥床休息（建議左側臥）。</li>
@@ -1156,7 +1200,7 @@
     </button>
     <button onclick="switchTab(1)" data-tab="1" class="mobile-tab-btn">
       <span style="font-size: 16px;">💊</span>
-      <span>母體用藥</span>
+      <span>守護媽媽</span>
     </button>
     <button onclick="switchTab(2)" data-tab="2" class="mobile-tab-btn">
       <span style="font-size: 16px;">🖼️</span>
@@ -1176,25 +1220,25 @@
       <div class="modal-header">
         <div class="flex-center" style="flex-wrap: wrap;">
           <span id="twin-modal-badge" class="badge">BB A</span>
-          <h3 style="font-size: 14px; font-weight: 800;">成長數據與 MCMA 標準線性對比</h3>
-          <button type="button" onclick="toggleTwinModalSide()" class="btn btn-soft" style="padding: 3px 8px; font-size: 11px;">⇄ 切換大/細孖</button>
+          <h3 style="font-size: 0.95rem; font-weight: 800;">成長數據與 MCMA 標準線性對比</h3>
+          <button type="button" onclick="toggleTwinModalSide()" class="btn btn-soft" style="padding: 3px 8px; font-size: 0.78rem;">⇄ 切換大/細孖</button>
         </div>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <div class="modal-body" id="modal-twin-body" style="display: flex; flex-direction: column; gap: 12px;">
         <div id="twin-modal-ga-compare" class="grid-resp-3" style="gap: 8px;"></div>
 
-        <div style="font-size: 11px; color: var(--text-muted); text-align: center; background: #f8fafc; padding: 4px 8px; border-radius: 8px;">
+        <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; background: #f8fafc; padding: 4px 8px; border-radius: 8px;">
           👈 在此頁面左右滑動可快速切換瀏覽大孖 (BB A) 與細孖 (BB B) 👉
         </div>
 
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 6px;">
             <div>
-              <span style="font-size: 12px; font-weight: 800; display: block;">📈 成長曲線對比 (含 MCMA 標準 P50 虛線及 P10–P90 區間)</span>
-              <span id="chart-standard-summary" style="font-size: 11px; color: var(--emerald-800); font-weight: 600;"></span>
+              <span style="font-size: 0.85rem; font-weight: 800; display: block;">📈 成長曲線對比 (含 MCMA 標準 P50 虛線及 P10–P90 區間)</span>
+              <span id="chart-standard-summary" style="font-size: 0.78rem; color: var(--emerald-800); font-weight: 600;"></span>
             </div>
-            <select id="twin-chart-metric" onchange="renderTwinSvgChart()" style="width: auto; padding: 4px 8px; font-size: 12px;">
+            <select id="twin-chart-metric" onchange="renderTwinSvgChart()" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
               <option value="crl">頭臀長 CRL (mm)</option>
               <option value="efw">預估體重 EFW (g)</option>
               <option value="bpd">雙頂徑 BPD (mm)</option>
@@ -1208,8 +1252,8 @@
 
         <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="margin-bottom: 8px;">
-            <h4 id="tm-form-title" style="font-size: 12px; font-weight: 800;">➕ 新增超聲波量度數據</h4>
-            <button type="button" onclick="resetTwinMeasurementForm()" id="tm-cancel-edit-btn" class="hidden" style="font-size: 11px; color: var(--rose-600); font-weight: 700;">取消編輯</button>
+            <h4 id="tm-form-title" style="font-size: 0.85rem; font-weight: 800;">➕ 新增超聲波量度數據</h4>
+            <button type="button" onclick="resetTwinMeasurementForm()" id="tm-cancel-edit-btn" class="hidden" style="font-size: 0.78rem; color: var(--rose-600); font-weight: 700;">取消編輯</button>
           </div>
           <form onsubmit="saveTwinMeasurement(event)" style="display: flex; flex-direction: column; gap: 8px;">
             <input type="hidden" id="tm-twin-id">
@@ -1268,7 +1312,7 @@
         </div>
 
         <div>
-          <h4 style="font-size: 12px; font-weight: 800; margin-bottom: 6px;">📋 歷史量度紀錄 (支援編輯)</h4>
+          <h4 style="font-size: 0.85rem; font-weight: 800; margin-bottom: 6px;">📋 歷史量度紀錄 (支援編輯)</h4>
           <div id="twin-measurements-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
         </div>
       </div>
@@ -1278,17 +1322,17 @@
     <div id="modal-calendar-day" class="modal-box hidden">
       <div class="modal-header">
         <div class="flex-center" style="gap: 6px;">
-          <button type="button" onclick="stepCalendarDayModal(-1)" class="btn btn-soft" style="padding: 4px 8px; font-size: 12px;" title="前一日">‹</button>
+          <button type="button" onclick="stepCalendarDayModal(-1)" class="btn btn-soft" style="padding: 4px 8px;" title="前一日">‹</button>
           <div>
-            <h3 id="cal-modal-date-title" style="font-size: 14px; font-weight: 800;">日程詳情</h3>
-            <p id="cal-modal-ga-subtitle" style="font-size: 10.5px; color: var(--rose-600); font-weight: 700;"></p>
+            <h3 id="cal-modal-date-title" style="font-size: 0.95rem; font-weight: 800;">日程詳情</h3>
+            <p id="cal-modal-ga-subtitle" style="font-size: 0.75rem; color: var(--rose-600); font-weight: 700;"></p>
           </div>
-          <button type="button" onclick="stepCalendarDayModal(1)" class="btn btn-soft" style="padding: 4px 8px; font-size: 12px;" title="後一日">›</button>
+          <button type="button" onclick="stepCalendarDayModal(1)" class="btn btn-soft" style="padding: 4px 8px;" title="後一日">›</button>
         </div>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px;">
-        <div style="font-size: 10.5px; color: var(--text-muted); text-align: center; background: #f8fafc; padding: 3px 8px; border-radius: 8px;">
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; background: #f8fafc; padding: 3px 8px; border-radius: 8px;">
           👈 左右滑動或點擊頂部 ‹ › 可切換至前一日 / 後一日 👉
         </div>
 
@@ -1296,7 +1340,7 @@
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="margin-bottom: 6px;">
             <label class="label-sm" style="margin: 0;">💼 當日工作更期 <span id="current-day-shift-badge" class="badge" style="background:#e2e8f0; color:#334155; margin-left:4px;">無/未定</span></label>
-            <button type="button" onclick="toggleShiftManageMode()" id="shift-manage-toggle-btn" class="btn btn-soft" style="padding: 3px 8px; font-size: 11px;">⚙️ 管理/排序更期</button>
+            <button type="button" onclick="toggleShiftManageMode()" id="shift-manage-toggle-btn" class="btn btn-soft" style="padding: 3px 8px; font-size: 0.78rem;">⚙️ 管理/排序更期</button>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;" id="shift-selector-btns"></div>
           <div style="display: flex; gap: 6px; flex-wrap: wrap;">
@@ -1304,21 +1348,21 @@
             <button type="button" onclick="applyCustomDayShiftOnly()" class="btn btn-dark" style="padding: 6px 10px;">套用當日</button>
             <button type="button" onclick="addShiftOptionAndApply()" class="btn btn-sky" style="padding: 6px 10px;">+ 加入按鈕</button>
           </div>
-          <p id="shift-manage-hint" class="hidden" style="font-size: 10.5px; color: var(--rose-600); margin-top: 5px; font-weight: 600;">
+          <p id="shift-manage-hint" class="hidden" style="font-size: 0.75rem; color: var(--rose-600); margin-top: 5px; font-weight: 600;">
             💡 管理與排序模式已開啟：點擊「‹」「›」可調整更期按鈕排序，點擊「✕」可刪減該更期選項（全部變更即時同步）。
           </p>
         </div>
 
         <div>
           <div class="flex-between" style="margin-bottom: 6px;">
-            <h4 style="font-size: 12px; font-weight: 800;">📅 當日覆診 / 住院行程 (儲存後自動同步老婆日曆)</h4>
-            <button type="button" onclick="handleClearAndResetEventForm()" class="btn btn-soft-rose" style="padding: 3px 8px; font-size: 11px;">+ 清空重填</button>
+            <h4 style="font-size: 0.85rem; font-weight: 800;">📅 當日覆診 / 住院行程 (儲存後自動同步老婆日曆)</h4>
+            <button type="button" onclick="handleClearAndResetEventForm()" class="btn btn-soft-rose" style="padding: 3px 8px; font-size: 0.78rem;">+ 清空重填</button>
           </div>
           <div id="cal-day-events-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
         </div>
 
         <form id="cal-event-form" onsubmit="saveCalendarEvent(event)" style="background: var(--rose-50); border: 1px solid var(--rose-200); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-          <h4 id="cal-form-heading" style="font-size: 12px; font-weight: 800;">➕ 新增 / 編輯行程 (支援分開設定住院及出院時間)</h4>
+          <h4 id="cal-form-heading" style="font-size: 0.85rem; font-weight: 800;">➕ 新增 / 編輯行程 (支援分開設定住院及出院時間)</h4>
           <input type="hidden" id="ev-id">
           <div>
             <label class="label-sm">類別</label>
@@ -1394,7 +1438,7 @@
     <!-- 3. 藥物與保健品彈窗 -->
     <div id="modal-med" class="modal-box hidden" style="max-width: 440px;">
       <div class="modal-header">
-        <h3 style="font-size: 14px; font-weight: 800;">💊 新增 / 編輯藥物或保健品</h3>
+        <h3 style="font-size: 0.95rem; font-weight: 800;">💊 新增 / 編輯藥物或保健品</h3>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <form onsubmit="saveMedication(event)" class="modal-body" style="display: flex; flex-direction: column; gap: 10px;">
@@ -1435,8 +1479,8 @@
     <div id="modal-angel" class="modal-box hidden" style="max-width: 500px;">
       <div class="modal-header" style="background: linear-gradient(90deg, #faf5ff, #fdf2f8);">
         <div>
-          <h3 style="font-size: 14px; font-weight: 800; color: var(--purple-800);">🕊️ 天使BB紀念冊</h3>
-          <p style="font-size: 11px; color: var(--purple-600);">18/5/2026 (11週1日) · 永遠在我們心中</p>
+          <h3 style="font-size: 0.95rem; font-weight: 800; color: var(--purple-800);">🕊️ 天使BB紀念冊</h3>
+          <p style="font-size: 0.78rem; color: var(--purple-600);">18/5/2026 (11週1日) · 永遠在我們心中</p>
         </div>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
@@ -1458,7 +1502,7 @@
     <!-- 5. 超聲波影像多選上載彈窗 -->
     <div id="modal-media-upload" class="modal-box hidden" style="max-width: 460px;">
       <div class="modal-header">
-        <h3 style="font-size: 14px; font-weight: 800;">📸 多選上載超聲波相片 / 短片</h3>
+        <h3 style="font-size: 0.95rem; font-weight: 800;">📸 多選上載超聲波相片 / 短片</h3>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <form onsubmit="submitTwinMedia(event)" class="modal-body" style="display: flex; flex-direction: column; gap: 10px;">
@@ -1472,7 +1516,7 @@
             </select>
           </div>
           <div>
-            <label class="label-sm">檢查日期 (可留空)</label>
+            <label class="label-sm">自訂檢查日期 (用於排序，可留空)</label>
             <input type="date" id="mu-date">
           </div>
         </div>
@@ -1491,10 +1535,46 @@
       </form>
     </div>
 
-    <!-- 6. 母體病史新增 / 編輯彈窗 -->
+    <!-- 5B. 影像庫自訂日期、分類與備註編輯確認彈窗 -->
+    <div id="modal-media-edit" class="modal-box hidden" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 style="font-size: 0.95rem; font-weight: 800;">✏️ 編輯影像日期、分類與備註</h3>
+        <button onclick="closeAllModals()" class="close-x">✕</button>
+      </div>
+      <form onsubmit="confirmMediaEditModal(event)" class="modal-body" style="display: flex; flex-direction: column; gap: 10px;">
+        <input type="hidden" id="me-uid">
+        <div id="me-preview-wrap" style="text-align: center; background: #f8fafc; padding: 8px; border-radius: 10px; border: 1px solid #e2e8f0;"></div>
+        <div>
+          <label class="label-sm">自訂日期 (影像庫將依此日期由新至舊排序)</label>
+          <input type="date" id="me-date">
+        </div>
+        <div>
+          <label class="label-sm">影像分類</label>
+          <select id="me-category" onchange="toggleMediaEditCustomCategory()">
+            <option value="超聲波">超聲波</option>
+            <option value="轉介信">轉介信</option>
+            <option value="藥單">藥單</option>
+            <option value="出院紀錄">出院紀錄</option>
+            <option value="自訂">自訂</option>
+            <option value="CUSTOM">✏️ 輸入自訂分類...</option>
+          </select>
+          <input type="text" id="me-custom-category" class="hidden" placeholder="輸入自訂分類名稱..." style="margin-top: 6px;">
+        </div>
+        <div>
+          <label class="label-sm">標題 / 備註</label>
+          <input type="text" id="me-caption" placeholder="輸入標題或備註...">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px;">
+          <button type="button" onclick="closeAllModals()" class="btn btn-soft">取消</button>
+          <button type="submit" class="btn btn-rose">確定儲存並同步</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 6. 媽媽病史新增 / 編輯彈窗 -->
     <div id="modal-history" class="modal-box hidden" style="max-width: 440px;">
       <div class="modal-header">
-        <h3 id="mh-modal-title" style="font-size: 14px; font-weight: 800;">🩺 新增母體病史 / 出血進展</h3>
+        <h3 id="mh-modal-title" style="font-size: 0.95rem; font-weight: 800;">🩺 新增媽媽病史 / 出血進展</h3>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <form onsubmit="saveMedicalHistory(event)" class="modal-body" style="display: flex; flex-direction: column; gap: 10px;">
@@ -1528,20 +1608,20 @@
       </form>
     </div>
 
-    <!-- 7. 多戶口家庭即時雲端同步設定彈窗 -->
-    <div id="modal-sync" class="modal-box hidden" style="max-width: 480px;">
+    <!-- 7. 多戶口家庭即時雲端同步、當日變更紀錄與每日 23:59 自動備份設定彈窗 -->
+    <div id="modal-sync" class="modal-box hidden" style="max-width: 520px;">
       <div class="modal-header">
-        <h3 style="font-size: 14px; font-weight: 800;">☁️ 多戶口家庭雲端與日曆同步設定</h3>
+        <h3 style="font-size: 0.95rem; font-weight: 800;">☁️ 雲端同步、今日變更紀錄與自動備份</h3>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
-      <div class="modal-body" style="display: flex; flex-direction: column; gap: 10px; font-size: 12px;">
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;">
         <div style="background: var(--sky-50); border: 1px solid var(--sky-200); border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="margin-bottom: 6px;">
-            <strong style="color: var(--sky-700);">👨‍👩‍👧‍👦 已預設綁定專屬 Firebase 雲端</strong>
+            <strong style="color: var(--sky-700);">👨‍👩‍👧‍👦 專屬 Firebase 雲端即時雙向同步</strong>
             <span id="cloud-mode-badge" class="badge" style="background: var(--emerald-100); color: var(--emerald-800);">homestocktake 已鎖定</span>
           </div>
-          <p style="font-size: 11px; color: #334155; margin-bottom: 8px;">
-            已內建鎖定你的 Firebase Realtime Database，任何家庭成員打開網頁輸入相同的「家庭共享同步碼」即可共同編輯並即時同步。
+          <p style="font-size: 0.78rem; color: #334155; margin-bottom: 8px;">
+            當雲端數據有更新時，系統會自動下載並即時更新到所有家庭成員裝置；本機操作亦會先儲存本機再背景同步。
           </p>
 
           <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -1555,22 +1635,47 @@
             </div>
             <div>
               <label class="label-sm">3. 已鎖定的 Firebase Realtime Database 網址</label>
-              <input type="text" id="sync-firebase-url" readonly style="background: #e2e8f0; color: #475569; font-size: 11px;">
+              <input type="text" id="sync-firebase-url" readonly style="background: #e2e8f0; color: #475569; font-size: 0.78rem;">
             </div>
-            <div style="display: flex; gap: 6px; margin-top: 4px;">
+            <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
               <button onclick="saveSyncSettings()" class="btn btn-sky" style="flex: 1;">儲存設定並立即同步</button>
               <button onclick="copySyncLink()" class="btn btn-soft">🔗 複製邀請連結</button>
             </div>
           </div>
         </div>
 
-        <!-- Google 老婆日曆自動同步選項 -->
+        <!-- 每日 00:00 後所有變更紀錄 -->
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 10px;">
+          <div class="flex-between" style="margin-bottom: 6px;">
+            <strong style="color: var(--amber-800);">📜 今日 00:00 後所有變更紀錄</strong>
+            <span id="daily-changelog-count" class="badge" style="background: var(--amber-100); color: var(--amber-800);">0 筆</span>
+          </div>
+          <div id="daily-changelog-list" style="max-height: 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; color: #334155;"></div>
+        </div>
+
+        <!-- 每日 23:59 本機備份檔位置與開啟按鈕 -->
         <div style="background: var(--emerald-50); border: 1px solid #a7f3d0; border-radius: 12px; padding: 10px;">
+          <div class="flex-between" style="margin-bottom: 4px;">
+            <strong style="color: var(--emerald-800);">🗄️ 每日 23:59 自動本機備份檔</strong>
+            <span class="badge" style="background: var(--emerald-100); color: var(--emerald-800);">自動排程已啟用</span>
+          </div>
+          <div style="font-size: 0.78rem; color: #065f46; line-height: 1.45;">
+            <div><strong>本機儲存位置：</strong><span id="local-backup-location-text" style="font-family: monospace; word-break: break-all;">瀏覽器本機下載資料夾 (Downloads) / IndexedDB 永久保險庫</span></div>
+            <div style="margin-top: 2px;"><strong>最近備份檔案：</strong><span id="local-backup-filename-text" style="font-family: monospace;">尚未產生今日 23:59 自動備份</span></div>
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+            <button type="button" onclick="openLatestLocalBackupFile()" class="btn btn-teal" style="flex: 1;">📂 開啟本機備份檔</button>
+            <button type="button" onclick="runDailyAutoBackupNow(true)" class="btn btn-soft" style="flex: 1;">⚡ 立即匯出今日備份</button>
+          </div>
+        </div>
+
+        <!-- Google 老婆日曆自動同步選項 -->
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="margin-bottom: 6px;">
             <strong style="color: var(--emerald-800);">📅 老婆 Google 日曆自動匯出設定</strong>
             <span class="badge" style="background: var(--emerald-100); color: var(--emerald-800);">GAS 已連結</span>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; color: #065f46;">
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: #065f46;">
             <label class="flex-center" style="cursor: pointer;">
               <input type="checkbox" id="gcal-auto-enabled" onchange="saveGcalPreferences()" style="width: 15px; height: 15px;">
               <span>月曆行程或工作更期有改動時<strong>自動匯出</strong>至老婆日曆</span>
@@ -1585,18 +1690,13 @@
             </label>
           </div>
           <div style="margin-top: 8px; display: flex; justify-content: flex-end;">
-            <button type="button" onclick="triggerManualWifeCalendarExport()" class="btn btn-teal" style="padding: 5px 10px; font-size: 11px;">立即全量同步至老婆日曆</button>
+            <button type="button" onclick="triggerManualWifeCalendarExport()" class="btn btn-teal" style="padding: 5px 10px; font-size: 0.78rem;">立即全量同步至老婆日曆</button>
           </div>
         </div>
 
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
-          <strong style="color: #1e293b; display: block; margin-bottom: 4px;">🛡️ 本機雙重永久防遺失保護</strong>
-          <p style="font-size: 11px; color: #475569;">所有資料已雙重寫入手機 <strong>localStorage</strong> 與 <strong>IndexedDB</strong>，更新網頁檔案或重開 App 後自動無損回復。</p>
-          <p id="local-storage-meta" style="font-size: 10.5px; color: #047857; margin-top: 4px; font-family: monospace;"></p>
-        </div>
-
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
-          <strong style="display: block; margin-bottom: 6px;">💾 完整備份檔匯出 / 還原 (JSON)</strong>
+          <strong style="display: block; margin-bottom: 6px;">💾 手動完整備份檔匯出 / 還原 (JSON)</strong>
+          <p id="local-storage-meta" style="font-size: 0.75rem; color: #047857; margin-bottom: 6px; font-family: monospace;"></p>
           <div style="display: flex; gap: 8px;">
             <button onclick="exportJsonBackup()" class="btn btn-dark" style="flex: 1;">⬇️ 匯出備份檔</button>
             <label class="btn btn-soft" style="flex: 1; cursor: pointer;">
@@ -1605,6 +1705,24 @@
             </label>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 8. 檢視本機備份檔內容預覽視窗 -->
+    <div id="modal-backup-viewer" class="modal-box hidden" style="max-width: 540px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size: 0.95rem; font-weight: 800;">📂 本機備份檔內容檢視</h3>
+          <p id="backup-viewer-subtitle" style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;"></p>
+        </div>
+        <button onclick="closeAllModals()" class="close-x">✕</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" onclick="downloadSavedBackupBlob()" class="btn btn-dark" style="flex: 1;">⬇️ 下載此 JSON 檔到手機/電腦</button>
+          <button type="button" onclick="openSyncModal()" class="btn btn-soft">‹ 返回同步設定</button>
+        </div>
+        <pre id="backup-viewer-pre" style="background: #0f172a; color: #e2e8f0; padding: 10px; border-radius: 10px; font-size: 0.75rem; max-height: 52vh; overflow: auto; white-space: pre-wrap; word-break: break-all;"></pre>
       </div>
     </div>
 
@@ -1722,7 +1840,7 @@
     }
 
     // =========================================================================
-    // 2. 雙層本機永久儲存 (localStorage + IndexedDB)
+    // 2. 雙層本機永久儲存 (localStorage + IndexedDB) + 每日變更紀錄與 23:59 自動備份
     // =========================================================================
     const STORAGE_KEY = 'MCMA_GUARDIAN_PERMANENT_DATA';
     const LEGACY_KEYS = ['MCMA_GUARDIAN_DATA_V1', 'MCMA_STATE_DATA'];
@@ -1730,6 +1848,8 @@
     const SHORTCUT_NAME_KEY = 'MCMA_IOS_SHORTCUT_NAME';
     const SYNC_CONFIG_KEY = 'MCMA_MULTI_USER_SYNC_CONFIG';
     const GCAL_PREFS_KEY = 'MCMA_WIFE_GCAL_PREFS';
+    const DAILY_CHANGELOG_KEY = 'MCMA_DAILY_CHANGELOG_V1';
+    const DAILY_BACKUP_META_KEY = 'MCMA_DAILY_AUTO_BACKUP_META';
     const IDB_NAME = 'MCMA_Guardian_DB';
     const IDB_STORE = 'app_snapshots';
 
@@ -1821,24 +1941,24 @@
       });
     }
 
-    async function writeToIDB(stateObj) {
+    async function writeToIDBKey(key, val) {
       try {
         const db = await openGuardianIDB();
         return new Promise((resolve) => {
           const tx = db.transaction(IDB_STORE, 'readwrite');
-          tx.objectStore(IDB_STORE).put(stateObj, 'latest_state');
+          tx.objectStore(IDB_STORE).put(val, key);
           tx.oncomplete = () => resolve(true);
           tx.onerror = () => resolve(false);
         });
       } catch (e) { return false; }
     }
 
-    async function readFromIDB() {
+    async function readFromIDBKey(key) {
       try {
         const db = await openGuardianIDB();
         return new Promise((resolve) => {
           const tx = db.transaction(IDB_STORE, 'readonly');
-          const req = tx.objectStore(IDB_STORE).get('latest_state');
+          const req = tx.objectStore(IDB_STORE).get(key);
           req.onsuccess = () => resolve(req.result || null);
           req.onerror = () => resolve(null);
         });
@@ -1857,6 +1977,160 @@
       }
       return JSON.parse(JSON.stringify(DEFAULT_STATE));
     }
+
+    // --- 每日 00:00 後變更紀錄管理 ---
+    function getTodayChangeLogs() {
+      const today = getTodayStr();
+      try {
+        const all = JSON.parse(localStorage.getItem(DAILY_CHANGELOG_KEY) || '[]');
+        return all.filter(item => item.date === today);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function recordDailyChangeLog(actionText, whoOverride) {
+      if (!actionText) return;
+      const today = getTodayStr();
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      const who = whoOverride || getSyncConfig().userName || '家人';
+      try {
+        const existing = getTodayChangeLogs();
+        existing.unshift({
+          id: 'chg-' + Date.now() + Math.random(),
+          date: today,
+          time: timeStr,
+          who,
+          action: actionText
+        });
+        localStorage.setItem(DAILY_CHANGELOG_KEY, JSON.stringify(existing.slice(0, 200)));
+      } catch (e) {}
+      renderDailyChangelogAndBackupInfo();
+    }
+
+    function renderDailyChangelogAndBackupInfo() {
+      const listEl = document.getElementById('daily-changelog-list');
+      const countEl = document.getElementById('daily-changelog-count');
+      const logs = getTodayChangeLogs();
+      if (countEl) countEl.textContent = `${logs.length} 筆`;
+      if (listEl) {
+        if (logs.length === 0) {
+          listEl.innerHTML = `<div style="color:#94a3b8; text-align:center; padding:8px;">今日 00:00 至今暫無變更紀錄</div>`;
+        } else {
+          listEl.innerHTML = logs.map(item => `
+            <div style="background:#fff; border:1px solid #fde68a; border-radius:8px; padding:5px 8px; display:flex; justify-content:space-between; gap:6px;">
+              <span><strong style="color:#92400e;">[${item.time}]</strong> ${item.action}</span>
+              <span style="color:#64748b; flex-shrink:0;">${item.who}</span>
+            </div>
+          `).join('');
+        }
+      }
+
+      const locEl = document.getElementById('local-backup-location-text');
+      const fileEl = document.getElementById('local-backup-filename-text');
+      try {
+        const meta = JSON.parse(localStorage.getItem(DAILY_BACKUP_META_KEY) || 'null');
+        if (meta && meta.filename) {
+          if (locEl) locEl.textContent = meta.locationPath;
+          if (fileEl) fileEl.textContent = `${meta.filename} (建立時間：${meta.createdAtStr})`;
+        }
+      } catch (e) {}
+    }
+
+    // --- 每日 23:59 自動備份至本機及提供開啟按鈕 ---
+    async function runDailyAutoBackupNow(manualTrigger = false) {
+      const today = getTodayStr();
+      const now = new Date();
+      const hhmm = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      const filename = `MCMA守護寶_每日自動備份_${today}_${hhmm}.json`;
+      const createdAtStr = `${formatDisplayDate(today)} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      const backupPayload = {
+        backupDate: today,
+        createdAt: createdAtStr,
+        todayChangeLogs: getTodayChangeLogs(),
+        data: appState
+      };
+      const jsonStr = JSON.stringify(backupPayload, null, 2);
+
+      // 1. 永久寫入本機 IndexedDB 備份庫
+      await writeToIDBKey('daily_auto_backup_latest', { filename, createdAtStr, jsonStr });
+
+      // 2. 觸發本機檔案下載至瀏覽器預設下載資料夾
+      try {
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      } catch (e) {}
+
+      const meta = {
+        date: today,
+        filename,
+        createdAtStr,
+        locationPath: `本機「下載 (Downloads)」資料夾 / ${filename}`
+      };
+      try {
+        localStorage.setItem(DAILY_BACKUP_META_KEY, JSON.stringify(meta));
+      } catch (e) {}
+
+      renderDailyChangelogAndBackupInfo();
+      if (manualTrigger) {
+        showToast(`🗄️ 已匯出本機備份檔：${filename}`);
+      }
+    }
+
+    async function openLatestLocalBackupFile() {
+      const saved = await readFromIDBKey('daily_auto_backup_latest');
+      if (!saved || !saved.jsonStr) {
+        showToast('ℹ️ 尚未找到自動備份檔，正在為你立即產生...');
+        await runDailyAutoBackupNow(true);
+        const newlySaved = await readFromIDBKey('daily_auto_backup_latest');
+        if (!newlySaved) return;
+        document.getElementById('backup-viewer-subtitle').textContent = `${newlySaved.filename} · ${newlySaved.createdAtStr}`;
+        document.getElementById('backup-viewer-pre').textContent = newlySaved.jsonStr;
+        openModal('modal-backup-viewer');
+        return;
+      }
+      document.getElementById('backup-viewer-subtitle').textContent = `${saved.filename} · ${saved.createdAtStr}`;
+      document.getElementById('backup-viewer-pre').textContent = saved.jsonStr;
+      openModal('modal-backup-viewer');
+    }
+
+    async function downloadSavedBackupBlob() {
+      const saved = await readFromIDBKey('daily_auto_backup_latest');
+      if (!saved || !saved.jsonStr) return;
+      const blob = new Blob([saved.jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = saved.filename || `MCMA守護寶_備份_${getTodayStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('⬇️ 已重新下載備份檔到本機資料夾');
+    }
+
+    // 每日 23:59 定時檢查器
+    setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 23 && now.getMinutes() === 59) {
+        const today = getTodayStr();
+        let alreadyDoneToday = false;
+        try {
+          const meta = JSON.parse(localStorage.getItem(DAILY_BACKUP_META_KEY) || 'null');
+          if (meta && meta.date === today) alreadyDoneToday = true;
+        } catch (e) {}
+        if (!alreadyDoneToday) {
+          runDailyAutoBackupNow(false);
+        }
+      }
+    }, 15000);
 
     let appState = loadFromLocalStorageSync();
     let localAlarms = loadLocalAlarms();
@@ -1934,7 +2208,7 @@
       updateGcalStatusUI('syncing', '偵測到日曆改動，準備自動匯出...');
       gcalAutoExportTimer = setTimeout(() => {
         exportToWifeGoogleCalendar(false);
-      }, 1500);
+      }, 1200);
     }
 
     async function triggerManualWifeCalendarExport() {
@@ -2023,10 +2297,11 @@
     }
 
     // =========================================================================
-    // 3. 多戶口家庭雲端同步引擎
+    // 3. 多戶口家庭雲端同步引擎（自動下載雲端最新數據 + 非阻塞背景同步）
     // =========================================================================
     const LOCKED_FIREBASE_URL = 'https://homestocktake-default-rtdb.firebaseio.com';
     let isSyncingNow = false;
+    let pendingSyncQueued = false;
     let lastSyncedSignature = '';
     let memorySyncConfig = null;
 
@@ -2178,7 +2453,7 @@
           window._lastSyncErr = `HTTP ${res.status}`;
         }
       } catch (e) {
-        window._lastSyncErr = e.message || '瀏覽器防追蹤攔截跨網域連線';
+        window._lastSyncErr = e.message || '跨網域連線受阻';
       }
       return null;
     }
@@ -2197,7 +2472,7 @@
         if (res.ok) return true;
         window._lastSyncErr = `HTTP ${res.status}`;
       } catch (e) {
-        window._lastSyncErr = e.message || '瀏覽器防追蹤攔截跨網域連線';
+        window._lastSyncErr = e.message || '跨網域連線受阻';
       }
       return false;
     }
@@ -2206,24 +2481,31 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
       } catch (e) {}
-      writeToIDB(appState);
+      writeToIDBKey('latest_state', appState);
       updateLocalMetaDisplay();
     }
 
-    async function persistAndSync(options = {}) {
+    // 第10點核心：先即時儲存本機並更新畫面，絕不阻塞操作，背景非同步推送雲端
+    function persistAndSync(options = {}) {
       const cfg = getSyncConfig();
       appState.updatedAt = Date.now();
       appState.lastEditor = cfg.userName;
+      if (options.changeDesc) {
+        recordDailyChangeLog(options.changeDesc, cfg.userName);
+      }
       saveLocalOnly();
       renderAll();
       if (options.exportCalendar) {
         scheduleAutoExportToWifeCalendar();
       }
-      await syncWithCloud(false, true);
+      // 非同步背景觸發同步，不 await 阻塞 UI
+      setTimeout(() => {
+        syncWithCloud(false, true);
+      }, 0);
     }
 
-    async function triggerManualSync() {
-      await syncWithCloud(true, false);
+    function triggerManualSync() {
+      syncWithCloud(true, false);
     }
 
     function computeStateSignature(st) {
@@ -2241,16 +2523,17 @@
     }
 
     async function syncWithCloud(showToastMsg = false, hasLocalChanges = false) {
-      if (isSyncingNow) return;
-      const currentSig = computeStateSignature(appState);
-      if (!hasLocalChanges && !showToastMsg && lastSyncedSignature === currentSig && appState.updatedAt > 0) {
+      if (isSyncingNow) {
+        if (hasLocalChanges) pendingSyncQueued = true;
         return;
       }
 
       isSyncingNow = true;
       window._lastSyncErr = '';
       const cfg = getSyncConfig();
-      setSyncUI('syncing', '同步中...');
+      if (hasLocalChanges || showToastMsg) {
+        setSyncUI('syncing', '同步中...');
+      }
 
       try {
         const prevCalSig = computeCalendarSignature(appState);
@@ -2268,7 +2551,8 @@
               renderCalendarDayEvents(selectedCalendarDate);
             }
             receivedRemote = true;
-            // 若遠端家庭成員修改了月曆或工作更期，本機亦自動同步匯出至老婆日曆
+            const who = remote.lastEditor ? ` (${remote.lastEditor})` : '';
+            recordDailyChangeLog(`雲端自動下載同步更新${who}`, remote.lastEditor || '雲端');
             if (computeCalendarSignature(appState) !== prevCalSig) {
               scheduleAutoExportToWifeCalendar();
             }
@@ -2286,18 +2570,22 @@
           setSyncUI('ok', '已同步');
           if (receivedRemote) {
             const who = remote.lastEditor ? ` (${remote.lastEditor})` : '';
-            showToast(`🔄 已同步家庭成員${who}的最新更新`);
+            showToast(`⬇️ 已自動下載家庭成員${who}的最新更新`);
           } else if (showToastMsg) {
             showToast('✅ 已與 homestocktake Firebase 即時同步');
           }
         } else {
           setSyncUI('offline', '已存本機');
           if (showToastMsg) {
-            showToast(`ℹ️ 暫未能連接雲端 (${window._lastSyncErr || '請檢查網絡或關閉網址列防追蹤盾牌'})`);
+            showToast(`ℹ️ 暫未能連接雲端 (${window._lastSyncErr || '請檢查網絡'})`);
           }
         }
       } finally {
         isSyncingNow = false;
+        if (pendingSyncQueued) {
+          pendingSyncQueued = false;
+          setTimeout(() => syncWithCloud(false, true), 150);
+        }
       }
     }
 
@@ -2311,10 +2599,11 @@
       document.getElementById('gcal-include-shifts').checked = prefs.includeShifts;
       document.getElementById('gcal-include-ga').checked = prefs.includeGa;
       updateLocalMetaDisplay();
+      renderDailyChangelogAndBackupInfo();
       openModal('modal-sync');
     }
 
-    async function saveSyncSettings() {
+    function saveSyncSettings() {
       const userName = document.getElementById('sync-user-name').value.trim() || '家人';
       const familyCode = document.getElementById('sync-code-input').value.trim() || 'MCMA-2027-LOVE';
 
@@ -2324,7 +2613,7 @@
       } catch (e) {}
       lastSyncedSignature = '';
       closeAllModals();
-      await syncWithCloud(true, true);
+      syncWithCloud(true, true);
     }
 
     function copySyncLink() {
@@ -2367,12 +2656,13 @@
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = async (e) => {
+      reader.onload = (e) => {
         try {
           const imported = JSON.parse(e.target.result);
-          if (imported && imported.twinMeasurements) {
-            appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...imported });
-            await persistAndSync({ exportCalendar: true });
+          const coreData = (imported && imported.data && imported.data.twinMeasurements) ? imported.data : imported;
+          if (coreData && coreData.twinMeasurements) {
+            appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...coreData });
+            persistAndSync({ exportCalendar: true, changeDesc: '從 JSON 備份檔還原完整資料' });
             closeAllModals();
             showToast('✅ 成功匯入備份並同步至 Firebase 與老婆日曆');
           } else {
@@ -2386,7 +2676,7 @@
     }
 
     // =========================================================================
-    // 4. 分頁切換 + 左右滑動支援
+    // 4. 分頁切換 + 獨立月曆左右滑動（不與主頁面滑動衝突）
     // =========================================================================
     function switchTab(index) {
       if (index < 0 || index > 3) return;
@@ -2470,12 +2760,41 @@
     }
 
     function initHorizontalSwipe() {
+      // 1. 月曆獨立左右滑動區：完全攔截事件，絕不會觸發主頁面切換
+      const calZone = document.getElementById('calendar-swipe-zone');
+      if (calZone) {
+        let calStartX = 0, calStartY = 0;
+        calZone.addEventListener('touchstart', (e) => {
+          if (e.target.closest('button, input, select')) return;
+          calStartX = e.touches[0].clientX;
+          calStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        calZone.addEventListener('touchend', (e) => {
+          if (!calStartX) return;
+          const dx = e.changedTouches[0].clientX - calStartX;
+          const dy = e.changedTouches[0].clientY - calStartY;
+          calStartX = 0;
+          if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+            e.stopPropagation();
+            if (dx < 0) {
+              changeCalendarMonth(1);
+              showToast(`📅 切換至下個月 (${calYear}年${calMonth + 1}月)`);
+            } else {
+              changeCalendarMonth(-1);
+              showToast(`📅 切換至上個月 (${calYear}年${calMonth + 1}月)`);
+            }
+          }
+        }, { passive: false });
+      }
+
+      // 2. 主頁面分頁左右滑動（若起點位於月曆區 #calendar-swipe-zone 內則直接略過）
       const area = document.getElementById('swipe-area');
       if (area) {
         let startX = 0, startY = 0;
         area.addEventListener('touchstart', (e) => {
           if (!document.getElementById('modal-backdrop').classList.contains('hidden')) return;
-          if (e.target.closest('input, select, textarea, svg')) return;
+          if (e.target.closest('#calendar-swipe-zone, input, select, textarea, svg')) return;
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
         }, { passive: true });
@@ -2492,6 +2811,7 @@
         }, { passive: true });
       }
 
+      // 3. 大/細孖曲線視窗左右滑動
       const twinModal = document.getElementById('modal-twin');
       if (twinModal) {
         let tmStartX = 0, tmStartY = 0;
@@ -2512,6 +2832,7 @@
         }, { passive: true });
       }
 
+      // 4. 單日詳情視窗左右滑動
       const calDayModal = document.getElementById('modal-calendar-day');
       if (calDayModal) {
         let cdStartX = 0, cdStartY = 0;
@@ -2532,6 +2853,7 @@
         }, { passive: true });
       }
 
+      // 5. 全螢幕燈箱左右滑動
       const lb = document.getElementById('media-lightbox');
       if (lb) {
         let lbStartX = 0, lbStartY = 0;
@@ -2553,7 +2875,7 @@
     }
 
     // =========================================================================
-    // 5. 頂部 LMP 徽章、主頁卡片獨立回溯各項最後檢查數據、成長曲線頁面
+    // 5. 頂部 LMP 徽章、主頁卡片、成長曲線頁面
     // =========================================================================
     function renderAll() {
       renderHeader();
@@ -2594,7 +2916,7 @@
         const summaryEl = document.getElementById(`twin-${id}-summary`);
 
         if (list.length === 0) {
-          summaryEl.innerHTML = `<p style="font-size:11px; color:#94a3b8;">暫無量度紀錄，點擊新增</p>`;
+          summaryEl.innerHTML = `<p style="font-size:0.78rem; color:#94a3b8;">暫無量度紀錄，點擊新增</p>`;
           return;
         }
 
@@ -2607,26 +2929,26 @@
         if (latestEfw) extraItems.push(`EFW: ${latestEfw.value}g (${formatShortDate(latestEfw.date)})`);
 
         summaryEl.innerHTML = `
-          <div style="font-size: 11px; color: var(--text-muted);">
+          <div style="font-size: 0.78rem; color: var(--text-muted);">
             <span>最後產檢：${formatDisplayDate(latestAny.date)}</span>
           </div>
           <div class="grid-2" style="gap: 6px;">
             <div class="stat-box">
               <div class="flex-between" style="gap:2px;">
-                <span style="font-size: 10px; color: #94a3b8;">CRL 頭臀長</span>
-                ${latestCrl && latestCrl.date ? `<span style="font-size: 9px; color: #64748b;">${formatShortDate(latestCrl.date)}</span>` : ''}
+                <span style="font-size: 0.7rem; color: #94a3b8;">CRL 頭臀長</span>
+                ${latestCrl && latestCrl.date ? `<span style="font-size: 0.68rem; color: #64748b;">${formatShortDate(latestCrl.date)}</span>` : ''}
               </div>
-              <strong style="font-size: 12px;">${latestCrl ? latestCrl.value + ' mm' : '-'}</strong>
+              <strong style="font-size: 0.85rem;">${latestCrl ? latestCrl.value + ' mm' : '-'}</strong>
             </div>
             <div class="stat-box">
               <div class="flex-between" style="gap:2px;">
-                <span style="font-size: 10px; color: #94a3b8;">FHR 胎心率</span>
-                ${latestFhr && latestFhr.date ? `<span style="font-size: 9px; color: #64748b;">${formatShortDate(latestFhr.date)}</span>` : ''}
+                <span style="font-size: 0.7rem; color: #94a3b8;">FHR 胎心率</span>
+                ${latestFhr && latestFhr.date ? `<span style="font-size: 0.68rem; color: #64748b;">${formatShortDate(latestFhr.date)}</span>` : ''}
               </div>
-              <strong style="font-size: 12px; color: var(--rose-600);">${latestFhr ? latestFhr.value + ' bpm' : '-'}</strong>
+              <strong style="font-size: 0.85rem; color: var(--rose-600);">${latestFhr ? latestFhr.value + ' bpm' : '-'}</strong>
             </div>
           </div>
-          ${extraItems.length > 0 ? `<div style="font-size:10px; color:#475569; margin-top:4px;">${extraItems.join(' · ')}</div>` : ''}
+          ${extraItems.length > 0 ? `<div style="font-size:0.72rem; color:#475569; margin-top:4px;">${extraItems.join(' · ')}</div>` : ''}
         `;
       });
 
@@ -2694,16 +3016,16 @@
         const themeCol = twinId === 'A' ? 'var(--sky-700)' : 'var(--pink-700)';
         compareBox.innerHTML = `
           <div style="background:var(--rose-50); border:1px solid var(--rose-200); border-radius:10px; padding:8px 10px;">
-            <span style="font-size:10.5px; color:#475569; display:block;">🗓️ LMP 推算週數</span>
-            <strong style="font-size:13.5px; color:var(--rose-700);">${gaInfo.lmpFull}</strong>
+            <span style="font-size:0.75rem; color:#475569; display:block;">🗓️ LMP 推算週數</span>
+            <strong style="font-size:0.95rem; color:var(--rose-700);">${gaInfo.lmpFull}</strong>
           </div>
           <div style="background:${themeBg}; border:1px solid ${themeBorder}; border-radius:10px; padding:8px 10px;">
-            <span style="font-size:10.5px; color:#475569; display:block;">📅 即日推算週數 (${formatDisplayDate(getTodayStr())})</span>
-            <strong style="font-size:13.5px; color:${themeCol};">${gaInfo.liveFull}</strong>
+            <span style="font-size:0.75rem; color:#475569; display:block;">📅 即日推算週數 (${formatDisplayDate(getTodayStr())})</span>
+            <strong style="font-size:0.95rem; color:${themeCol};">${gaInfo.liveFull}</strong>
           </div>
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px;">
-            <span style="font-size:10.5px; color:#475569; display:block;">🩺 最後產檢週數 (${gaInfo.lastScanDate})</span>
-            <strong style="font-size:13.5px; color:#0f172a;">${gaInfo.lastScanGa}</strong>
+            <span style="font-size:0.75rem; color:#475569; display:block;">🩺 最後產檢週數 (${gaInfo.lastScanDate})</span>
+            <strong style="font-size:0.95rem; color:#0f172a;">${gaInfo.lastScanGa}</strong>
           </div>
         `;
       }
@@ -2846,7 +3168,7 @@
           ${ptsB.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5.5" fill="#db2777" /><text x="${p.x}" y="${p.y + 16}" font-size="12.5" font-weight="bold" fill="#be185d" text-anchor="middle">B:${p.v}</text>`).join('')}
           ${xLabels}
         </svg>
-        <div style="display:flex; gap:14px; justify-content:center; font-size:11.5px; font-weight:600; padding-top:4px; color:#334155;">
+        <div style="display:flex; gap:14px; justify-content:center; font-size:0.78rem; font-weight:600; padding-top:4px; color:#334155;">
           <span><b style="color:#0284c7;">●</b> BB A 實際值</span>
           <span><b style="color:#db2777;">●</b> BB B 實際值</span>
           <span><b style="color:#10b981;">┄</b> MCMA 標準線 (P50)</span>
@@ -2854,7 +3176,7 @@
       `;
     }
 
-    async function saveTwinMeasurement(e) {
+    function saveTwinMeasurement(e) {
       e.preventDefault();
       const twinId = document.getElementById('tm-twin-id').value;
       const editId = document.getElementById('tm-edit-id').value;
@@ -2883,15 +3205,15 @@
       if (idx >= 0) appState.twinMeasurements[twinId][idx] = record;
       else appState.twinMeasurements[twinId].push(record);
 
-      await persistAndSync();
+      persistAndSync({ changeDesc: `${editId ? '更新' : '新增'} BB ${twinId} 超聲波量度數據 (${formatDisplayDate(record.date)})` });
       openTwinModal(twinId);
-      showToast(`✅ 已儲存 BB ${twinId} 數據並同步`);
+      showToast(`✅ 已儲存 BB ${twinId} 數據`);
     }
 
-    async function deleteTwinMeasurement(twinId, id) {
+    function deleteTwinMeasurement(twinId, id) {
       appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
       appState.twinMeasurements[twinId] = appState.twinMeasurements[twinId].filter(x => x.id !== id);
-      await persistAndSync();
+      persistAndSync({ changeDesc: `刪除 BB ${twinId} 一筆量度紀錄` });
       openTwinModal(twinId);
     }
 
@@ -2899,10 +3221,10 @@
       const container = document.getElementById('twin-measurements-list');
       const list = [...(appState.twinMeasurements[twinId] || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       container.innerHTML = list.map(item => `
-        <div class="flex-between" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; font-size:12px;">
+        <div class="flex-between" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; font-size:0.85rem;">
           <div>
             <strong>${formatDisplayDate(item.date)} ${formatDisplayTime(item.time)}</strong> <span style="color:var(--rose-600); font-weight:700;">${item.usGa || ''}</span>
-            <div style="font-size:11px; color:#475569; margin-top:2px;">
+            <div style="font-size:0.78rem; color:#475569; margin-top:2px;">
               ${item.crl ? `CRL: <b>${item.crl}mm</b> · ` : ''}
               ${item.fhr ? `FHR: <b>${item.fhr}bpm</b> · ` : ''}
               ${item.efw ? `EFW: <b>${item.efw}g</b> ` : ''}
@@ -2910,15 +3232,15 @@
             </div>
           </div>
           <div class="flex-center" style="gap: 6px;">
-            <button onclick="editTwinMeasurement('${twinId}', '${item.id}')" class="btn btn-soft" style="padding:3px 7px; font-size:11px;">編輯</button>
-            <button onclick="deleteTwinMeasurement('${twinId}', '${item.id}')" style="color:var(--rose-600); font-size:11px; font-weight:700;">刪除</button>
+            <button onclick="editTwinMeasurement('${twinId}', '${item.id}')" class="btn btn-soft" style="padding:3px 7px; font-size:0.78rem;">編輯</button>
+            <button onclick="deleteTwinMeasurement('${twinId}', '${item.id}')" style="color:var(--rose-600); font-size:0.78rem; font-weight:700;">刪除</button>
           </div>
         </div>
       `).join('');
     }
 
     // =========================================================================
-    // 6. 互動月曆與工作更期自訂排序/管理（改動自動匯出至老婆日曆）
+    // 6. 互動月曆與工作更期自訂排序/管理
     // =========================================================================
     const CATEGORY_CLASS = {
       '公立覆診': 'cat-public',
@@ -2973,7 +3295,7 @@
       let shiftBadge = '';
       if (shift) {
         const st = getShiftStyle(shift);
-        shiftBadge = `<span style="background:${st.bg}; color:${st.col}; font-size:9px; font-weight:700; padding:1px 3px; border-radius:4px;">${shift}</span>`;
+        shiftBadge = `<span style="background:${st.bg}; color:${st.col}; font-size:0.65rem; font-weight:700; padding:1px 3px; border-radius:4px;">${shift}</span>`;
       }
 
       const bars = dayEvents.slice(0, 3).map(ev => {
@@ -2993,7 +3315,7 @@
 
       const dayNumColor = isToday ? 'var(--rose-600)' : (isOtherMonth ? '#94a3b8' : '#0f172a');
       const twinGaLines = (gaA.valid || gaB.valid) ? `
-        <div style="font-size:8px; line-height:1.2; margin-top:1px;">
+        <div style="font-size:0.6rem; line-height:1.2; margin-top:1px;">
           ${gaA.valid ? `<div style="color:${isOtherMonth ? '#94a3b8' : '#0369a1'};">A:${gaA.short}</div>` : ''}
           ${gaB.valid ? `<div style="color:${isOtherMonth ? '#94a3b8' : '#be185d'};">B:${gaB.short}</div>` : ''}
         </div>
@@ -3003,7 +3325,7 @@
         <div onclick="openCalendarDayModal('${dateStr}')" class="cal-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}">
           <div>
             <div class="flex-between" style="gap:2px;">
-              <strong style="font-size:12px; color:${dayNumColor};">${day}</strong>
+              <strong style="font-size:0.85rem; color:${dayNumColor};">${day}</strong>
               ${shiftBadge}
             </div>
             ${twinGaLines}
@@ -3118,19 +3440,19 @@
       container.innerHTML = html;
     }
 
-    async function moveShiftOption(idx, dir) {
+    function moveShiftOption(idx, dir) {
       if (!Array.isArray(appState.shiftOptions)) return;
       const targetIdx = idx + dir;
       if (targetIdx < 0 || targetIdx >= appState.shiftOptions.length) return;
       const arr = appState.shiftOptions;
       [arr[idx], arr[targetIdx]] = [arr[targetIdx], arr[idx]];
       appState.shiftOptionsUpdatedAt = Date.now();
-      await persistAndSync();
+      persistAndSync({ changeDesc: '調整工作更期按鈕排序' });
       renderShiftSelectorButtons();
-      showToast('🔄 更期排序已同步');
+      showToast('🔄 更期排序已更新');
     }
 
-    async function setDayShift(shiftVal) {
+    function setDayShift(shiftVal) {
       if (!appState.shiftMeta) appState.shiftMeta = {};
       if (!shiftVal) {
         delete appState.shifts[selectedCalendarDate];
@@ -3138,22 +3460,22 @@
         appState.shifts[selectedCalendarDate] = shiftVal;
       }
       appState.shiftMeta[selectedCalendarDate] = Date.now();
-      await persistAndSync({ exportCalendar: true });
+      persistAndSync({ exportCalendar: true, changeDesc: `設定 ${formatDisplayDate(selectedCalendarDate)} 更期為「${shiftVal || '無/未定'}」` });
       renderShiftSelectorButtons();
-      showToast(`已更新 ${formatDisplayDate(selectedCalendarDate)} 更期為「${shiftVal || '無/未定'}」並自動同步日曆`);
+      showToast(`已更新 ${formatDisplayDate(selectedCalendarDate)} 更期為「${shiftVal || '無/未定'}」`);
     }
 
-    async function applyCustomDayShiftOnly() {
+    function applyCustomDayShiftOnly() {
       const val = document.getElementById('custom-shift-input').value.trim();
       if (!val) {
         showToast('⚠️ 請先輸入自訂更期名稱');
         return;
       }
       document.getElementById('custom-shift-input').value = '';
-      await setDayShift(val);
+      setDayShift(val);
     }
 
-    async function addShiftOptionAndApply() {
+    function addShiftOptionAndApply() {
       const val = document.getElementById('custom-shift-input').value.trim();
       if (!val) {
         showToast('⚠️ 請先輸入要加入的更期名稱');
@@ -3168,18 +3490,18 @@
       appState.shiftMeta[selectedCalendarDate] = Date.now();
       appState.shiftOptionsUpdatedAt = Date.now();
       document.getElementById('custom-shift-input').value = '';
-      await persistAndSync({ exportCalendar: true });
+      persistAndSync({ exportCalendar: true, changeDesc: `新增工作更期按鈕「${val}」並套用至 ${formatDisplayDate(selectedCalendarDate)}` });
       renderShiftSelectorButtons();
-      showToast(`✅ 已新增「${val}」並自動同步老婆日曆`);
+      showToast(`✅ 已新增「${val}」`);
     }
 
-    async function deleteShiftOption(idx) {
+    function deleteShiftOption(idx) {
       if (!Array.isArray(appState.shiftOptions)) return;
       const removed = appState.shiftOptions.splice(idx, 1)[0];
       appState.shiftOptionsUpdatedAt = Date.now();
-      await persistAndSync();
+      persistAndSync({ changeDesc: `刪除工作更期按鈕「${removed}」` });
       renderShiftSelectorButtons();
-      showToast(`🗑️ 已刪除「${removed}」更期按鈕並同步`);
+      showToast(`🗑️ 已刪除「${removed}」更期按鈕`);
     }
 
     function renderCalendarDayEvents(dateStr) {
@@ -3187,7 +3509,7 @@
       const dayEvents = (appState.events || []).filter(ev => doesEventCoverDate(ev, dateStr)).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
 
       if (dayEvents.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:#94a3b8; background:#f8fafc; padding:10px; border-radius:10px; text-align:center;">當日暫無覆診或住院行程</p>`;
+        container.innerHTML = `<p style="font-size:0.85rem; color:#94a3b8; background:#f8fafc; padding:10px; border-radius:10px; text-align:center;">當日暫無覆診或住院行程</p>`;
         return;
       }
 
@@ -3214,16 +3536,16 @@
             <div class="flex-between" style="align-items:flex-start;">
               <div>
                 <div class="flex-center" style="flex-wrap:wrap; gap:5px;">
-                  <span class="cal-ev-tag ${cls}" style="margin:0; font-size:10px;">${catLabel}</span>
-                  <strong style="font-size:12px;">${formatDisplayTime(ev.time)}</strong>
+                  <span class="cal-ev-tag ${cls}" style="margin:0; font-size:0.75rem;">${catLabel}</span>
+                  <strong style="font-size:0.85rem;">${formatDisplayTime(ev.time)}</strong>
                   ${rangeTag}
-                  ${ev.location ? `<span style="font-size:11px; color:#64748b;">📍 ${ev.location}</span>` : ''}
+                  ${ev.location ? `<span style="font-size:0.78rem; color:#64748b;">📍 ${ev.location}</span>` : ''}
                 </div>
-                <p style="font-size:12px; font-weight:700; margin-top:4px;">${ev.title || catLabel}</p>
+                <p style="font-size:0.85rem; font-weight:700; margin-top:4px;">${ev.title || catLabel}</p>
               </div>
               <div class="flex-center" style="gap:4px;">
-                <button onclick="editCalendarEvent('${ev.id}')" class="btn btn-soft" style="padding:4px 8px; font-size:11px;">編輯</button>
-                <button onclick="deleteCalendarEvent('${ev.id}')" class="btn btn-soft-rose" style="padding:4px 8px; font-size:11px;">刪除</button>
+                <button onclick="editCalendarEvent('${ev.id}')" class="btn btn-soft" style="padding:4px 8px; font-size:0.78rem;">編輯</button>
+                <button onclick="deleteCalendarEvent('${ev.id}')" class="btn btn-soft-rose" style="padding:4px 8px; font-size:0.78rem;">刪除</button>
               </div>
             </div>
             ${mediaHtml}
@@ -3353,10 +3675,11 @@
       renderEventMediaPreview();
     }
 
-    async function saveCalendarEvent(e) {
+    function saveCalendarEvent(e) {
       e.preventDefault();
       const cfg = getSyncConfig();
-      const id = document.getElementById('ev-id').value || ('ev-' + Date.now());
+      const existingId = document.getElementById('ev-id').value;
+      const id = existingId || ('ev-' + Date.now());
       const date = document.getElementById('ev-date').value || '';
       const rawEnd = document.getElementById('ev-end-date').value || '';
       const endDate = (rawEnd && (!date || rawEnd >= date)) ? rawEnd : '';
@@ -3379,23 +3702,58 @@
       if (idx >= 0) appState.events[idx] = record;
       else appState.events.push(record);
 
-      await persistAndSync({ exportCalendar: true });
+      persistAndSync({ exportCalendar: true, changeDesc: `${existingId ? '編輯' : '新增'}日曆行程「${category}：${title}」(${formatDisplayDate(date)})` });
       if (date) openCalendarDayModal(date);
       else closeAllModals();
-      showToast('✅ 行程已儲存並自動匯出至老婆日曆');
+      showToast('✅ 行程已儲存並同步');
     }
 
-    async function deleteCalendarEvent(evId) {
+    function deleteCalendarEvent(evId) {
+      const target = appState.events.find(item => item.id === evId);
       appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), evId]));
       appState.events = appState.events.filter(item => item.id !== evId);
-      await persistAndSync({ exportCalendar: true });
+      persistAndSync({ exportCalendar: true, changeDesc: `刪除日曆行程「${target ? target.title : evId}」` });
       renderCalendarDayEvents(selectedCalendarDate);
       showToast('🗑️ 已刪除行程');
     }
 
     // =========================================================================
-    // 7. 母體狀況、用藥清單與本機鬧鐘
+    // 7. 守護媽媽狀況、用藥清單、過往媽媽紀錄編輯與本機鬧鐘 (支援「每日」選項)
     // =========================================================================
+    function formatTodayEventsForMotherOverview(todayEvents, today) {
+      if (!todayEvents || todayEvents.length === 0) return '';
+      return todayEvents.map(ev => {
+        const catLabel = ev.category === '入院' ? '住院' : ev.category;
+        const isHosp = (catLabel === '住院');
+        const endD = (ev.endDate && ev.endDate >= ev.date) ? ev.endDate : ev.date;
+
+        if (isHosp) {
+          // 情境 A：今日正好是出院日（跨日住院）
+          if (ev.endDate && ev.endDate > ev.date && today === ev.endDate) {
+            return ev.endTime ? `今日 ${ev.endTime} 出院` : `今日出院`;
+          }
+          // 情境 B：今日是入院日（當日或跨日）
+          if (today === ev.date) {
+            if (ev.endDate && ev.endDate > ev.date) {
+              const inT = ev.time || '未定時間';
+              const outPart = `${formatShortDate(ev.endDate)}${ev.endTime ? ' ' + ev.endTime : ''}`;
+              return `住院 (${inT} 入院 → ${outPart} 出院)`;
+            } else {
+              const inT = ev.time || '--:--';
+              const outT = ev.endTime || '--:--';
+              return `住院 (${inT} 入院至 ${outT} 出院)`;
+            }
+          }
+          // 情境 C：住院期間中間日子
+          if (today > ev.date && today < endD) {
+            const outPart = `${formatShortDate(endD)}${ev.endTime ? ' ' + ev.endTime : ''}`;
+            return `住院中 (預計 ${outPart} 出院)`;
+          }
+        }
+        return `${formatDisplayTime(ev.time)} ${catLabel}`;
+      }).join('、');
+    }
+
     function renderMaternalTab() {
       const today = getTodayStr();
       document.getElementById('maternal-today-date').textContent = formatDisplayDate(today);
@@ -3411,13 +3769,11 @@
         ? [todayLog.mood, todayLog.feeling].filter(Boolean).join(' · ')
         : '';
       const bleedingText = todayLog ? (todayLog.bleeding || '') : '';
-      const eventsText = todayEvents.length > 0
-        ? todayEvents.map(e => `${formatDisplayTime(e.time)} ${e.category === '入院' ? '住院' : e.category}`).join('、')
-        : '';
+      const eventsText = formatTodayEventsForMotherOverview(todayEvents, today);
 
       document.getElementById('maternal-today-summary').innerHTML = `
         <div class="flex-between mat-mini-box"><span>今日工作更期</span><strong>${todayShift}</strong></div>
-        <div class="flex-between mat-mini-box"><span>今日覆診/住院</span><strong style="color:var(--rose-600);">${eventsText}</strong></div>
+        <div class="flex-between mat-mini-box"><span>今日覆診/住院</span><strong style="color:var(--rose-600); text-align:right;">${eventsText}</strong></div>
         <div class="flex-between mat-mini-box"><span>最新心情 / 感覺</span><strong>${moodFeelingText}</strong></div>
         <div class="flex-between mat-mini-box"><span>分泌物 / 狀況</span><strong style="color:${bleedingText && bleedingText !== '正常無出血' ? 'var(--amber-800)' : 'var(--emerald-800)'};">${bleedingText}</strong></div>
       `;
@@ -3434,9 +3790,9 @@
               <div style="min-width:0;">
                 <div class="flex-center" style="gap:5px;">
                   <span class="badge" style="background:${badgeBg}; color:${badgeCol};">${med.type}</span>
-                  <strong style="font-size:12px; text-decoration:${isChecked ? 'line-through' : 'none'}; color:${isChecked ? '#94a3b8' : '#1e293b'};">${med.name}</strong>
+                  <strong style="font-size:0.85rem; text-decoration:${isChecked ? 'line-through' : 'none'}; color:${isChecked ? '#94a3b8' : '#1e293b'};">${med.name}</strong>
                 </div>
-                <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">${med.dosage}</p>
+                <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">${med.dosage}</p>
               </div>
             </label>
             <div class="flex-center" style="gap:4px;">
@@ -3451,7 +3807,7 @@
       const logsContainer = document.getElementById('maternal-logs-list');
       const sortedLogs = [...(appState.maternalLogs || [])].sort((a, b) => ((b.date || '') + (b.time || '')).localeCompare((a.date || '') + (a.time || '')));
       if (sortedLogs.length === 0) {
-        logsContainer.innerHTML = `<p style="font-size:11.5px; color:#94a3b8; text-align:center; padding:12px;">暫無母體紀錄</p>`;
+        logsContainer.innerHTML = `<p style="font-size:0.8rem; color:#94a3b8; text-align:center; padding:12px;">暫無媽媽紀錄</p>`;
       } else {
         logsContainer.innerHTML = sortedLogs.map(log => {
           const mediaHtml = (log.media && log.media.length > 0) ? `
@@ -3466,18 +3822,21 @@
           if (log.feeling) partsLine.push(`<strong>感覺：</strong>${log.feeling}`);
           if (log.activity) partsLine.push(`<strong>活動：</strong>${log.activity}`);
           return `
-            <div class="flex-between" style="align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:9px 10px; font-size:12px;">
-              <div style="flex:1;">
+            <div class="flex-between" style="align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:9px 10px; font-size:0.85rem;">
+              <div style="flex:1; min-width:0;">
                 <div class="flex-center" style="flex-wrap:wrap; gap:5px; margin-bottom:3px;">
                   <strong>${formatDisplayDate(log.date)} ${formatDisplayTime(log.time)}</strong>
                   ${log.mood ? `<span class="badge" style="background:var(--rose-100); color:var(--rose-700);">${log.mood}</span>` : ''}
                   ${log.bleeding ? `<span class="badge" style="background:${log.bleeding === '正常無出血' ? 'var(--emerald-100)' : 'var(--amber-100)'}; color:${log.bleeding === '正常無出血' ? 'var(--emerald-800)' : 'var(--amber-800)'};">${log.bleeding}</span>` : ''}
                 </div>
                 ${partsLine.length > 0 ? `<p>${partsLine.join(' ｜ ')}</p>` : ''}
-                ${log.condition ? `<p style="font-size:11px; color:var(--text-muted);">備註：${log.condition}</p>` : ''}
+                ${log.condition ? `<p style="font-size:0.78rem; color:var(--text-muted);">備註：${log.condition}</p>` : ''}
                 ${mediaHtml}
               </div>
-              <button onclick="deleteMaternalLog('${log.id}')" style="color:#94a3b8; font-weight:700; padding:2px 6px;">✕</button>
+              <div class="flex-center" style="gap: 4px; flex-shrink: 0;">
+                <button onclick="editMaternalLog('${log.id}')" class="btn btn-soft" style="padding:3px 8px; font-size:0.78rem;">編輯</button>
+                <button onclick="deleteMaternalLog('${log.id}')" style="color:#94a3b8; font-weight:700; padding:2px 6px;">✕</button>
+              </div>
             </div>
           `;
         }).join('');
@@ -3486,13 +3845,80 @@
       renderLocalAlarms();
     }
 
-    async function toggleMedicationCheck(medId) {
+    function toggleCustomMoodInput() {
+      const moodSel = document.getElementById('mat-mood').value;
+      const customInp = document.getElementById('mat-mood-custom');
+      if (moodSel === 'CUSTOM') {
+        customInp.classList.remove('hidden');
+        customInp.focus();
+      } else {
+        customInp.classList.add('hidden');
+      }
+    }
+
+    function editMaternalLog(logId) {
+      const item = (appState.maternalLogs || []).find(l => l.id === logId);
+      if (!item) return;
+      document.getElementById('mat-edit-id').value = item.id;
+      document.getElementById('mat-form-heading').textContent = '✏️ 編輯媽媽紀錄';
+      document.getElementById('mat-submit-btn').textContent = '更新媽媽紀錄';
+      document.getElementById('mat-cancel-edit-btn').classList.remove('hidden');
+
+      document.getElementById('mat-date').value = item.date || '';
+      const [h, m] = (item.time || '').split(':');
+      document.getElementById('mat-hour').value = h || '';
+      document.getElementById('mat-min').value = m || '';
+
+      const presetMoods = ['', '😊 平靜安心', '🥰 開心期待', '😴 疲倦嗜睡', '😰 緊張擔心', '😢 情緒低落'];
+      const moodSel = document.getElementById('mat-mood');
+      const moodCustom = document.getElementById('mat-mood-custom');
+      if (presetMoods.includes(item.mood || '')) {
+        moodSel.value = item.mood || '';
+        moodCustom.classList.add('hidden');
+        moodCustom.value = '';
+      } else {
+        moodSel.value = 'CUSTOM';
+        moodCustom.classList.remove('hidden');
+        moodCustom.value = item.mood || '';
+      }
+
+      document.getElementById('mat-bleeding').value = item.bleeding || '';
+      document.getElementById('mat-feeling').value = item.feeling || '';
+      document.getElementById('mat-activity').value = item.activity || '';
+      document.getElementById('mat-condition').value = item.condition || '';
+      tempMaternalMedia = [...(item.media || [])];
+      renderMaternalMediaPreview();
+
+      document.getElementById('mat-form-heading').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      showToast('✏️ 已載入紀錄，修改後按「更新媽媽紀錄」');
+    }
+
+    function resetMaternalForm() {
+      document.getElementById('mat-edit-id').value = '';
+      document.getElementById('mat-form-heading').textContent = '📝 記錄媽媽當刻活動、心情與身體狀況';
+      document.getElementById('mat-submit-btn').textContent = '儲存媽媽紀錄';
+      document.getElementById('mat-cancel-edit-btn').classList.add('hidden');
+      document.getElementById('mat-date').value = getTodayStr();
+      document.getElementById('mat-hour').value = '';
+      document.getElementById('mat-min').value = '';
+      document.getElementById('mat-mood').value = '';
+      document.getElementById('mat-mood-custom').value = '';
+      document.getElementById('mat-mood-custom').classList.add('hidden');
+      document.getElementById('mat-bleeding').value = '';
+      document.getElementById('mat-feeling').value = '';
+      document.getElementById('mat-activity').value = '';
+      document.getElementById('mat-condition').value = '';
+      tempMaternalMedia = [];
+      renderMaternalMediaPreview();
+    }
+
+    function toggleMedicationCheck(medId) {
       const today = getTodayStr();
       const med = appState.medications.find(m => m.id === medId);
       if (!med) return;
       med.checkedDate = (med.checkedDate === today) ? '' : today;
       med.updatedAt = Date.now();
-      await persistAndSync();
+      persistAndSync({ changeDesc: `${med.checkedDate ? '已服用' : '取消勾選'}藥物「${med.name}」` });
     }
 
     function openMedModal(medId) {
@@ -3539,9 +3965,10 @@
       `;
     }
 
-    async function saveMedication(e) {
+    function saveMedication(e) {
       e.preventDefault();
-      const id = document.getElementById('med-id').value || ('med-' + Date.now());
+      const existingId = document.getElementById('med-id').value;
+      const id = existingId || ('med-' + Date.now());
       const name = document.getElementById('med-name').value.trim();
       const type = document.getElementById('med-type').value;
       const dosage = document.getElementById('med-dosage').value.trim();
@@ -3552,15 +3979,16 @@
       } else {
         appState.medications.push({ id, name, type, dosage, checkedDate: '', image: tempMedImage, imageCategory: '藥單', updatedAt: Date.now() });
       }
-      await persistAndSync();
+      persistAndSync({ changeDesc: `${existingId ? '更新' : '新增'}藥物「${name}」` });
       closeAllModals();
-      showToast('💊 已儲存藥物清單及圖片並同步');
+      showToast('💊 已儲存藥物清單及圖片');
     }
 
-    async function deleteMedication(id) {
+    function deleteMedication(id) {
+      const med = appState.medications.find(m => m.id === id);
       appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
       appState.medications = appState.medications.filter(m => m.id !== id);
-      await persistAndSync();
+      persistAndSync({ changeDesc: `刪除藥物「${med ? med.name : id}」` });
     }
 
     function handleMaternalMediaUpload(event) {
@@ -3591,16 +4019,22 @@
       `).join('');
     }
 
-    async function saveMaternalLog(e) {
+    function saveMaternalLog(e) {
       e.preventDefault();
       const cfg = getSyncConfig();
+      const editId = document.getElementById('mat-edit-id').value;
       const hVal = document.getElementById('mat-hour').value;
       const mVal = document.getElementById('mat-min').value;
-      appState.maternalLogs.unshift({
-        id: 'ml-' + Date.now(),
+      const rawMood = document.getElementById('mat-mood').value;
+      const finalMood = rawMood === 'CUSTOM'
+        ? document.getElementById('mat-mood-custom').value.trim()
+        : rawMood;
+
+      const record = {
+        id: editId || ('ml-' + Date.now()),
         date: document.getElementById('mat-date').value || '',
         time: (hVal && mVal) ? `${hVal}:${mVal}` : '',
-        mood: document.getElementById('mat-mood').value,
+        mood: finalMood,
         bleeding: document.getElementById('mat-bleeding').value,
         feeling: document.getElementById('mat-feeling').value.trim(),
         activity: document.getElementById('mat-activity').value.trim(),
@@ -3608,25 +4042,24 @@
         media: [...tempMaternalMedia],
         updatedAt: Date.now(),
         updatedBy: cfg.userName
-      });
-      await persistAndSync();
-      document.getElementById('mat-mood').value = '';
-      document.getElementById('mat-bleeding').value = '';
-      document.getElementById('mat-feeling').value = '';
-      document.getElementById('mat-activity').value = '';
-      document.getElementById('mat-condition').value = '';
-      tempMaternalMedia = [];
-      renderMaternalMediaPreview();
-      showToast('📝 已儲存母體紀錄並同步');
+      };
+
+      const idx = appState.maternalLogs.findIndex(l => l.id === record.id);
+      if (idx >= 0) appState.maternalLogs[idx] = record;
+      else appState.maternalLogs.unshift(record);
+
+      persistAndSync({ changeDesc: `${editId ? '更新' : '新增'}媽媽狀況紀錄 (${formatDisplayDate(record.date)})` });
+      resetMaternalForm();
+      showToast('📝 已儲存媽媽紀錄');
     }
 
-    async function deleteMaternalLog(id) {
+    function deleteMaternalLog(id) {
       appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
       appState.maternalLogs = appState.maternalLogs.filter(l => l.id !== id);
-      await persistAndSync();
+      persistAndSync({ changeDesc: '刪除一筆媽媽狀況紀錄' });
     }
 
-    // --- 本機鬧鐘與 iOS 捷徑串接 ---
+    // --- 本機鬧鐘（支援「每日」選項與預設 ----，每日鬧鐘響後保留不刪除） ---
     let sharedAudioCtx = null;
     let alarmRingInterval = null;
     let wakeLockObj = null;
@@ -3708,7 +4141,12 @@
 
     function startAlarmRinging(alarmObj) {
       currentRingingAlarmId = alarmObj.id;
-      document.getElementById('alarm-ringing-text').textContent = `${alarmObj.time} · ${alarmObj.label}`;
+      const isDaily = alarmObj.repeat === '每日';
+      document.getElementById('alarm-ringing-text').textContent = `${alarmObj.time} ${isDaily ? '[每日]' : ''} · ${alarmObj.label}`;
+      const stopBtn = document.getElementById('alarm-stop-btn');
+      if (stopBtn) {
+        stopBtn.textContent = isDaily ? '關閉今日響鬧 (明日繼續)' : '關閉並刪除鬧鐘';
+      }
       document.getElementById('alarm-ringing-banner').classList.remove('hidden');
       playSingleChime();
       if (alarmRingInterval) clearInterval(alarmRingInterval);
@@ -3722,10 +4160,19 @@
         alarmRingInterval = null;
       }
       if (currentRingingAlarmId) {
-        localAlarms = localAlarms.filter(a => a.id !== currentRingingAlarmId);
-        currentRingingAlarmId = null;
-        saveLocalAlarms();
-        showToast('🗑️ 鬧鐘響鬧完成，已自動刪除該鬧鐘設定');
+        const target = localAlarms.find(a => a.id === currentRingingAlarmId);
+        const isDaily = target && target.repeat === '每日';
+        if (isDaily) {
+          // 每日鬧鐘保留，明日同一時間繼續響鬧
+          currentRingingAlarmId = null;
+          saveLocalAlarms();
+          showToast('🔁 已關閉今日響鬧，每日鬧鐘已保留並於明日同一時間再響');
+        } else {
+          localAlarms = localAlarms.filter(a => a.id !== currentRingingAlarmId);
+          currentRingingAlarmId = null;
+          saveLocalAlarms();
+          showToast('🗑️ 單次鬧鐘響鬧完成，已自動刪除該鬧鐘');
+        }
       }
     }
 
@@ -3737,25 +4184,30 @@
         showToast('⚠️ 請先選擇鬧鐘時與分');
         return;
       }
+      const repeatVal = document.getElementById('alarm-repeat').value || '----';
       const label = document.getElementById('alarm-label').value.trim() || '服藥 / 安胎提醒';
       const timeStr = `${hour}:${min}`;
 
       localAlarms.push({
         id: 'al-' + Date.now(),
         time: timeStr,
+        repeat: repeatVal,
         label,
         enabled: true,
         lastTriggeredDate: ''
       });
+      document.getElementById('alarm-hour').value = '';
+      document.getElementById('alarm-min').value = '';
+      document.getElementById('alarm-repeat').value = '----';
       document.getElementById('alarm-label').value = '';
       saveLocalAlarms();
 
-      triggerIosShortcutAlarm(timeStr, label);
+      triggerIosShortcutAlarm(timeStr, label, repeatVal);
     }
 
-    function triggerIosShortcutAlarm(timeStr, labelStr) {
+    function triggerIosShortcutAlarm(timeStr, labelStr, repeatStr = '----') {
       const todayStr = getTodayStr();
-      const cleanLabel = labelStr || 'MCMA提醒';
+      const cleanLabel = (repeatStr === '每日' ? `[每日] ${labelStr}` : labelStr) || 'MCMA提醒';
       const payload = `${todayStr} ${timeStr}|${cleanLabel}`;
       const shortcutName = getSavedShortcutName();
 
@@ -3813,13 +4265,18 @@
       const now = new Date();
       const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0'), d = String(now.getDate()).padStart(2, '0');
       const dtStart = `${y}${m}${d}T${hh}${mm}00`;
-      const ics = [
+      const lines = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
         'BEGIN:VEVENT',
         `DTSTART:${dtStart}`,
         `DTEND:${dtStart}`,
-        `SUMMARY:MCMA守護寶 - ${al.label}`,
+        `SUMMARY:MCMA守護寶 - ${al.label}`
+      ];
+      if (al.repeat === '每日') {
+        lines.push('RRULE:FREQ=DAILY');
+      }
+      lines.push(
         'BEGIN:VALARM',
         'TRIGGER:-PT0M',
         'ACTION:DISPLAY',
@@ -3827,14 +4284,22 @@
         'END:VALARM',
         'END:VEVENT',
         'END:VCALENDAR'
-      ].join('\r\n');
-      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      );
+      const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `鬧鐘_${al.time.replace(':', '')}.ics`;
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    function toggleAlarmRepeatMode(id) {
+      const al = localAlarms.find(a => a.id === id);
+      if (!al) return;
+      al.repeat = (al.repeat === '每日') ? '----' : '每日';
+      saveLocalAlarms();
+      showToast(al.repeat === '每日' ? '🔁 已切換為「每日」固定鬧鐘 (響鬧後不刪除)' : '⏱️ 已切換為「----」單次鬧鐘');
     }
 
     function toggleLocalAlarm(id) {
@@ -3856,22 +4321,25 @@
       const container = document.getElementById('local-alarms-list');
       if (!container) return;
       if (localAlarms.length === 0) {
-        container.innerHTML = `<p style="font-size:11px; color:#94a3b8; text-align:center; padding:4px;">此手機尚未建立鬧鐘</p>`;
+        container.innerHTML = `<p style="font-size:0.78rem; color:#94a3b8; text-align:center; padding:4px;">此手機尚未建立鬧鐘</p>`;
         return;
       }
       container.innerHTML = localAlarms.map(al => {
         const safeLabel = (al.label || 'MCMA提醒').replace(/'/g, "\\'");
+        const rep = al.repeat || '----';
+        const isDaily = rep === '每日';
         return `
           <div class="flex-between" style="background:#1e293b; border:1px solid #334155; padding:8px 10px; border-radius:10px; flex-wrap:wrap; gap:6px;">
-            <div class="flex-center">
-              <strong style="font-size:14px; font-family:monospace; color:#fbbf24;">${al.time}</strong>
-              <span style="font-size:12px; color:#f1f5f9;">${al.label}</span>
+            <div class="flex-center" style="flex-wrap:wrap;">
+              <strong style="font-size:0.95rem; font-family:monospace; color:#fbbf24;">${al.time}</strong>
+              <button type="button" onclick="toggleAlarmRepeatMode('${al.id}')" title="點擊切換每日/單次" class="badge" style="background:${isDaily ? '#059669' : '#334155'}; color:#fff; cursor:pointer;">${isDaily ? '🔁 每日' : rep}</button>
+              <span style="font-size:0.85rem; color:#f1f5f9;">${al.label}</span>
             </div>
             <div class="flex-center" style="gap:6px; margin-left:auto;">
-              <button onclick="triggerIosShortcutAlarm('${al.time}', '${safeLabel}')" title="透過 iOS 捷徑直接寫入 iPhone 時鐘 App" style="font-size:11px; font-weight:700; background:#f59e0b; color:#0f172a; padding:4px 8px; border-radius:7px;">⏰寫入手機鬧鐘</button>
-              <button onclick="exportAlarmToCalendar('${al.id}')" title="匯入日曆提醒" style="font-size:10px; background:#334155; color:#7dd3fc; padding:4px 6px; border-radius:6px;">📅日曆</button>
+              <button onclick="triggerIosShortcutAlarm('${al.time}', '${safeLabel}', '${rep}')" title="透過 iOS 捷徑直接寫入 iPhone 時鐘 App" style="font-size:0.78rem; font-weight:700; background:#f59e0b; color:#0f172a; padding:4px 8px; border-radius:7px;">⏰寫入手機鬧鐘</button>
+              <button onclick="exportAlarmToCalendar('${al.id}')" title="匯入日曆提醒" style="font-size:0.72rem; background:#334155; color:#7dd3fc; padding:4px 6px; border-radius:6px;">📅日曆</button>
               <input type="checkbox" ${al.enabled ? 'checked' : ''} onchange="toggleLocalAlarm('${al.id}')" style="width:16px; height:16px;">
-              <button onclick="deleteLocalAlarm('${al.id}')" style="color:#94a3b8; font-size:12px; padding:2px 4px;">✕</button>
+              <button onclick="deleteLocalAlarm('${al.id}')" style="color:#94a3b8; font-size:0.85rem; padding:2px 4px;">✕</button>
             </div>
           </div>
         `;
@@ -3898,24 +4366,24 @@
     }, 2000);
 
     // =========================================================================
-    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像（支援直接編輯日期）
+    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像（依自訂日期排序 + 編輯視窗先確定後儲存）
     // =========================================================================
     function renderHistoryAndGalleryTab() {
       const mhList = document.getElementById('medical-history-list');
       const sortedMh = [...(appState.medicalHistory || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       mhList.innerHTML = sortedMh.map(item => `
-        <div style="background:var(--amber-50); border:1px solid #fde68a; border-radius:10px; padding:8px 10px; font-size:12px;">
+        <div style="background:var(--amber-50); border:1px solid #fde68a; border-radius:10px; padding:8px 10px; font-size:0.85rem;">
           <div class="flex-between" style="margin-bottom:3px;">
             <div class="flex-center">
               <span class="badge" style="background:var(--amber-100); color:var(--amber-800);">${item.tag}</span>
               <strong>${formatDisplayDate(item.date)}</strong>
             </div>
             <div class="flex-center" style="gap:4px;">
-              <button onclick="openHistoryModal('${item.id}')" class="btn btn-soft" style="padding:2px 7px; font-size:10.5px;">編輯</button>
+              <button onclick="openHistoryModal('${item.id}')" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;">編輯</button>
               <button onclick="deleteMedicalHistory('${item.id}')" style="color:#94a3b8; font-weight:700; padding:2px 4px;">✕</button>
             </div>
           </div>
-          ${item.detail ? `<p style="color:#334155; font-size:11.5px;">${item.detail}</p>` : `<p style="color:#94a3b8; font-size:11px;">(無文字詳情)</p>`}
+          ${item.detail ? `<p style="color:#334155; font-size:0.8rem;">${item.detail}</p>` : `<p style="color:#94a3b8; font-size:0.78rem;">(無文字詳情)</p>`}
         </div>
       `).join('');
 
@@ -3926,14 +4394,16 @@
             ? `<video src="${m.url}" onclick="openMediaLightbox('${m.url}', 'video', '天使BB紀念冊')" style="width:46px; height:46px; border-radius:8px; object-fit:cover; cursor:zoom-in;"></video>`
             : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image', '天使BB紀念冊')" style="width:46px; height:46px; border-radius:8px; object-fit:cover; cursor:zoom-in;">`
           ).join('')
-        : `<span style="font-size:11px; color:var(--purple-600);">點擊「開啟紀念冊」可多選上載珍貴相片或影片</span>`;
+        : `<span style="font-size:0.78rem; color:var(--purple-600);">點擊「開啟紀念冊」可多選上載珍貴相片或影片</span>`;
 
       ['A', 'B'].forEach(twinId => {
         const grid = document.getElementById(`gallery-grid-${twinId}`);
-        const items = (appState.twinMedia || []).filter(m => m.target === twinId || m.target === 'BOTH').sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const items = (appState.twinMedia || [])
+          .filter(m => m.target === twinId || m.target === 'BOTH')
+          .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
         if (items.length === 0) {
-          grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:11px; color:#94a3b8; text-align:center; padding:18px 0;">暫無影像紀錄</p>`;
+          grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:0.78rem; color:#94a3b8; text-align:center; padding:18px 0;">暫無影像紀錄</p>`;
           return;
         }
 
@@ -3944,13 +4414,14 @@
               : `<img src="${m.url}" onclick="openTwinGalleryLightbox('${twinId}', ${idx})" title="點擊放大並左右滑動瀏覽" style="width:100%; height:84px; object-fit:cover; border-radius:7px; cursor:zoom-in;">`
             }
             <div class="flex-between" style="margin-top:2px; gap:2px;">
-              <input type="date" value="${m.date || ''}" onchange="updateMediaDate('${m.id}', this.value)" style="padding:2px; font-size:10px; border:none; border-bottom:1px dashed #cbd5e1; border-radius:0; min-width:0; flex:1;">
+              <span style="font-size:0.72rem; font-weight:700; color:#475569;">📅 ${formatDisplayDate(m.date)}</span>
               ${m.target === 'BOTH' ? '<span class="badge" style="background:var(--purple-100); color:var(--purple-800); flex-shrink:0;">同框</span>' : ''}
             </div>
-            <p style="font-size:10.5px; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.caption || '超聲波紀錄'}</p>
+            <p style="font-size:0.75rem; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.caption || '超聲波紀錄'}</p>
             <div style="display:flex; gap:4px;">
-              ${m.type === 'image' ? `<button onclick="setTwinAvatar('${twinId}', '${m.url}')" class="btn btn-soft" style="flex:1; padding:4px 2px; font-size:10px;">設為頭像</button>` : '<span style="flex:1;"></span>'}
-              <button onclick="deleteTwinMedia('${m.id}')" class="btn btn-soft-rose" style="padding:4px 6px; font-size:10px;">刪除</button>
+              <button type="button" onclick="openUnifiedMediaEditModal('twin:${m.id}')" class="btn btn-soft" style="flex:1; padding:4px 2px; font-size:0.72rem;">編輯</button>
+              ${m.type === 'image' ? `<button onclick="setTwinAvatar('${twinId}', '${m.url}')" class="btn btn-soft" style="flex:1; padding:4px 2px; font-size:0.72rem;">頭像</button>` : ''}
+              <button onclick="deleteTwinMedia('${m.id}')" class="btn btn-soft-rose" style="padding:4px 5px; font-size:0.72rem;">刪</button>
             </div>
           </div>
         `).join('');
@@ -4019,10 +4490,10 @@
             subIdx: mIdx,
             url: m.url,
             type: m.type || 'image',
-            source: '🤰 母體日記',
+            source: '🤰 媽媽日記',
             mediaCategory: m.mediaCategory || '自訂',
             date: m.customDate !== undefined ? m.customDate : (ml.date || ''),
-            caption: m.customCaption || ml.feeling || ml.mood || '母體紀錄附件',
+            caption: m.customCaption || ml.feeling || ml.mood || '媽媽紀錄附件',
             ts: m.addedAt || ml.updatedAt || 0
           });
         });
@@ -4060,7 +4531,18 @@
         });
       });
 
-      unified.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      // 第1點核心：完全以自訂日期 (date) 由新至舊排序，若無日期則排於後方
+      unified.sort((a, b) => {
+        if (a.date && b.date) {
+          const cmp = b.date.localeCompare(a.date);
+          if (cmp !== 0) return cmp;
+        } else if (a.date && !b.date) {
+          return -1;
+        } else if (!a.date && b.date) {
+          return 1;
+        }
+        return (b.ts || 0) - (a.ts || 0);
+      });
       return unified;
     }
 
@@ -4078,127 +4560,146 @@
       if (list[idx]) openMediaLightbox(list[idx].url, list[idx].type, list[idx].caption, list, idx);
     }
 
-    // 更改全庫影像日期（支援所有來源影像）
-    async function updateUnifiedMediaDate(uid, newDate) {
-      const parts = uid.split(':');
-      const kind = parts[0];
-      if (kind === 'twin') {
-        const item = (appState.twinMedia || []).find(x => x.id === parts[1]);
-        if (item) { item.date = newDate || ''; item.updatedAt = Date.now(); }
-      } else if (kind === 'event') {
-        const ev = (appState.events || []).find(x => x.id === parts[1]);
-        const idx = parseInt(parts[2], 10);
-        if (ev && ev.media && ev.media[idx]) { ev.media[idx].customDate = newDate || ''; ev.updatedAt = Date.now(); }
-      } else if (kind === 'maternal') {
-        const ml = (appState.maternalLogs || []).find(x => x.id === parts[1]);
-        const idx = parseInt(parts[2], 10);
-        if (ml && ml.media && ml.media[idx]) { ml.media[idx].customDate = newDate || ''; ml.updatedAt = Date.now(); }
-      } else if (kind === 'med') {
-        const med = (appState.medications || []).find(x => x.id === parts[1]);
-        if (med) { med.imageDate = newDate || ''; med.updatedAt = Date.now(); }
-      } else if (kind === 'angel') {
-        const idx = parseInt(parts[1], 10);
-        if (appState.angelMemorial?.media?.[idx]) { appState.angelMemorial.media[idx].date = newDate || ''; appState.angelMemorial.updatedAt = Date.now(); }
+    // 第1點核心：開啟編輯彈窗修改自訂日期、分類與備註，按確定後才寫入並同步
+    function openUnifiedMediaEditModal(uid) {
+      const target = getUnifiedMediaList().find(x => x.uid === uid);
+      if (!target) return;
+
+      document.getElementById('me-uid').value = uid;
+      document.getElementById('me-date').value = target.date || '';
+      document.getElementById('me-caption').value = target.caption || '';
+
+      const previewWrap = document.getElementById('me-preview-wrap');
+      previewWrap.innerHTML = target.type === 'video'
+        ? `<video src="${target.url}" controls style="max-height:110px; border-radius:8px; max-width:100%;"></video>`
+        : `<img src="${target.url}" style="max-height:110px; border-radius:8px; max-width:100%; object-fit:contain;">`;
+
+      const standardCats = ['超聲波', '轉介信', '藥單', '出院紀錄', '自訂'];
+      const catSel = document.getElementById('me-category');
+      const customInp = document.getElementById('me-custom-category');
+      if (standardCats.includes(target.mediaCategory)) {
+        catSel.value = target.mediaCategory;
+        customInp.classList.add('hidden');
+        customInp.value = '';
+      } else {
+        catSel.value = 'CUSTOM';
+        customInp.classList.remove('hidden');
+        customInp.value = target.mediaCategory || '';
       }
 
-      await persistAndSync();
-      showToast('📅 已更新影像日期並同步');
+      openModal('modal-media-edit');
     }
 
-    async function updateUnifiedMediaCategory(uid, selectedVal) {
-      let finalCat = selectedVal;
-      if (selectedVal === 'CUSTOM') {
-        const customInput = prompt('請輸入自訂影像分類名稱：', '');
-        if (!customInput || !customInput.trim()) {
-          renderAllMediaTimeline();
-          return;
+    function toggleMediaEditCustomCategory() {
+      const catSel = document.getElementById('me-category').value;
+      const customInp = document.getElementById('me-custom-category');
+      if (catSel === 'CUSTOM') {
+        customInp.classList.remove('hidden');
+        customInp.focus();
+      } else {
+        customInp.classList.add('hidden');
+      }
+    }
+
+    function confirmMediaEditModal(e) {
+      e.preventDefault();
+      const uid = document.getElementById('me-uid').value;
+      const newDate = document.getElementById('me-date').value || '';
+      const rawCat = document.getElementById('me-category').value;
+      const finalCat = rawCat === 'CUSTOM'
+        ? (document.getElementById('me-custom-category').value.trim() || '自訂')
+        : rawCat;
+      const newCaption = document.getElementById('me-caption').value.trim();
+
+      const parts = uid.split(':');
+      const kind = parts[0];
+      const refId = parts[1];
+      const subIdx = parts[2] !== undefined ? parseInt(parts[2], 10) : -1;
+
+      if (kind === 'twin') {
+        const rec = (appState.twinMedia || []).find(x => x.id === refId);
+        if (rec) {
+          rec.date = newDate;
+          rec.mediaCategory = finalCat;
+          if (newCaption) rec.caption = newCaption;
+          rec.updatedAt = Date.now();
         }
-        finalCat = customInput.trim();
-      }
-
-      const parts = uid.split(':');
-      const kind = parts[0];
-      if (kind === 'twin') {
-        const item = (appState.twinMedia || []).find(x => x.id === parts[1]);
-        if (item) { item.mediaCategory = finalCat; item.updatedAt = Date.now(); }
       } else if (kind === 'event') {
-        const ev = (appState.events || []).find(x => x.id === parts[1]);
-        const idx = parseInt(parts[2], 10);
-        if (ev && ev.media && ev.media[idx]) { ev.media[idx].mediaCategory = finalCat; ev.updatedAt = Date.now(); }
+        const ev = (appState.events || []).find(x => x.id === refId);
+        if (ev && ev.media && ev.media[subIdx]) {
+          ev.media[subIdx].customDate = newDate;
+          ev.media[subIdx].mediaCategory = finalCat;
+          if (newCaption) ev.media[subIdx].customCaption = newCaption;
+          ev.updatedAt = Date.now();
+        }
       } else if (kind === 'maternal') {
-        const ml = (appState.maternalLogs || []).find(x => x.id === parts[1]);
-        const idx = parseInt(parts[2], 10);
-        if (ml && ml.media && ml.media[idx]) { ml.media[idx].mediaCategory = finalCat; ml.updatedAt = Date.now(); }
+        const ml = (appState.maternalLogs || []).find(x => x.id === refId);
+        if (ml && ml.media && ml.media[subIdx]) {
+          ml.media[subIdx].customDate = newDate;
+          ml.media[subIdx].mediaCategory = finalCat;
+          if (newCaption) ml.media[subIdx].customCaption = newCaption;
+          ml.updatedAt = Date.now();
+        }
       } else if (kind === 'med') {
-        const med = (appState.medications || []).find(x => x.id === parts[1]);
-        if (med) { med.imageCategory = finalCat; med.updatedAt = Date.now(); }
+        const med = (appState.medications || []).find(x => x.id === refId);
+        if (med) {
+          med.imageDate = newDate;
+          med.imageCategory = finalCat;
+          if (newCaption) med.name = newCaption;
+          med.updatedAt = Date.now();
+        }
       } else if (kind === 'angel') {
-        const idx = parseInt(parts[1], 10);
-        if (appState.angelMemorial?.media?.[idx]) { appState.angelMemorial.media[idx].mediaCategory = finalCat; appState.angelMemorial.updatedAt = Date.now(); }
+        const aIdx = parseInt(refId, 10);
+        if (appState.angelMemorial && appState.angelMemorial.media && appState.angelMemorial.media[aIdx]) {
+          appState.angelMemorial.media[aIdx].date = newDate;
+          appState.angelMemorial.media[aIdx].mediaCategory = finalCat;
+          if (newCaption) appState.angelMemorial.media[aIdx].customCaption = newCaption;
+          appState.angelMemorial.updatedAt = Date.now();
+        }
       }
 
-      currentAllMediaFilter = 'ALL';
-      await persistAndSync();
-      showToast(`🏷️ 已歸類為「${finalCat}」（停留於全部類別）`);
+      persistAndSync({ changeDesc: `編輯影像資料（日期：${formatDisplayDate(newDate)}，分類：${finalCat}）` });
+      closeAllModals();
+      showToast(`✅ 已更新影像日期與分類並同步`);
     }
 
-    async function editUnifiedMediaCaption(uid) {
-      const targetItem = getUnifiedMediaList().find(x => x.uid === uid);
-      if (!targetItem) return;
-      const nextCap = prompt('編輯影像標題 / 備註：', targetItem.caption || '');
-      if (nextCap === null) return;
-      const trimmed = nextCap.trim();
-
+    function deleteUnifiedMediaItem(uid) {
       const parts = uid.split(':');
       const kind = parts[0];
+      const refId = parts[1];
+      const subIdx = parts[2] !== undefined ? parseInt(parts[2], 10) : -1;
+
       if (kind === 'twin') {
-        const item = (appState.twinMedia || []).find(x => x.id === parts[1]);
-        if (item) { item.caption = trimmed; item.updatedAt = Date.now(); }
+        appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), refId]));
+        appState.twinMedia = (appState.twinMedia || []).filter(m => m.id !== refId);
       } else if (kind === 'event') {
-        const ev = (appState.events || []).find(x => x.id === parts[1]);
-        const idx = parseInt(parts[2], 10);
-        if (ev && ev.media && ev.media[idx]) { ev.media[idx].customCaption = trimmed; ev.updatedAt = Date.now(); }
+        const ev = (appState.events || []).find(x => x.id === refId);
+        if (ev && ev.media) {
+          ev.media.splice(subIdx, 1);
+          ev.updatedAt = Date.now();
+        }
       } else if (kind === 'maternal') {
-        const ml = (appState.maternalLogs || []).find(x => x.id === parts[1]);
-        const idx = parseInt(parts[2], 10);
-        if (ml && ml.media && ml.media[idx]) { ml.media[idx].customCaption = trimmed; ml.updatedAt = Date.now(); }
+        const ml = (appState.maternalLogs || []).find(x => x.id === refId);
+        if (ml && ml.media) {
+          ml.media.splice(subIdx, 1);
+          ml.updatedAt = Date.now();
+        }
       } else if (kind === 'med') {
-        const med = (appState.medications || []).find(x => x.id === parts[1]);
-        if (med && trimmed) { med.name = trimmed; med.updatedAt = Date.now(); }
+        const med = (appState.medications || []).find(x => x.id === refId);
+        if (med) {
+          med.image = '';
+          med.updatedAt = Date.now();
+        }
       } else if (kind === 'angel') {
-        const idx = parseInt(parts[1], 10);
-        if (appState.angelMemorial?.media?.[idx]) { appState.angelMemorial.media[idx].customCaption = trimmed; appState.angelMemorial.updatedAt = Date.now(); }
+        const aIdx = parseInt(refId, 10);
+        if (appState.angelMemorial && appState.angelMemorial.media) {
+          appState.angelMemorial.media.splice(aIdx, 1);
+          appState.angelMemorial.updatedAt = Date.now();
+        }
       }
 
-      await persistAndSync();
-      showToast('✏️ 已更新影像備註並同步');
-    }
-
-    async function deleteUnifiedMedia(uid) {
-      const parts = uid.split(':');
-      const kind = parts[0];
-      if (kind === 'twin') {
-        const id = parts[1];
-        appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
-        appState.twinMedia = (appState.twinMedia || []).filter(x => x.id !== id);
-      } else if (kind === 'event') {
-        const ev = (appState.events || []).find(x => x.id === parts[1]);
-        const idx = parseInt(parts[2], 10);
-        if (ev && ev.media) { ev.media.splice(idx, 1); ev.updatedAt = Date.now(); }
-      } else if (kind === 'maternal') {
-        const ml = (appState.maternalLogs || []).find(x => x.id === parts[1]);
-        const idx = parseInt(parts[2], 10);
-        if (ml && ml.media) { ml.media.splice(idx, 1); ml.updatedAt = Date.now(); }
-      } else if (kind === 'med') {
-        const med = (appState.medications || []).find(x => x.id === parts[1]);
-        if (med) { med.image = ''; med.updatedAt = Date.now(); }
-      } else if (kind === 'angel') {
-        const idx = parseInt(parts[1], 10);
-        if (appState.angelMemorial?.media) { appState.angelMemorial.media.splice(idx, 1); appState.angelMemorial.updatedAt = Date.now(); }
-      }
-
-      await persistAndSync();
-      showToast('🗑️ 已刪除該影像並同步');
+      persistAndSync({ changeDesc: '刪除影像庫一個檔案' });
+      showToast('🗑️ 已從資料庫永久刪除該影像並同步');
     }
 
     function renderAllMediaTimeline() {
@@ -4207,221 +4708,64 @@
       const filterBar = document.getElementById('all-media-filter-bar');
       if (!grid) return;
 
-      const allItems = getUnifiedMediaList();
-      const presetCats = ['超聲波', '轉介信', '藥單', '出院紀錄'];
-      const extraCats = Array.from(new Set(allItems.map(i => i.mediaCategory).filter(c => c && !presetCats.includes(c))));
-      const filterTabs = [
-        { key: 'ALL', label: `全部 (${allItems.length})` },
-        ...presetCats.map(c => ({ key: c, label: `${c} (${allItems.filter(i => i.mediaCategory === c).length})` })),
-        ...extraCats.map(c => ({ key: c, label: `${c} (${allItems.filter(i => i.mediaCategory === c).length})` }))
-      ];
+      const allUnified = getUnifiedMediaList();
+      if (countBadge) countBadge.textContent = `共 ${allUnified.length} 個檔案`;
 
-      if (currentAllMediaFilter !== 'ALL' && !filterTabs.some(t => t.key === currentAllMediaFilter)) {
+      const baseCategories = ['超聲波', '轉介信', '藥單', '出院紀錄', '自訂'];
+      const extraCategories = Array.from(new Set(allUnified.map(x => x.mediaCategory).filter(c => c && !baseCategories.includes(c))));
+      const allCategories = [...baseCategories, ...extraCategories];
+
+      if (currentAllMediaFilter !== 'ALL' && !allCategories.includes(currentAllMediaFilter)) {
         currentAllMediaFilter = 'ALL';
       }
 
       if (filterBar) {
-        filterBar.innerHTML = filterTabs.map(tab => {
-          const safeKey = tab.key.replace(/'/g, "\\'");
-          return `<button type="button" onclick="setAllMediaFilter('${safeKey}')" class="media-filter-btn ${currentAllMediaFilter === tab.key ? 'active' : ''}">${tab.label}</button>`;
-        }).join('');
+        const countFor = (cat) => cat === 'ALL' ? allUnified.length : allUnified.filter(x => x.mediaCategory === cat).length;
+        const buttons = [{ key: 'ALL', label: `全部 (${countFor('ALL')})` }, ...allCategories.map(c => ({ key: c, label: `${c} (${countFor(c)})` }))];
+        filterBar.innerHTML = buttons.map(b => `
+          <button type="button" onclick="setAllMediaFilter('${b.key.replace(/'/g, "\\'")}')" class="media-filter-btn ${currentAllMediaFilter === b.key ? 'active' : ''}">
+            ${b.label}
+          </button>
+        `).join('');
       }
 
       const filtered = currentAllMediaFilter === 'ALL'
-        ? allItems
-        : allItems.filter(item => item.mediaCategory === currentAllMediaFilter);
-
+        ? allUnified
+        : allUnified.filter(item => item.mediaCategory === currentAllMediaFilter);
       cachedFilteredUnifiedMedia = filtered;
-      if (countBadge) countBadge.textContent = `${filtered.length} 個檔案`;
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:11.5px; color:#94a3b8; text-align:center; padding:16px 0;">此分類暫無相片或影片</p>`;
+        grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:0.8rem; color:#94a3b8; text-align:center; padding:18px 0;">此分類暫無上載影像</p>`;
         return;
       }
 
-      grid.innerHTML = filtered.map((item, idx) => {
-        const timeText = item.ts
-          ? new Date(item.ts).toLocaleString('zh-HK', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
-          : formatDisplayDate(item.date);
-        const isCustom = !presetCats.includes(item.mediaCategory);
-        const safeUid = item.uid.replace(/'/g, "\\'");
-
-        return `
-          <div class="media-thumb-card">
-            ${item.type === 'video'
-              ? `<video src="${item.url}" onclick="openAllMediaLightbox(${idx})" style="width:100%; height:78px; object-fit:cover; border-radius:7px; background:#000; cursor:zoom-in;"></video>`
-              : `<img src="${item.url}" onclick="openAllMediaLightbox(${idx})" title="點擊放大並左右滑動切換" style="width:100%; height:78px; object-fit:cover; border-radius:7px; cursor:zoom-in;">`
-            }
-            <span class="badge" style="background:var(--sky-100); color:var(--sky-700); align-self:flex-start;">${item.source}</span>
-            <p style="font-size:10.5px; font-weight:700; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.caption}</p>
-            <input type="date" value="${item.date || ''}" onchange="updateUnifiedMediaDate('${safeUid}', this.value)" title="編輯影像日期" style="padding:2px 4px; font-size:10px; border-radius:6px; background:#fff; width:100%;">
-            <select onchange="updateUnifiedMediaCategory('${safeUid}', this.value)" style="padding:3px 4px; font-size:10px; border-radius:6px; background:#fff; width:100%;">
-              <option value="超聲波" ${item.mediaCategory === '超聲波' ? 'selected' : ''}>分類：超聲波</option>
-              <option value="轉介信" ${item.mediaCategory === '轉介信' ? 'selected' : ''}>分類：轉介信</option>
-              <option value="藥單" ${item.mediaCategory === '藥單' ? 'selected' : ''}>分類：藥單</option>
-              <option value="出院紀錄" ${item.mediaCategory === '出院紀錄' ? 'selected' : ''}>分類：出院紀錄</option>
-              ${isCustom ? `<option value="${item.mediaCategory}" selected>分類：${item.mediaCategory}</option>` : ''}
-              <option value="CUSTOM">自訂分類...</option>
-            </select>
-            <div style="display:flex; gap:4px; margin-top:1px;">
-              <button type="button" onclick="editUnifiedMediaCaption('${safeUid}')" class="btn btn-soft" style="flex:1; padding:3px 2px; font-size:10px;">編輯</button>
-              <button type="button" onclick="deleteUnifiedMedia('${safeUid}')" class="btn btn-soft-rose" style="flex:1; padding:3px 2px; font-size:10px;">刪除</button>
-            </div>
-            <span style="font-size:9px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">#${filtered.length - idx} · ${timeText}</span>
+      grid.innerHTML = filtered.map((item, idx) => `
+        <div class="media-thumb-card">
+          ${item.type === 'video'
+            ? `<video src="${item.url}" controls onclick="openAllMediaLightbox(${idx})" style="width:100%; height:92px; object-fit:cover; border-radius:7px; background:#000; cursor:zoom-in;"></video>`
+            : `<img src="${item.url}" onclick="openAllMediaLightbox(${idx})" title="點擊放大並左右滑動切換" style="width:100%; height:92px; object-fit:cover; border-radius:7px; cursor:zoom-in;">`
+          }
+          <div class="flex-between" style="margin-top:2px; gap:2px;">
+            <span class="badge" style="background:var(--rose-100); color:var(--rose-700);">${item.mediaCategory}</span>
+            <span style="font-size:0.7rem; color:#64748b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.source}</span>
           </div>
-        `;
-      }).join('');
-    }
-
-    async function setTwinAvatar(twinId, url) {
-      appState.twinAvatars[twinId] = url;
-      await persistAndSync();
-      showToast(`✨ 已更新 BB ${twinId} 頭像並同步`);
-    }
-
-    function toggleCustomHistoryTag() {
-      const sel = document.getElementById('mh-tag').value;
-      const wrap = document.getElementById('mh-custom-tag-wrap');
-      if (sel === 'CUSTOM') {
-        wrap.classList.remove('hidden');
-        document.getElementById('mh-custom-tag').focus();
-      } else {
-        wrap.classList.add('hidden');
-      }
-    }
-
-    function openHistoryModal(editId) {
-      document.getElementById('mh-id').value = editId || '';
-      document.getElementById('mh-custom-tag').value = '';
-      if (editId) {
-        const item = (appState.medicalHistory || []).find(x => x.id === editId);
-        if (item) {
-          document.getElementById('mh-modal-title').textContent = '✏️ 編輯母體病史 / 出血進展';
-          document.getElementById('mh-date').value = item.date || '';
-          const presets = ['子宮頸瘜肉', '孕初期流血/流啡', '其他醫療紀錄'];
-          if (presets.includes(item.tag)) {
-            document.getElementById('mh-tag').value = item.tag;
-            document.getElementById('mh-custom-tag-wrap').classList.add('hidden');
-          } else {
-            document.getElementById('mh-tag').value = 'CUSTOM';
-            document.getElementById('mh-custom-tag').value = item.tag;
-            document.getElementById('mh-custom-tag-wrap').classList.remove('hidden');
-          }
-          document.getElementById('mh-detail').value = item.detail || '';
-          openModal('modal-history');
-          return;
-        }
-      }
-      document.getElementById('mh-modal-title').textContent = '🩺 新增母體病史 / 出血進展';
-      document.getElementById('mh-date').value = getTodayStr();
-      document.getElementById('mh-tag').value = '子宮頸瘜肉';
-      document.getElementById('mh-custom-tag-wrap').classList.add('hidden');
-      document.getElementById('mh-detail').value = '';
-      openModal('modal-history');
-    }
-
-    async function saveMedicalHistory(e) {
-      e.preventDefault();
-      const editId = document.getElementById('mh-id').value;
-      const rawTag = document.getElementById('mh-tag').value;
-      const tag = rawTag === 'CUSTOM'
-        ? (document.getElementById('mh-custom-tag').value.trim() || '自訂病史')
-        : rawTag;
-
-      const record = {
-        id: editId || ('mh-' + Date.now()),
-        date: document.getElementById('mh-date').value || '',
-        tag,
-        detail: document.getElementById('mh-detail').value.trim(),
-        updatedAt: Date.now()
-      };
-
-      const idx = (appState.medicalHistory || []).findIndex(x => x.id === record.id);
-      if (idx >= 0) appState.medicalHistory[idx] = record;
-      else appState.medicalHistory.unshift(record);
-
-      await persistAndSync();
-      closeAllModals();
-      showToast('🩺 已儲存母體病史紀錄並同步');
-    }
-
-    async function deleteMedicalHistory(id) {
-      appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
-      appState.medicalHistory = appState.medicalHistory.filter(x => x.id !== id);
-      await persistAndSync();
-    }
-
-    function openAngelModal() {
-      document.getElementById('angel-note-input').value = appState.angelMemorial.note || '';
-      renderAngelGallery();
-      openModal('modal-angel');
-    }
-
-    async function saveAngelNote() {
-      appState.angelMemorial.note = document.getElementById('angel-note-input').value;
-      appState.angelMemorial.updatedAt = Date.now();
-      await persistAndSync();
-      showToast('🕊️ 已儲存紀念冊文字並同步');
-    }
-
-    function handleAngelMediaUpload(e) {
-      const files = Array.from(e.target.files || []);
-      let done = 0;
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = async (ev) => {
-          appState.angelMemorial.media.push({
-            id: 'ang-' + Date.now() + Math.random(),
-            type: file.type.startsWith('video/') ? 'video' : 'image',
-            url: ev.target.result,
-            mediaCategory: '超聲波',
-            date: '2026-05-18'
-          });
-          appState.angelMemorial.updatedAt = Date.now();
-          done++;
-          if (done === files.length) {
-            await persistAndSync();
-            renderAngelGallery();
-            showToast(`🕊️ 已上載 ${files.length} 個紀念檔案`);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-      e.target.value = '';
-    }
-
-    function renderAngelGallery() {
-      const grid = document.getElementById('angel-gallery-grid');
-      const items = appState.angelMemorial.media || [];
-      if (items.length === 0) {
-        grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:11px; color:var(--purple-600); text-align:center; padding:12px;">可多選上載超聲波相片或短片</p>`;
-        return;
-      }
-      grid.innerHTML = items.map((m, idx) => `
-        <div class="media-thumb-card" style="position:relative; background:var(--purple-50); border-color:#e9d5ff;">
-          ${m.type === 'video'
-            ? `<video src="${m.url}" controls onclick="openMediaLightbox('${m.url}', 'video', '天使BB紀念冊')" style="width:100%; height:84px; object-fit:cover; border-radius:7px; cursor:zoom-in;"></video>`
-            : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image', '天使BB紀念冊')" style="width:100%; height:84px; object-fit:cover; border-radius:7px; cursor:zoom-in;">`
-          }
-          <button onclick="removeAngelMedia(${idx})" class="preview-del-btn" style="top:8px; right:8px;">✕</button>
+          <div style="font-size:0.75rem; font-weight:700; color:#334155;">📅 ${formatDisplayDate(item.date)}</div>
+          <p style="font-size:0.75rem; color:#475569; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.caption}</p>
+          <div style="display:flex; gap:4px; margin-top:2px;">
+            <button type="button" onclick="openUnifiedMediaEditModal('${item.uid}')" class="btn btn-soft" style="flex:1; padding:4px 2px; font-size:0.75rem;">✏️ 編輯</button>
+            <button type="button" onclick="deleteUnifiedMediaItem('${item.uid}')" class="btn btn-soft-rose" style="padding:4px 8px; font-size:0.75rem;">刪除</button>
+          </div>
         </div>
       `).join('');
     }
 
-    async function removeAngelMedia(idx) {
-      appState.angelMemorial.media.splice(idx, 1);
-      appState.angelMemorial.updatedAt = Date.now();
-      await persistAndSync();
-      renderAngelGallery();
-    }
-
-    function openMediaUploadModal(targetDefault) {
-      tempPendingTwinMedia = [];
-      document.getElementById('mu-target').value = targetDefault || 'BOTH';
+    function openMediaUploadModal(defaultTarget) {
+      document.getElementById('mu-target').value = defaultTarget || 'BOTH';
       document.getElementById('mu-date').value = getTodayStr();
       document.getElementById('mu-caption').value = '';
       document.getElementById('mu-files').value = '';
-      renderPendingTwinMedia();
+      tempPendingTwinMedia = [];
+      renderPendingTwinMediaPreview();
       openModal('modal-media-upload');
     }
 
@@ -4435,120 +4779,252 @@
             url: ev.target.result,
             name: file.name
           });
-          renderPendingTwinMedia();
+          renderPendingTwinMediaPreview();
         };
         reader.readAsDataURL(file);
       });
       e.target.value = '';
     }
 
-    function renderPendingTwinMedia() {
+    function renderPendingTwinMediaPreview() {
       const box = document.getElementById('mu-pending-preview');
       document.getElementById('mu-count-label').textContent = tempPendingTwinMedia.length;
       box.innerHTML = tempPendingTwinMedia.map((m, idx) => `
-        <div class="preview-item" title="${m.name || ''}">
+        <div class="preview-item">
           ${m.type === 'video' ? `<video src="${m.url}" onclick="openMediaLightbox('${m.url}', 'video')"></video>` : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image')">`}
-          <button type="button" onclick="removePendingTwinMedia(${idx})" class="preview-del-btn" title="剔除此檔案">✕</button>
+          <button type="button" onclick="tempPendingTwinMedia.splice(${idx},1);renderPendingTwinMediaPreview()" class="preview-del-btn">✕</button>
         </div>
       `).join('');
     }
 
-    function removePendingTwinMedia(idx) {
-      tempPendingTwinMedia.splice(idx, 1);
-      renderPendingTwinMedia();
-    }
-
-    async function submitTwinMedia(e) {
+    function submitTwinMedia(e) {
       e.preventDefault();
       if (tempPendingTwinMedia.length === 0) {
-        showToast('⚠️ 請先選擇至少一張相片或影片');
+        showToast('⚠️ 請至少選擇一個相片或影片檔案');
         return;
       }
-      const cfg = getSyncConfig();
       const target = document.getElementById('mu-target').value;
       const date = document.getElementById('mu-date').value || '';
       const caption = document.getElementById('mu-caption').value.trim();
 
-      tempPendingTwinMedia.forEach(item => {
-        appState.twinMedia.unshift({
-          id: 'medimg-' + Date.now() + Math.random(),
-          target, date, caption,
+      tempPendingTwinMedia.forEach((item, idx) => {
+        appState.twinMedia.push({
+          id: 'tm-media-' + Date.now() + '-' + idx,
+          target,
+          date,
+          caption,
           mediaCategory: '超聲波',
           type: item.type,
           url: item.url,
-          updatedAt: Date.now(),
-          updatedBy: cfg.userName
+          updatedAt: Date.now()
         });
       });
 
-      const count = tempPendingTwinMedia.length;
+      const uploadedCount = tempPendingTwinMedia.length;
+      persistAndSync({ changeDesc: `上載 ${uploadedCount} 個超聲波影像檔案 (${formatDisplayDate(date)})` });
       tempPendingTwinMedia = [];
-      await persistAndSync();
       closeAllModals();
-      showToast(`📸 已成功上載 ${count} 個檔案並同步`);
+      showToast(`📸 已成功上載 ${uploadedCount} 個超聲波影像並同步`);
     }
 
-    async function updateMediaDate(id, newDate) {
-      const item = appState.twinMedia.find(m => m.id === id);
-      if (item) {
-        item.date = newDate || '';
-        item.updatedAt = Date.now();
-        await persistAndSync();
-        showToast('📅 已更新影像日期並同步');
-      }
+    function setTwinAvatar(twinId, url) {
+      appState.twinAvatars[twinId] = url;
+      persistAndSync({ changeDesc: `更新 BB ${twinId} 頭像` });
+      showToast(`👶 已設為 BB ${twinId} 頭像並同步`);
     }
 
-    async function deleteTwinMedia(id) {
+    function deleteTwinMedia(id) {
       appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
       appState.twinMedia = appState.twinMedia.filter(m => m.id !== id);
-      await persistAndSync();
-      showToast('🗑️ 已刪除影像並同步');
+      persistAndSync({ changeDesc: '刪除一個超聲波影像檔案' });
+    }
+
+    // 病史新增與編輯
+    function openHistoryModal(mhId) {
+      const customWrap = document.getElementById('mh-custom-tag-wrap');
+      const customInput = document.getElementById('mh-custom-tag');
+      customWrap.classList.add('hidden');
+      customInput.value = '';
+
+      if (mhId) {
+        const item = appState.medicalHistory.find(x => x.id === mhId);
+        document.getElementById('mh-modal-title').textContent = '✏️ 編輯媽媽病史 / 出血進展';
+        document.getElementById('mh-id').value = item.id;
+        document.getElementById('mh-date').value = item.date || '';
+        const presets = ['子宮頸瘜肉', '孕初期流血/流啡', '其他醫療紀錄'];
+        if (presets.includes(item.tag)) {
+          document.getElementById('mh-tag').value = item.tag;
+        } else {
+          document.getElementById('mh-tag').value = 'CUSTOM';
+          customWrap.classList.remove('hidden');
+          customInput.value = item.tag;
+        }
+        document.getElementById('mh-detail').value = item.detail || '';
+      } else {
+        document.getElementById('mh-modal-title').textContent = '🩺 新增媽媽病史 / 出血進展';
+        document.getElementById('mh-id').value = '';
+        document.getElementById('mh-date').value = getTodayStr();
+        document.getElementById('mh-tag').value = '子宮頸瘜肉';
+        document.getElementById('mh-detail').value = '';
+      }
+      openModal('modal-history');
+    }
+
+    function toggleCustomHistoryTag() {
+      const val = document.getElementById('mh-tag').value;
+      const wrap = document.getElementById('mh-custom-tag-wrap');
+      if (val === 'CUSTOM') wrap.classList.remove('hidden');
+      else wrap.classList.add('hidden');
+    }
+
+    function saveMedicalHistory(e) {
+      e.preventDefault();
+      const existingId = document.getElementById('mh-id').value;
+      const id = existingId || ('mh-' + Date.now());
+      const date = document.getElementById('mh-date').value || '';
+      const rawTag = document.getElementById('mh-tag').value;
+      const tag = rawTag === 'CUSTOM'
+        ? (document.getElementById('mh-custom-tag').value.trim() || '自訂醫療紀錄')
+        : rawTag;
+      const detail = document.getElementById('mh-detail').value.trim();
+
+      const idx = appState.medicalHistory.findIndex(x => x.id === id);
+      if (idx >= 0) appState.medicalHistory[idx] = { id, date, tag, detail, updatedAt: Date.now() };
+      else appState.medicalHistory.push({ id, date, tag, detail, updatedAt: Date.now() });
+
+      persistAndSync({ changeDesc: `${existingId ? '編輯' : '新增'}媽媽病史紀錄「${tag}」` });
+      closeAllModals();
+      showToast('🩺 已儲存病史紀錄並同步');
+    }
+
+    function deleteMedicalHistory(id) {
+      appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
+      appState.medicalHistory = appState.medicalHistory.filter(x => x.id !== id);
+      persistAndSync({ changeDesc: '刪除一筆媽媽病史紀錄' });
+    }
+
+    // 天使BB紀念冊
+    function openAngelModal() {
+      document.getElementById('angel-note-input').value = appState.angelMemorial.note || '';
+      renderAngelGallery();
+      openModal('modal-angel');
+    }
+
+    function renderAngelGallery() {
+      const grid = document.getElementById('angel-gallery-grid');
+      const media = appState.angelMemorial.media || [];
+      if (media.length === 0) {
+        grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:0.8rem; color:#94a3b8; text-align:center; padding:18px 0;">可點擊上方按鈕多選上載超聲波相片或紀念影片</p>`;
+        return;
+      }
+      grid.innerHTML = media.map((m, idx) => `
+        <div class="media-thumb-card" style="position:relative; border-color:#e9d5ff; padding:4px;">
+          ${m.type === 'video'
+            ? `<video src="${m.url}" controls onclick="openMediaLightbox('${m.url}', 'video', '天使BB紀念影像')" style="width:100%; height:96px; object-fit:cover; border-radius:7px; cursor:zoom-in;"></video>`
+            : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image', '天使BB紀念影像')" style="width:100%; height:96px; object-fit:cover; border-radius:7px; cursor:zoom-in;">`
+          }
+          <button onclick="deleteAngelMedia(${idx})" class="preview-del-btn">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function handleAngelMediaUpload(e) {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+      let loaded = 0;
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          appState.angelMemorial.media.push({
+            type: file.type.startsWith('video/') ? 'video' : 'image',
+            url: ev.target.result,
+            date: '2026-05-18',
+            mediaCategory: '超聲波'
+          });
+          loaded++;
+          if (loaded === files.length) {
+            appState.angelMemorial.updatedAt = Date.now();
+            persistAndSync({ changeDesc: `上載 ${files.length} 個天使BB紀念冊影像` });
+            renderAngelGallery();
+            showToast(`🕊️ 已上載 ${files.length} 個天使BB紀念影像並同步`);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+      e.target.value = '';
+    }
+
+    function saveAngelNote() {
+      appState.angelMemorial.note = document.getElementById('angel-note-input').value.trim();
+      appState.angelMemorial.updatedAt = Date.now();
+      persistAndSync({ changeDesc: '更新天使BB紀念冊文字留言' });
+      showToast('🕊️ 已儲存天使BB紀念文字並同步');
+    }
+
+    function deleteAngelMedia(idx) {
+      appState.angelMemorial.media.splice(idx, 1);
+      appState.angelMemorial.updatedAt = Date.now();
+      persistAndSync({ changeDesc: '刪除天使BB紀念冊一個影像' });
+      renderAngelGallery();
     }
 
     // =========================================================================
-    // 9. 安全運動建議
+    // 9. 安全運動動態建議模組
     // =========================================================================
     function renderExerciseTab() {
-      const infoA = getTwinGestationalInfo('A');
-      const infoB = getTwinGestationalInfo('B');
-      document.getElementById('exercise-ga-tag').textContent = `大孖 ${infoA.liveFull} · 細孖 ${infoB.liveFull}`;
+      const ga = getGestationalAgeForDate(new Date());
+      document.getElementById('exercise-ga-tag').textContent = `目前孕週：${ga.label} (${ga.short})`;
 
-      const latestLog = [...(appState.maternalLogs || [])].sort((a, b) => ((b.date || '') + (b.time || '')).localeCompare((a.date || '') + (a.time || '')))[0];
-      const hasBleeding = latestLog && latestLog.bleeding && latestLog.bleeding !== '正常無出血';
-
+      const recentLogs = (appState.maternalLogs || []).slice(0, 5);
+      const hasRecentBleeding = recentLogs.some(l => l.bleeding && l.bleeding !== '正常無出血');
       const alertBox = document.getElementById('exercise-dynamic-alert');
-      if (hasBleeding) {
+
+      if (hasRecentBleeding) {
         alertBox.style.background = 'var(--amber-50)';
         alertBox.style.border = '1px solid #fcd34d';
         alertBox.style.color = 'var(--amber-800)';
-        alertBox.innerHTML = `<strong>⚠️ 動態安全提示：</strong>偵測到近期母體紀錄有「${latestLog.bleeding}」，加上子宮頸瘜肉病史，<strong>今日建議以臥床靜養（左側臥為主）及床上深呼吸放鬆為宜</strong>，暫停戶外散步。`;
+        alertBox.innerHTML = `<strong>⚠️ 偵測到近期媽媽紀錄曾有分泌物/流啡：</strong>目前系統自動切換為<strong>「高度安胎靜養模式」</strong>，建議以臥床左側臥及床上踝泵運動為主，待連續 7 日完全無分泌物後再恢復平地慢步。`;
       } else {
         alertBox.style.background = 'var(--emerald-50)';
         alertBox.style.border = '1px solid #a7f3d0';
         alertBox.style.color = 'var(--emerald-800)';
-        alertBox.innerHTML = `<strong>✅ 動態安全提示：</strong>目前大孖 ${infoA.liveFull}、細孖 ${infoB.liveFull}，最近紀錄無異常出血。在無疲倦或腹緊的前提下，可進行溫和舒緩活動。`;
+        alertBox.innerHTML = `<strong>✅ 目前母體分泌物狀況穩定：</strong>可進行<strong>「溫和低負荷血液循環活動」</strong>，每次 10–15 分鐘為限，以完全不喘氣、下腹無緊繃感為準。`;
       }
 
       const cards = [
-        { icon: '🛌', title: '左側臥休息與腹式深呼吸', duration: '每日 2-3 次 · 每次 10 分鐘', desc: 'MCMA 雙胎共用單一胎盤，左側臥能最大化子宮胎盤血流量，減少下腔靜脈受壓並穩定情緒。' },
-        { icon: '🚶‍♀️', title: '平地慢速散步 (僅限無出血日)', duration: '每次 10-15 分鐘 · 步速緩慢', desc: '飯後於平坦路面慢步有助促進腸胃蠕動，若感微喘或下腹墜脹須立即坐下休息。' },
-        { icon: '🦶', title: '坐姿腳踝繞圈與小腿伸展', duration: '每小時 3-5 分鐘', desc: '長時間安胎臥床時，透過轉動腳踝及輕柔屈伸腳掌，有效預防雙胎孕期下肢水腫及血栓。' },
-        { icon: '🧘‍♀️', title: '上肢肩頸輕柔伸展', duration: '每次 5-8 分鐘', desc: '坐姿下緩慢轉動肩膀及伸展頸部，紓緩孕初期緊張焦慮，不會牽動腹部或子宮頸。' }
+        {
+          title: '1. 床上踝泵運動 (預防雙胎下肢水腫及血栓)',
+          time: '每日 2–3 次 · 每次 3 分鐘',
+          desc: '平躺或半坐臥，雙腳腳尖緩慢向上勾起維持 5 秒，再向下踩直維持 5 秒。完全零腹壓，出血安胎期間亦可安全進行。'
+        },
+        {
+          title: '2. 腹式深呼吸與胸廓放鬆',
+          time: '早晚各 1 次 · 每次 5 分鐘',
+          desc: '採取舒適左側臥姿，鼻吸氣 4 秒讓肋骨兩側擴張，嘴巴慢吐氣 6 秒，有助穩定自律神經及提升胎盤血流灌注。'
+        },
+        {
+          title: '3. 飯後室內平地慢步 (僅限無出血時)',
+          time: '每次 10–15 分鐘 · 步速宜慢',
+          desc: '如當日完全無啡色分泌及無腹痛，可於室內或平坦商場慢行，避免斜坡及樓梯，減少子宮頸瘜肉受摩擦出血。'
+        },
+        {
+          title: '4. 坐姿肩頸及上肢伸展',
+          time: '每日 1–2 次 · 每次 5 分鐘',
+          desc: '安坐於有靠背椅子上，緩慢轉動雙肩及伸展手臂，紓緩安胎臥床帶來的肩背僵硬，全程保持骨盆穩定不扭轉腰部。'
+        }
       ];
 
       document.getElementById('exercise-recommendations-grid').innerHTML = cards.map(c => `
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px;">
-          <div class="flex-between" style="margin-bottom:4px;">
-            <strong style="font-size:13px;">${c.icon} ${c.title}</strong>
-            <span class="badge" style="background:var(--emerald-100); color:var(--emerald-800);">${c.duration}</span>
-          </div>
-          <p style="font-size:11.5px; color:#475569;">${c.desc}</p>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px 12px;">
+          <div style="font-size:0.88rem; font-weight:800; color:#0f172a;">${c.title}</div>
+          <span class="badge" style="background:var(--sky-100); color:var(--sky-700); margin:4px 0;">⏱️ ${c.time}</span>
+          <p style="font-size:0.8rem; color:#475569; margin-top:2px;">${c.desc}</p>
         </div>
       `).join('');
     }
 
     // =========================================================================
-    // 10. 彈窗與時間選單初始化
+    // 10. 彈窗控制、時間下拉選單與初始化
     // =========================================================================
     function openModal(modalId) {
       document.getElementById('modal-backdrop').classList.remove('hidden');
@@ -4565,89 +5041,87 @@
       if (e.target.id === 'modal-backdrop') closeAllModals();
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeMediaLightbox();
-        closeAllModals();
-      } else if (!document.getElementById('media-lightbox').classList.contains('hidden')) {
-        if (e.key === 'ArrowLeft') stepMediaLightbox(-1);
-        else if (e.key === 'ArrowRight') stepMediaLightbox(1);
-      }
-    });
-
-    function populateFullTimeSelects() {
-      let hoursHtml = `<option value="">-- 時 --</option>`;
-      for (let h = 0; h < 24; h++) {
-        const hh = String(h).padStart(2, '0');
-        hoursHtml += `<option value="${hh}">${hh} 時</option>`;
-      }
-
-      let quarterMinsHtml = `<option value="">-- 分 --</option>`;
-      ['00', '15', '30', '45'].forEach(mm => {
-        quarterMinsHtml += `<option value="${mm}">${mm} 分</option>`;
-      });
-
-      ['ev-hour', 'ev-end-hour', 'mat-hour', 'tm-hour'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = hoursHtml;
-      });
-      ['ev-min', 'ev-end-min', 'mat-min', 'tm-min'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = quarterMinsHtml;
-      });
-
-      const alarmHourEl = document.getElementById('alarm-hour');
-      const alarmMinEl = document.getElementById('alarm-min');
-      if (alarmHourEl) {
-        let ah = `<option value="">-- 時 --</option>`;
-        for (let h = 0; h < 24; h++) ah += `<option value="${String(h).padStart(2, '0')}">${String(h).padStart(2, '0')} 時</option>`;
-        alarmHourEl.innerHTML = ah;
-      }
-      if (alarmMinEl) {
-        let am = `<option value="">-- 分 --</option>`;
-        for (let m = 0; m < 60; m++) am += `<option value="${String(m).padStart(2, '0')}">${String(m).padStart(2, '0')} 分</option>`;
-        alarmMinEl.innerHTML = am;
-      }
-    }
-
     function showToast(msg) {
       const container = document.getElementById('toast-container');
-      const el = document.createElement('div');
-      el.className = 'toast-msg';
-      el.textContent = msg;
-      container.appendChild(el);
+      const div = document.createElement('div');
+      div.className = 'toast-msg';
+      div.textContent = msg;
+      container.appendChild(div);
       setTimeout(() => {
-        el.style.opacity = '0';
-        el.style.transition = 'opacity 0.3s';
-        setTimeout(() => el.remove(), 300);
+        div.style.opacity = '0';
+        div.style.transition = 'opacity 0.25s';
+        setTimeout(() => div.remove(), 260);
       }, 2800);
     }
 
-    // 啟動應用程式
-    window.addEventListener('DOMContentLoaded', async () => {
-      populateFullTimeSelects();
-      document.getElementById('mat-date').value = getTodayStr();
-      initHorizontalSwipe();
-      updateGcalStatusUI('idle');
+    function populateQuarterHourSelects() {
+      const hourPairs = [
+        ['ev-hour', 'ev-min'],
+        ['ev-end-hour', 'ev-end-min'],
+        ['mat-hour', 'mat-min'],
+        ['tm-hour', 'tm-min']
+      ];
+      hourPairs.forEach(([hId, mId]) => {
+        const hEl = document.getElementById(hId);
+        const mEl = document.getElementById(mId);
+        if (hEl) {
+          hEl.innerHTML = `<option value="">-- 時</option>` + Array.from({ length: 24 }, (_, i) => {
+            const v = String(i).padStart(2, '0');
+            return `<option value="${v}">${v}時</option>`;
+          }).join('');
+        }
+        if (mEl) {
+          mEl.innerHTML = `<option value="">-- 分</option>` + ['00', '15', '30', '45'].map(v => `<option value="${v}">${v}分</option>`).join('');
+        }
+      });
 
-      const idbSnapshot = await readFromIDB();
-      if (idbSnapshot && (idbSnapshot.updatedAt || 0) > (appState.updatedAt || 0)) {
-        appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...idbSnapshot });
-        saveLocalOnly();
-      } else {
-        saveLocalOnly();
+      const alHour = document.getElementById('alarm-hour');
+      const alMin = document.getElementById('alarm-min');
+      if (alHour) {
+        alHour.innerHTML = `<option value="">-- 時</option>` + Array.from({ length: 24 }, (_, i) => {
+          const v = String(i).padStart(2, '0');
+          return `<option value="${v}">${v} 時</option>`;
+        }).join('');
       }
+      if (alMin) {
+        alMin.innerHTML = `<option value="">-- 分</option>` + Array.from({ length: 60 }, (_, i) => {
+          const v = String(i).padStart(2, '0');
+          return `<option value="${v}">${v} 分</option>`;
+        }).join('');
+      }
+    }
 
+    window.addEventListener('DOMContentLoaded', async () => {
+      populateQuarterHourSelects();
+      document.getElementById('mat-date').value = getTodayStr();
+      getSyncConfig();
+      updateGcalStatusUI('idle');
+      initHorizontalSwipe();
+
+      const idbData = await readFromIDBKey('latest_state');
+      if (idbData && idbData.twinMeasurements && (idbData.updatedAt || 0) > (appState.updatedAt || 0)) {
+        appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...idbData });
+      }
+      saveLocalOnly();
       renderAll();
-      manageWakeLock();
 
-      await syncWithCloud(false, false);
-      setInterval(() => syncWithCloud(false, false), 6000);
+      // 開啟頁面立即主動下載雲端最新數據
+      syncWithCloud(false, false);
+
+      // 每 3 秒自動輪詢檢查雲端，若有家人更新立即自動下載更新畫面
+      setInterval(() => {
+        if (!document.hidden) syncWithCloud(false, false);
+      }, 3000);
+
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
+        if (!document.hidden) {
           syncWithCloud(false, false);
           manageWakeLock();
         }
+      });
+
+      window.addEventListener('beforeunload', () => {
+        saveLocalOnly();
       });
     });
   </script>
