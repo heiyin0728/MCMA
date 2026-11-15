@@ -2663,23 +2663,26 @@
     }
 
     function addLocalAlarm() {
-      ensureAudioUnlocked();
-      const hour = document.getElementById('alarm-hour').value;
-      const min = document.getElementById('alarm-min').value;
-      const label = document.getElementById('alarm-label').value.trim() || '服藥 / 安胎提醒';
+  ensureAudioUnlocked();
+  const hour = document.getElementById('alarm-hour').value;
+  const min = document.getElementById('alarm-min').value;
+  const label = document.getElementById('alarm-label').value.trim() || '服藥 / 安胎提醒';
+  const timeStr = `${hour}:${min}`;
 
-      localAlarms.push({
-        id: 'al-' + Date.now(),
-        time: `${hour}:${min}`,
-        label,
-        enabled: true,
-        lastTriggeredDate: ''
-      });
-      document.getElementById('alarm-label').value = '';
-      saveLocalAlarms();
-      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
-      showToast(`⏰ 已新增 ${hour}:${min}，可按「寫入手機鬧鐘」同步至 iPhone 時鐘`);
-    }
+  localAlarms.push({
+    id: 'al-' + Date.now(),
+    time: timeStr,
+    label,
+    enabled: true,
+    lastTriggeredDate: ''
+  });
+  document.getElementById('alarm-label').value = '';
+  saveLocalAlarms();
+
+  // 新增後立即自動跳轉呼叫 iOS 捷徑寫入 iPhone 原生時鐘 App
+  triggerIosShortcutAlarm(timeStr, label);
+}
+
 
     function estimateAlarmFromImage(e) {
       const file = e.target.files[0];
