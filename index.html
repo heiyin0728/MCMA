@@ -414,6 +414,7 @@
       font-size: 12px;
       font-weight: 700;
       transition: opacity 0.15s;
+      text-decoration: none;
     }
     .btn:active { opacity: 0.85; }
     .btn-rose { background: var(--rose-600); color: #fff; }
@@ -826,13 +827,13 @@
         <div id="maternal-logs-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto;"></div>
       </div>
 
-      <!-- 本機專屬鬧鐘 -->
+      <!-- 本機專屬鬧鐘（支援一鍵呼叫 iOS 捷徑「MCMA設鬧鐘」） -->
       <div class="alarm-card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div class="flex-center" style="flex-wrap: wrap;">
             <span style="font-size: 16px;">⏰</span>
-            <h3 style="font-size: 14px; font-weight: 800;">本機專屬鬧鐘 (00–59分完整設定)</h3>
-            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35);">僅限此手機響鬧</span>
+            <h3 style="font-size: 14px; font-weight: 800;">本機專屬鬧鐘 (支援一鍵寫入 iPhone 系統鬧鐘)</h3>
+            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35);">穿透靜音與鎖屏</span>
           </div>
           <div class="flex-center">
             <button onclick="unlockAndTestAlarmSound()" class="btn" style="background:#334155; color:#fcd34d; padding:5px 10px;">🔔 解鎖並試聽</button>
@@ -840,7 +841,7 @@
         </div>
 
         <p style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">
-          提示：手機瀏覽器需點擊一次「開啟鬧鐘」或「解鎖並試聽」以啟用響鬧權限；若需鎖屏後依然強提醒，可按「匯入iPhone日曆」設為系統鬧鐘。
+          提示：建立鬧鐘後，點擊右側 <strong>「⏰寫入手機鬧鐘」</strong> 會自動透過 iOS 捷徑「MCMA設鬧鐘」寫入 iPhone 原生時鐘 App，即使鎖屏、轉背景或開靜音模式都必定準時響鬧。
         </p>
 
         <div style="display: grid; grid-template-columns: 1fr; gap: 8px; background: rgba(30, 41, 59, 0.9); padding: 10px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 10px;">
@@ -854,7 +855,7 @@
               📷 影像估算時間
               <input type="file" accept="image/*" onchange="estimateAlarmFromImage(event)" class="hidden">
             </label>
-            <button type="button" onclick="addLocalAlarm()" class="btn btn-amber" style="flex:1;">+ 開啟本機鬧鐘</button>
+            <button type="button" onclick="addLocalAlarm()" class="btn btn-amber" style="flex:1;">+ 新增鬧鐘</button>
           </div>
         </div>
 
@@ -1518,10 +1519,9 @@
     let tempMedImage = '';
 
     // =========================================================================
-    // 3. 多戶口家庭雲端同步引擎（跨瀏覽器 / 無痕模式全相容版）
+    // 3. 多戶口家庭雲端同步引擎（已鎖定 homestocktake-default-rtdb.firebaseio.com）
     // =========================================================================
     const LOCKED_FIREBASE_URL = 'https://homestocktake-default-rtdb.firebaseio.com';
-
     let isSyncingNow = false;
     let lastSyncedSignature = '';
     let memorySyncConfig = null;
@@ -2383,7 +2383,7 @@
     }
 
     // =========================================================================
-    // 7. 母體狀況、用藥清單與本機鬧鐘
+    // 7. 母體狀況、用藥清單與本機鬧鐘（含 iOS 捷徑「MCMA設鬧鐘」一鍵呼叫）
     // =========================================================================
     function renderMaternalTab() {
       const today = getTodayStr();
@@ -2586,7 +2586,7 @@
       await persistAndSync();
     }
 
-    // --- 本機鬧鐘完整解決方案 ---
+    // --- 本機鬧鐘與 iOS 捷徑「MCMA設鬧鐘」串接 ---
     let sharedAudioCtx = null;
     let alarmRingInterval = null;
     let wakeLockObj = null;
@@ -2678,7 +2678,7 @@
       document.getElementById('alarm-label').value = '';
       saveLocalAlarms();
       if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
-      showToast(`⏰ 已於此手機開啟鬧鐘 ${hour}:${min}`);
+      showToast(`⏰ 已新增 ${hour}:${min}，可按「寫入手機鬧鐘」同步至 iPhone 時鐘`);
     }
 
     function estimateAlarmFromImage(e) {
@@ -2688,7 +2688,13 @@
       document.getElementById('alarm-hour').value = String((now.getHours() + 1) % 24).padStart(2, '0');
       document.getElementById('alarm-min').value = String(now.getMinutes()).padStart(2, '0');
       document.getElementById('alarm-label').value = `藥單提醒 (${file.name.slice(0, 10)})`;
-      showToast('📷 已估算提醒時間，請按「+ 開啟本機鬧鐘」');
+      showToast('📷 已估算提醒時間，請按「+ 新增鬧鐘」');
+    }
+
+    function triggerIosShortcutAlarm(timeStr, labelStr) {
+      const payload = `${timeStr}|${labelStr || 'MCMA提醒'}`;
+      const shortcutUrl = `shortcuts://run-shortcut?name=${encodeURIComponent('MCMA設鬧鐘')}&input=text&text=${encodeURIComponent(payload)}`;
+      window.location.href = shortcutUrl;
     }
 
     function exportAlarmToCalendar(id) {
@@ -2739,22 +2745,26 @@
       const container = document.getElementById('local-alarms-list');
       if (!container) return;
       if (localAlarms.length === 0) {
-        container.innerHTML = `<p style="font-size:11px; color:#94a3b8; text-align:center; padding:4px;">此手機尚未開啟鬧鐘</p>`;
+        container.innerHTML = `<p style="font-size:11px; color:#94a3b8; text-align:center; padding:4px;">此手機尚未建立鬧鐘</p>`;
         return;
       }
-      container.innerHTML = localAlarms.map(al => `
-        <div class="flex-between" style="background:#1e293b; border:1px solid #334155; padding:7px 10px; border-radius:10px;">
-          <div class="flex-center">
-            <strong style="font-size:14px; font-family:monospace; color:#fbbf24;">${al.time}</strong>
-            <span style="font-size:12px; color:#f1f5f9;">${al.label}</span>
+      container.innerHTML = localAlarms.map(al => {
+        const safeLabel = (al.label || 'MCMA提醒').replace(/'/g, "\\'");
+        return `
+          <div class="flex-between" style="background:#1e293b; border:1px solid #334155; padding:8px 10px; border-radius:10px; flex-wrap:wrap; gap:6px;">
+            <div class="flex-center">
+              <strong style="font-size:14px; font-family:monospace; color:#fbbf24;">${al.time}</strong>
+              <span style="font-size:12px; color:#f1f5f9;">${al.label}</span>
+            </div>
+            <div class="flex-center" style="gap:6px; margin-left:auto;">
+              <button onclick="triggerIosShortcutAlarm('${al.time}', '${safeLabel}')" title="透過 iOS 捷徑直接寫入 iPhone 時鐘 App" style="font-size:11px; font-weight:700; background:#f59e0b; color:#0f172a; padding:4px 8px; border-radius:7px;">⏰寫入手機鬧鐘</button>
+              <button onclick="exportAlarmToCalendar('${al.id}')" title="匯入日曆提醒" style="font-size:10px; background:#334155; color:#7dd3fc; padding:4px 6px; border-radius:6px;">📅日曆</button>
+              <input type="checkbox" ${al.enabled ? 'checked' : ''} onchange="toggleLocalAlarm('${al.id}')" style="width:16px; height:16px;">
+              <button onclick="deleteLocalAlarm('${al.id}')" style="color:#94a3b8; font-size:12px; padding:2px 4px;">✕</button>
+            </div>
           </div>
-          <div class="flex-center" style="gap:6px;">
-            <button onclick="exportAlarmToCalendar('${al.id}')" title="匯入iPhone日曆作系統強提醒" style="font-size:10px; background:#334155; color:#7dd3fc; padding:3px 6px; border-radius:6px;">📅系統提醒</button>
-            <input type="checkbox" ${al.enabled ? 'checked' : ''} onchange="toggleLocalAlarm('${al.id}')" style="width:16px; height:16px;">
-            <button onclick="deleteLocalAlarm('${al.id}')" style="color:#94a3b8; font-size:12px;">✕</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     setInterval(() => {
