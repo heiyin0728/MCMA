@@ -234,11 +234,12 @@
       display: inline-block;
       padding: 2px 8px;
       border-radius: 99px;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       background: var(--rose-100);
       color: var(--rose-700);
       border: 1px solid var(--rose-200);
+      white-space: nowrap;
     }
 
     .sync-pill {
@@ -409,28 +410,44 @@
       line-height: 1.35;
     }
 
-    /* 更期自訂按鈕刪除小圓章 */
+    /* 更期自訂按鈕及排序控制 */
     .shift-chip-wrap {
       position: relative;
       display: inline-flex;
       align-items: center;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 2px;
+      gap: 2px;
     }
-    .shift-del-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--rose-600);
-      color: #ffffff;
-      font-size: 10px;
+    .shift-sort-btn {
+      width: 22px;
+      height: 24px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 12px;
       font-weight: 800;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
-      z-index: 2;
+    }
+    .shift-sort-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+    .shift-del-btn {
+      width: 22px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--rose-100);
+      color: var(--rose-700);
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* 月曆樣式（星期一為第一天、星期日為最後一天；本月深色、上下月淺色） */
@@ -454,7 +471,7 @@
     }
 
     .cal-cell {
-      min-height: 74px;
+      min-height: 78px;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
       padding: 4px;
@@ -587,7 +604,7 @@
       background: #ffffff;
       width: 100%;
       max-width: 620px;
-      max-height: 76vh;
+      max-height: 78vh;
       border-radius: 18px;
       display: flex;
       flex-direction: column;
@@ -755,7 +772,7 @@
         <div class="flex-center" style="min-width: 0;">
           <div class="brand-icon">♥</div>
           <div style="min-width: 0;">
-            <div class="flex-center" style="flex-wrap: wrap; gap: 6px;">
+            <div class="flex-center" style="flex-wrap: wrap; gap: 5px;">
               <h1 style="font-size: 16px; font-weight: 800; color: #0f172a;">MCMA守護寶</h1>
               <span id="header-ga-badge" class="ga-badge">計算中...</span>
             </div>
@@ -893,7 +910,7 @@
     <!-- ==================== 分頁 1：母體與用藥 ==================== -->
     <section id="tab-1" class="tab-panel hidden">
       <div class="grid-resp-2">
-        <!-- 今日母體概覽（縮小字體） -->
+        <!-- 今日母體概覽（縮小字體，若無輸入項目顯示空白） -->
         <div class="card">
           <div class="flex-between" style="margin-bottom: 8px;">
             <h3 style="font-size: 13px; font-weight: 800;">🤰 今日母體概覽</h3>
@@ -912,7 +929,7 @@
         </div>
       </div>
 
-      <!-- 記錄母體當刻活動、心情與身體狀況 -->
+      <!-- 記錄母體當刻活動、心情與身體狀況（除日期時間外，所有項目預設空白） -->
       <div class="card">
         <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 10px;">📝 記錄母體當刻活動、心情與身體狀況</h3>
         <form onsubmit="saveMaternalLog(event)" style="display: flex; flex-direction: column; gap: 10px;">
@@ -929,8 +946,9 @@
               </div>
             </div>
             <div>
-              <label class="label-sm">心情狀態</label>
+              <label class="label-sm">心情狀態 (預設空白)</label>
               <select id="mat-mood">
+                <option value="">-- 空白 --</option>
                 <option value="😊 平靜安心">😊 平靜安心</option>
                 <option value="🥰 開心期待">🥰 開心期待</option>
                 <option value="😴 疲倦嗜睡">😴 疲倦嗜睡</option>
@@ -939,8 +957,9 @@
               </select>
             </div>
             <div>
-              <label class="label-sm">分泌物 / 出血狀況</label>
+              <label class="label-sm">分泌物 / 出血狀況 (預設空白)</label>
               <select id="mat-bleeding">
+                <option value="">-- 空白 --</option>
                 <option value="正常無出血">正常無出血</option>
                 <option value="極少量啡色分泌">極少量啡色分泌</option>
                 <option value="少量粉紅/啡色">少量粉紅/啡色</option>
@@ -951,16 +970,16 @@
 
           <div class="grid-resp-3">
             <div>
-              <label class="label-sm">身體感覺 / 症狀</label>
-              <input type="text" id="mat-feeling" placeholder="例如：輕微作悶、乳房脹痛...">
+              <label class="label-sm">身體感覺 / 症狀 (預設空白)</label>
+              <input type="text" id="mat-feeling" placeholder="">
             </div>
             <div>
-              <label class="label-sm">當刻進行的活動</label>
-              <input type="text" id="mat-activity" placeholder="例如：在家臥床休息、散步10分鐘...">
+              <label class="label-sm">當刻進行的活動 (預設空白)</label>
+              <input type="text" id="mat-activity" placeholder="">
             </div>
             <div>
-              <label class="label-sm">身體狀況備註</label>
-              <input type="text" id="mat-condition" placeholder="例如：血壓正常、胃口一般...">
+              <label class="label-sm">身體狀況備註 (預設空白)</label>
+              <input type="text" id="mat-condition" placeholder="">
             </div>
           </div>
 
@@ -982,7 +1001,7 @@
         <div id="maternal-logs-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto;"></div>
       </div>
 
-      <!-- 本機專屬鬧鐘（修復 iOS 捷徑名稱與 URL 編碼接駁） -->
+      <!-- 本機專屬鬧鐘 -->
       <div class="alarm-card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div class="flex-center" style="flex-wrap: wrap;">
@@ -1082,12 +1101,12 @@
         </div>
       </div>
 
-      <!-- 全庫所有上載影像時序總覽（加入分類頁面按鈕 + 嚴格兩張卡片並排顯示於頁面範圍內） -->
+      <!-- 全庫所有上載影像時序總覽（分類切換 + 編輯與刪除功能） -->
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div>
             <h3 style="font-size: 14px; font-weight: 800;">🗂️ 全庫上載影像時序總覽</h3>
-            <p style="font-size: 11px; color: var(--text-muted);">自動彙整所有位置上載的相片縮圖（依加入時序排列），可點擊上方分類按鈕篩選或點擊放大左右滑動瀏覽</p>
+            <p style="font-size: 11px; color: var(--text-muted);">選擇分類後自動跳轉至該分類頁面，支援隨時編輯備註或刪除影像</p>
           </div>
           <span id="all-media-count-badge" class="badge" style="background: var(--rose-100); color: var(--rose-700);">0 個</span>
         </div>
@@ -1160,7 +1179,6 @@
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <div class="modal-body" id="modal-twin-body" style="display: flex; flex-direction: column; gap: 12px;">
-        <!-- 雙週數對照資訊欄：僅在此內頁同時顯示即日推算週數 + 最後產檢週數 -->
         <div id="twin-modal-ga-compare" class="grid-2" style="gap: 8px;"></div>
 
         <div style="font-size: 11px; color: var(--text-muted); text-align: center; background: #f8fafc; padding: 4px 8px; border-radius: 8px;">
@@ -1253,21 +1271,29 @@
       </div>
     </div>
 
-    <!-- 2. 月曆單日詳情與工作更期自訂管理彈窗 -->
+    <!-- 2. 月曆單日詳情與工作更期自訂管理彈窗（支援左右滑動切換前後一日 + 工作更期自訂排序） -->
     <div id="modal-calendar-day" class="modal-box hidden">
       <div class="modal-header">
-        <div>
-          <h3 id="cal-modal-date-title" style="font-size: 14px; font-weight: 800;">日程詳情</h3>
-          <p id="cal-modal-ga-subtitle" style="font-size: 11px; color: var(--rose-600); font-weight: 700;"></p>
+        <div class="flex-center" style="gap: 6px;">
+          <button type="button" onclick="stepCalendarDayModal(-1)" class="btn btn-soft" style="padding: 4px 8px; font-size: 12px;" title="前一日">‹</button>
+          <div>
+            <h3 id="cal-modal-date-title" style="font-size: 14px; font-weight: 800;">日程詳情</h3>
+            <p id="cal-modal-ga-subtitle" style="font-size: 10.5px; color: var(--rose-600); font-weight: 700;"></p>
+          </div>
+          <button type="button" onclick="stepCalendarDayModal(1)" class="btn btn-soft" style="padding: 4px 8px; font-size: 12px;" title="後一日">›</button>
         </div>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px;">
-        <!-- 工作更期自訂管理（支援加入及刪減預設按鈕） -->
+        <div style="font-size: 10.5px; color: var(--text-muted); text-align: center; background: #f8fafc; padding: 3px 8px; border-radius: 8px;">
+          👈 左右滑動或點擊頂部 ‹ › 可切換至前一日 / 後一日 👉
+        </div>
+
+        <!-- 工作更期自訂管理（支援新增、刪減及自訂左右排序） -->
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="margin-bottom: 6px;">
             <label class="label-sm" style="margin: 0;">💼 當日工作更期 <span id="current-day-shift-badge" class="badge" style="background:#e2e8f0; color:#334155; margin-left:4px;">無/未定</span></label>
-            <button type="button" onclick="toggleShiftManageMode()" id="shift-manage-toggle-btn" class="btn btn-soft" style="padding: 3px 8px; font-size: 11px;">⚙️ 管理更期按鈕</button>
+            <button type="button" onclick="toggleShiftManageMode()" id="shift-manage-toggle-btn" class="btn btn-soft" style="padding: 3px 8px; font-size: 11px;">⚙️ 管理/排序更期</button>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;" id="shift-selector-btns"></div>
           <div style="display: flex; gap: 6px; flex-wrap: wrap;">
@@ -1276,19 +1302,19 @@
             <button type="button" onclick="addShiftOptionAndApply()" class="btn btn-sky" style="padding: 6px 10px;">+ 加入按鈕</button>
           </div>
           <p id="shift-manage-hint" class="hidden" style="font-size: 10.5px; color: var(--rose-600); margin-top: 5px; font-weight: 600;">
-            💡 管理模式已開啟：點擊上方更期按鈕右上角的「✕」即可刪減該更期選項。
+            💡 管理與排序模式已開啟：點擊「‹」「›」可調整更期按鈕排序，點擊「✕」可刪減該更期選項。
           </p>
         </div>
 
         <div>
           <div class="flex-between" style="margin-bottom: 6px;">
             <h4 style="font-size: 12px; font-weight: 800;">📅 當日覆診 / 住院行程 (點擊縮圖放大)</h4>
-            <button onclick="resetEventFormForDate(selectedCalendarDate)" style="font-size: 11px; font-weight: 700; color: var(--rose-600);">+ 清空重填</button>
+            <button type="button" onclick="handleClearAndResetEventForm()" class="btn btn-soft-rose" style="padding: 3px 8px; font-size: 11px;">+ 清空重填</button>
           </div>
           <div id="cal-day-events-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
         </div>
 
-        <form onsubmit="saveCalendarEvent(event)" style="background: var(--rose-50); border: 1px solid var(--rose-200); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+        <form id="cal-event-form" onsubmit="saveCalendarEvent(event)" style="background: var(--rose-50); border: 1px solid var(--rose-200); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
           <h4 id="cal-form-heading" style="font-size: 12px; font-weight: 800;">➕ 新增 / 編輯行程 (支援分開設定入院及出院時間)</h4>
           <input type="hidden" id="ev-id">
           <div>
@@ -1362,7 +1388,7 @@
       </div>
     </div>
 
-    <!-- 3. 藥物與保健品彈窗（支援上載與編輯藥物圖片） -->
+    <!-- 3. 藥物與保健品彈窗 -->
     <div id="modal-med" class="modal-box hidden" style="max-width: 440px;">
       <div class="modal-header">
         <h3 style="font-size: 14px; font-weight: 800;">💊 新增 / 編輯藥物或保健品</h3>
@@ -1462,7 +1488,7 @@
       </form>
     </div>
 
-    <!-- 6. 母體病史新增 / 編輯彈窗（支援自訂類別與空白詳情） -->
+    <!-- 6. 母體病史新增 / 編輯彈窗 -->
     <div id="modal-history" class="modal-box hidden" style="max-width: 440px;">
       <div class="modal-header">
         <h3 id="mh-modal-title" style="font-size: 14px; font-weight: 800;">🩺 新增母體病史 / 出血進展</h3>
@@ -1499,7 +1525,7 @@
       </form>
     </div>
 
-    <!-- 7. 多戶口家庭即時雲端同步設定彈窗（已鎖定 homestocktake Firebase 網址） -->
+    <!-- 7. 多戶口家庭即時雲端同步設定彈窗 -->
     <div id="modal-sync" class="modal-box hidden" style="max-width: 480px;">
       <div class="modal-header">
         <h3 style="font-size: 14px; font-weight: 800;">☁️ 多戶口家庭雲端同步設定</h3>
@@ -1558,7 +1584,7 @@
 
   <script>
     // =========================================================================
-    // 1. 隱形基準計算 (2026-09-19 -> 預產期 27/6/2027，介面絕不出現 LMP)
+    // 1. 隱形基準計算與大孖(BB A)、細孖(BB B)雙週數計算引擎
     // =========================================================================
     const INTERNAL_BASE_MS = new Date(2026, 8, 19, 0, 0, 0).getTime();
     const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -1571,61 +1597,81 @@
     function getGestationalAgeForDate(targetDateObj) {
       const d = new Date(targetDateObj.getFullYear(), targetDateObj.getMonth(), targetDateObj.getDate());
       const diffDays = Math.floor((d.getTime() - INTERNAL_BASE_MS) / MS_PER_DAY);
-      if (diffDays < 0) return { weeks: 0, days: 0, totalDays: 0, label: '0週0日' };
+      if (diffDays < 0) return { weeks: 0, days: 0, totalDays: 0, label: '0週0日', short: '0w0d' };
       const weeks = Math.floor(diffDays / 7);
       const days = diffDays % 7;
-      return { weeks, days, totalDays: diffDays, label: `${weeks}週${days}日` };
+      return { weeks, days, totalDays: diffDays, label: `${weeks}週${days}日`, short: `${weeks}w${days}d` };
     }
 
-    // 精準計算大孖 / 細孖各自「即日推算週數」及「最後產檢週數」（供主頁與內頁分別調用）
+    // 計算指定日期時，大孖 (BB A) 與細孖 (BB B) 各自的推算週數
+    function getTwinGAOnTargetDate(twinId, targetDateObj) {
+      const list = [...(appState.twinMeasurements[twinId] || [])]
+        .filter(x => x.date && x.usGa)
+        .sort((a, b) => b.date.localeCompare(a.date));
+      const latest = list[0];
+
+      const targetMs = new Date(targetDateObj.getFullYear(), targetDateObj.getMonth(), targetDateObj.getDate()).getTime();
+      let baseWeeks = 7;
+      let baseDays = twinId === 'A' ? 2 : 0;
+      let scanMs = new Date(2026, 10, 12).getTime();
+
+      if (latest) {
+        const match = latest.usGa.match(/(\d+)\s*[w週]\s*(\d+)\s*[d日]?/i);
+        if (match) {
+          baseWeeks = parseInt(match[1], 10);
+          baseDays = parseInt(match[2], 10);
+          const p = latest.date.split('-');
+          scanMs = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getTime();
+        }
+      }
+
+      const diffDays = Math.floor((targetMs - scanMs) / MS_PER_DAY);
+      const total = baseWeeks * 7 + baseDays + diffDays;
+      if (total < 0) {
+        return { valid: false, weeks: 0, days: 0, label: '', short: '' };
+      }
+      const w = Math.floor(total / 7);
+      const d = total % 7;
+      return { valid: true, weeks: w, days: d, label: `${w}週${d}日`, short: `${w}w${d}d` };
+    }
+
+    // 取得大孖 / 細孖「即日推算週數」及「最後產檢週數」（供主頁與內頁分別調用）
     function getTwinGestationalInfo(twinId) {
       const list = [...(appState.twinMeasurements[twinId] || [])]
         .filter(x => x.date && x.usGa)
         .sort((a, b) => b.date.localeCompare(a.date));
       const latest = list[0];
 
-      const now = new Date();
-      const todayMs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const todayGA = getTwinGAOnTargetDate(twinId, new Date());
+      let lastScanDate = '12/11/2026';
+      let lastScanGa = twinId === 'A' ? '7週2日 (7w2d)' : '7週0日 (7w0d)';
 
       if (latest) {
         const match = latest.usGa.match(/(\d+)\s*[w週]\s*(\d+)\s*[d日]?/i);
         if (match) {
-          const baseWeeks = parseInt(match[1], 10);
-          const baseDays = parseInt(match[2], 10);
-          const p = latest.date.split('-');
-          const scanMs = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getTime();
-          const elapsedDays = Math.max(0, Math.floor((todayMs - scanMs) / MS_PER_DAY));
-          const total = baseWeeks * 7 + baseDays + elapsedDays;
-          const liveWeeks = Math.floor(total / 7);
-          const liveDays = total % 7;
-          return {
-            liveShort: `即日 ${liveWeeks}週${liveDays}日`,
-            liveFull: `${liveWeeks}週${liveDays}日`,
-            lastScanDate: formatDisplayDate(latest.date),
-            lastScanGa: `${baseWeeks}週${baseDays}日 (${latest.usGa})`
-          };
+          lastScanDate = formatDisplayDate(latest.date);
+          lastScanGa = `${parseInt(match[1], 10)}週${parseInt(match[2], 10)}日 (${latest.usGa})`;
         }
       }
 
-      // 預設基準：BB A 12/11/2026 7w2d；BB B 12/11/2026 7w0d
-      const defaultScanMs = new Date(2026, 10, 12).getTime();
-      const elapsed = Math.max(0, Math.floor((todayMs - defaultScanMs) / MS_PER_DAY));
-      const baseWeeks = 7;
-      const baseDays = twinId === 'A' ? 2 : 0;
-      const total = baseWeeks * 7 + baseDays + elapsed;
-      const liveWeeks = Math.floor(total / 7);
-      const liveDays = total % 7;
       return {
-        liveShort: `即日 ${liveWeeks}週${liveDays}日`,
-        liveFull: `${liveWeeks}週${liveDays}日`,
-        lastScanDate: '12/11/2026',
-        lastScanGa: `${baseWeeks}週${baseDays}日 (${baseWeeks}w${baseDays}d)`
+        liveShort: `即日 ${todayGA.label}`,
+        liveFull: todayGA.label,
+        liveCompact: todayGA.short,
+        lastScanDate,
+        lastScanGa
       };
     }
 
     function getTodayStr() {
       const now = new Date();
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function shiftIsoDate(isoStr, deltaDays) {
+      const p = isoStr.split('-');
+      const d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10) + deltaDays);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
     function formatDisplayDate(isoStr) {
@@ -1698,14 +1744,7 @@
         { id: 'med-2', name: '黃體酮安胎藥 (Duphaston / Utrogestan)', type: '西藥', dosage: '每日2次 · 早晚各1次', checkedDate: '', image: '', imageCategory: '藥單', updatedAt: 1731378600000 },
         { id: 'med-3', name: '固腎安胎中藥煎劑', type: '中藥', dosage: '每日1劑 · 晚飯後溫服', checkedDate: '', image: '', imageCategory: '藥單', updatedAt: 1731378600000 }
       ],
-      maternalLogs: [
-        {
-          id: 'ml-1', date: '2026-11-14', time: '09:00', mood: '😊 平靜安心',
-          bleeding: '正常無出血', feeling: '輕微晨吐作悶，乳房微脹',
-          activity: '在家休息及慢步', condition: '無腹痛，睡眠充足',
-          media: [], updatedAt: 1731546000000, updatedBy: '媽媽'
-        }
-      ],
+      maternalLogs: [],
       medicalHistory: [
         { id: 'mh-1', date: '2026-11-05', tag: '子宮頸瘜肉', detail: '私家婦科檢查發現細小子宮頸瘜肉，醫生建議暫不切除以減少刺激，密切觀察分泌物。', updatedAt: 1730764800000 },
         { id: 'mh-2', date: '2026-11-08', tag: '孕初期流血/流啡', detail: '孕初期曾出現多次少量啡色及粉紅分泌，加強臥床休息及按時服用黃體酮後已逐漸穩定止血。', updatedAt: 1731024000000 }
@@ -1947,7 +1986,7 @@
 
     async function syncWithCloud(showToastMsg = false, hasLocalChanges = false) {
       if (isSyncingNow) return;
-      const currentSig = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}_${(appState.shiftOptions || []).length}`;
+      const currentSig = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}_${(appState.shiftOptions || []).join(',')}`;
       if (!hasLocalChanges && !showToastMsg && lastSyncedSignature === currentSig && appState.updatedAt > 0) {
         return;
       }
@@ -1978,7 +2017,7 @@
         }
 
         if ((remote || pushOk) && !window._lastSyncErr) {
-          lastSyncedSignature = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}_${(appState.shiftOptions || []).length}`;
+          lastSyncedSignature = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}_${(appState.shiftOptions || []).join(',')}`;
           setSyncUI('ok', '已同步');
           if (receivedRemote) {
             const who = remote.lastEditor ? ` (${remote.lastEditor})` : '';
@@ -2078,7 +2117,7 @@
     }
 
     // =========================================================================
-    // 4. 分頁切換 + 左右滑動支援
+    // 4. 分頁切換 + 左右滑動支援（含主畫面分頁、大/細孖彈窗、日程詳情彈窗前後一日）
     // =========================================================================
     function switchTab(index) {
       if (index < 0 || index > 3) return;
@@ -2108,6 +2147,12 @@
       const nextId = currentTwinModalId === 'A' ? 'B' : 'A';
       openTwinModal(nextId);
       showToast(nextId === 'A' ? '👶 已切換至大孖 (BB A) 頁面' : '👶 已切換至細孖 (BB B) 頁面');
+    }
+
+    function stepCalendarDayModal(deltaDays) {
+      const nextDate = shiftIsoDate(selectedCalendarDate, deltaDays);
+      openCalendarDayModal(nextDate);
+      showToast(deltaDays < 0 ? `‹ 已切換至前一日 (${formatDisplayDate(nextDate)})` : `已切換至後一日 (${formatDisplayDate(nextDate)}) ›`);
     }
 
     let lightboxItems = [];
@@ -2198,6 +2243,27 @@
         }, { passive: true });
       }
 
+      // 編輯日程彈窗左右滑動切換前一日 / 後一日
+      const calDayModal = document.getElementById('modal-calendar-day');
+      if (calDayModal) {
+        let cdStartX = 0, cdStartY = 0;
+        calDayModal.addEventListener('touchstart', (e) => {
+          if (e.target.closest('input, select, textarea')) return;
+          cdStartX = e.touches[0].clientX;
+          cdStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        calDayModal.addEventListener('touchend', (e) => {
+          if (!cdStartX) return;
+          const dx = e.changedTouches[0].clientX - cdStartX;
+          const dy = e.changedTouches[0].clientY - cdStartY;
+          cdStartX = 0;
+          if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+            stepCalendarDayModal(dx < 0 ? 1 : -1);
+          }
+        }, { passive: true });
+      }
+
       const lb = document.getElementById('media-lightbox');
       if (lb) {
         let lbStartX = 0, lbStartY = 0;
@@ -2219,7 +2285,7 @@
     }
 
     // =========================================================================
-    // 5. 主頁雙胎卡片（只顯示即時推算各自即日週數）與內頁（同時顯示即日週數及最後產檢週數）
+    // 5. 頂部大孖/細孖雙週數顯示、主頁卡片與成長曲線內頁
     // =========================================================================
     function renderAll() {
       renderHeader();
@@ -2231,8 +2297,9 @@
     }
 
     function renderHeader() {
-      const todayGA = getGestationalAgeForDate(new Date());
-      document.getElementById('header-ga-badge').textContent = `孕 ${todayGA.label}`;
+      const infoA = getTwinGestationalInfo('A');
+      const infoB = getTwinGestationalInfo('B');
+      document.getElementById('header-ga-badge').textContent = `A:${infoA.liveCompact} / B:${infoB.liveCompact}`;
       document.getElementById('header-edd-text').textContent = getCalculatedEDD();
     }
 
@@ -2243,7 +2310,6 @@
           avatarEl.src = appState.twinAvatars[id];
         }
 
-        // 主頁只顯示即時推算 A, B 胎兒各自即日週數（最後產檢週數只在內頁顯示）
         const gaInfo = getTwinGestationalInfo(id);
         const liveGaEl = document.getElementById(`twin-${id}-live-ga`);
         if (liveGaEl) liveGaEl.textContent = gaInfo.liveShort;
@@ -2329,7 +2395,6 @@
       badge.style.background = twinId === 'A' ? 'var(--sky-100)' : 'var(--pink-100)';
       badge.style.color = twinId === 'A' ? 'var(--sky-700)' : 'var(--pink-700)';
 
-      // 在胎兒卡片內頁同時顯示「即日推算週數」與「最後產檢週數」
       const compareBox = document.getElementById('twin-modal-ga-compare');
       if (compareBox) {
         const themeBg = twinId === 'A' ? 'var(--sky-50)' : 'var(--pink-50)';
@@ -2557,7 +2622,7 @@
     }
 
     // =========================================================================
-    // 6. 互動月曆與工作更期自訂管理（支援新增及刪減按鈕）
+    // 6. 互動月曆（每日同時顯示大孖與細孖週數）與工作更期自訂排序/管理
     // =========================================================================
     const CATEGORY_CLASS = {
       '公立覆診': 'cat-public',
@@ -2603,7 +2668,10 @@
       const isToday = dateStr === todayStr;
       const shift = appState.shifts[dateStr] || '';
       const dayEvents = (appState.events || []).filter(ev => doesEventCoverDate(ev, dateStr)).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
-      const ga = getGestationalAgeForDate(new Date(year, month, day));
+
+      const cellDateObj = new Date(year, month, day);
+      const gaA = getTwinGAOnTargetDate('A', cellDateObj);
+      const gaB = getTwinGAOnTargetDate('B', cellDateObj);
 
       let shiftBadge = '';
       if (shift) {
@@ -2626,6 +2694,13 @@
       }).join('');
 
       const dayNumColor = isToday ? 'var(--rose-600)' : (isOtherMonth ? '#94a3b8' : '#0f172a');
+      const twinGaLines = (gaA.valid || gaB.valid) ? `
+        <div style="font-size:8px; line-height:1.2; margin-top:1px;">
+          ${gaA.valid ? `<div style="color:${isOtherMonth ? '#94a3b8' : '#0369a1'};">A:${gaA.short}</div>` : ''}
+          ${gaB.valid ? `<div style="color:${isOtherMonth ? '#94a3b8' : '#be185d'};">B:${gaB.short}</div>` : ''}
+        </div>
+      ` : '';
+
       return `
         <div onclick="openCalendarDayModal('${dateStr}')" class="cal-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}">
           <div>
@@ -2633,7 +2708,7 @@
               <strong style="font-size:12px; color:${dayNumColor};">${day}</strong>
               ${shiftBadge}
             </div>
-            <div style="font-size:9px; color:${isOtherMonth ? '#cbd5e1' : '#64748b'};">${ga.totalDays >= 0 ? ga.label : ''}</div>
+            ${twinGaLines}
           </div>
           <div>${bars}</div>
         </div>
@@ -2670,10 +2745,14 @@
       selectedCalendarDate = dateStr;
       isShiftManageMode = false;
       const parts = dateStr.split('-');
-      const ga = getGestationalAgeForDate(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+      const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      const gaA = getTwinGAOnTargetDate('A', dObj);
+      const gaB = getTwinGAOnTargetDate('B', dObj);
 
       document.getElementById('cal-modal-date-title').textContent = `${formatDisplayDate(dateStr)} 日程詳情`;
-      document.getElementById('cal-modal-ga-subtitle').textContent = ga.totalDays >= 0 ? `當日孕週：${ga.label}` : '';
+      document.getElementById('cal-modal-ga-subtitle').textContent = (gaA.valid || gaB.valid)
+        ? `大孖 A：${gaA.label || '-'} ｜ 細孖 B：${gaB.label || '-'}`
+        : '';
       document.getElementById('custom-shift-input').value = '';
 
       renderShiftSelectorButtons();
@@ -2703,7 +2782,7 @@
       }
 
       if (toggleBtn) {
-        toggleBtn.textContent = isShiftManageMode ? '✓ 完成管理' : '⚙️ 管理更期按鈕';
+        toggleBtn.textContent = isShiftManageMode ? '✓ 完成排序/管理' : '⚙️ 管理/排序更期';
         toggleBtn.className = isShiftManageMode ? 'btn btn-rose' : 'btn btn-soft';
       }
       if (hintEl) {
@@ -2719,17 +2798,36 @@
         const st = getShiftStyle(opt);
         const safeOpt = opt.replace(/'/g, "\\'");
         const isSelected = currentVal === opt;
-        return `
-          <div class="shift-chip-wrap">
+        if (!isShiftManageMode) {
+          return `
             <button type="button" onclick="setDayShift('${safeOpt}')" class="btn" style="background:${st.bg}; color:${st.col}; border:${isSelected ? '2px solid #0f172a' : '1px solid transparent'};">
               ${opt}
             </button>
-            ${isShiftManageMode ? `<button type="button" onclick="deleteShiftOption(${idx})" class="shift-del-badge" title="刪除此更期按鈕">✕</button>` : ''}
+          `;
+        }
+        return `
+          <div class="shift-chip-wrap">
+            <button type="button" onclick="moveShiftOption(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="shift-sort-btn" title="向左移">‹</button>
+            <button type="button" onclick="setDayShift('${safeOpt}')" class="btn" style="padding:5px 8px; background:${st.bg}; color:${st.col}; border:${isSelected ? '2px solid #0f172a' : '1px solid transparent'};">
+              ${opt}
+            </button>
+            <button type="button" onclick="moveShiftOption(${idx}, 1)" ${idx === options.length - 1 ? 'disabled' : ''} class="shift-sort-btn" title="向右移">›</button>
+            <button type="button" onclick="deleteShiftOption(${idx})" class="shift-del-btn" title="刪除此更期">✕</button>
           </div>
         `;
       }).join('');
 
       container.innerHTML = html;
+    }
+
+    async function moveShiftOption(idx, dir) {
+      if (!Array.isArray(appState.shiftOptions)) return;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= appState.shiftOptions.length) return;
+      const arr = appState.shiftOptions;
+      [arr[idx], arr[targetIdx]] = [arr[targetIdx], arr[idx]];
+      await persistAndSync();
+      renderShiftSelectorButtons();
     }
 
     async function setDayShift(shiftVal) {
@@ -2853,7 +2951,17 @@
       }
     }
 
+    function handleClearAndResetEventForm() {
+      resetEventFormForDate(selectedCalendarDate);
+      const formEl = document.getElementById('cal-event-form');
+      if (formEl) formEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const titleInput = document.getElementById('ev-title');
+      if (titleInput) titleInput.focus();
+      showToast('🧹 已清空行程表單，可重新填寫');
+    }
+
     function resetEventFormForDate(dateStr) {
+      document.getElementById('cal-form-heading').textContent = '➕ 新增 / 編輯行程 (支援分開設定入院及出院時間)';
       document.getElementById('ev-id').value = '';
       document.getElementById('ev-date').value = dateStr || '';
       document.getElementById('ev-end-date').value = '';
@@ -2879,6 +2987,7 @@
     function editCalendarEvent(evId) {
       const ev = appState.events.find(item => item.id === evId);
       if (!ev) return;
+      document.getElementById('cal-form-heading').textContent = '✏️ 正在編輯行程';
       document.getElementById('ev-id').value = ev.id;
       document.getElementById('ev-date').value = ev.date || '';
       document.getElementById('ev-end-date').value = ev.endDate || '';
@@ -2973,21 +3082,32 @@
     }
 
     // =========================================================================
-    // 7. 母體狀況、用藥清單與本機鬧鐘
+    // 7. 母體狀況（預設空白、無輸入時顯示空白）、用藥清單與本機鬧鐘
     // =========================================================================
     function renderMaternalTab() {
       const today = getTodayStr();
       document.getElementById('maternal-today-date').textContent = formatDisplayDate(today);
 
-      const todayShift = appState.shifts[today] || '未設定';
+      const todayShift = appState.shifts[today] || '';
       const todayEvents = (appState.events || []).filter(ev => doesEventCoverDate(ev, today));
-      const latestLog = [...(appState.maternalLogs || [])].sort((a, b) => ((b.date || '') + (b.time || '')).localeCompare((a.date || '') + (a.time || '')))[0];
+      const todayLogs = [...(appState.maternalLogs || [])]
+        .filter(l => l.date === today)
+        .sort((a, b) => (b.time || '').localeCompare(a.time || ''));
+      const todayLog = todayLogs[0];
+
+      const moodFeelingText = todayLog
+        ? [todayLog.mood, todayLog.feeling].filter(Boolean).join(' · ')
+        : '';
+      const bleedingText = todayLog ? (todayLog.bleeding || '') : '';
+      const eventsText = todayEvents.length > 0
+        ? todayEvents.map(e => (e.time ? e.time + ' ' : '') + e.category).join('、')
+        : '';
 
       document.getElementById('maternal-today-summary').innerHTML = `
         <div class="flex-between mat-mini-box"><span>今日工作更期</span><strong>${todayShift}</strong></div>
-        <div class="flex-between mat-mini-box"><span>今日覆診/住院</span><strong style="color:var(--rose-600);">${todayEvents.length > 0 ? todayEvents.map(e => (e.time ? e.time + ' ' : '') + e.category).join('、') : '今日無覆診'}</strong></div>
-        <div class="flex-between mat-mini-box"><span>最新心情 / 感覺</span><strong>${latestLog ? `${latestLog.mood} · ${latestLog.feeling || '平穩'}` : '尚未記錄'}</strong></div>
-        <div class="flex-between mat-mini-box"><span>分泌物 / 狀況</span><strong style="color:${latestLog && latestLog.bleeding !== '正常無出血' ? 'var(--amber-800)' : 'var(--emerald-800)'};">${latestLog ? latestLog.bleeding : '正常'}</strong></div>
+        <div class="flex-between mat-mini-box"><span>今日覆診/住院</span><strong style="color:var(--rose-600);">${eventsText}</strong></div>
+        <div class="flex-between mat-mini-box"><span>最新心情 / 感覺</span><strong>${moodFeelingText}</strong></div>
+        <div class="flex-between mat-mini-box"><span>分泌物 / 狀況</span><strong style="color:${bleedingText && bleedingText !== '正常無出血' ? 'var(--amber-800)' : 'var(--emerald-800)'};">${bleedingText}</strong></div>
       `;
 
       const medContainer = document.getElementById('med-checklist-container');
@@ -3018,31 +3138,38 @@
 
       const logsContainer = document.getElementById('maternal-logs-list');
       const sortedLogs = [...(appState.maternalLogs || [])].sort((a, b) => ((b.date || '') + (b.time || '')).localeCompare((a.date || '') + (a.time || '')));
-      logsContainer.innerHTML = sortedLogs.map(log => {
-        const mediaHtml = (log.media && log.media.length > 0) ? `
-          <div class="preview-grid">
-            ${log.media.map(m => m.type === 'video'
-              ? `<video src="${m.url}" controls onclick="openMediaLightbox('${m.url}', 'video')" style="height:56px; border-radius:8px; cursor:zoom-in;"></video>`
-              : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image')" style="height:56px; width:56px; object-fit:cover; border-radius:8px; cursor:zoom-in;">`
-            ).join('')}
-          </div>
-        ` : '';
-        return `
-          <div class="flex-between" style="align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:9px 10px; font-size:12px;">
-            <div style="flex:1;">
-              <div class="flex-center" style="flex-wrap:wrap; gap:5px; margin-bottom:3px;">
-                <strong>${formatDisplayDate(log.date)} ${log.time || ''}</strong>
-                <span class="badge" style="background:var(--rose-100); color:var(--rose-700);">${log.mood}</span>
-                <span class="badge" style="background:${log.bleeding === '正常無出血' ? 'var(--emerald-100)' : 'var(--amber-100)'}; color:${log.bleeding === '正常無出血' ? 'var(--emerald-800)' : 'var(--amber-800)'};">${log.bleeding}</span>
-              </div>
-              <p><strong>感覺：</strong>${log.feeling || '-'} ｜ <strong>活動：</strong>${log.activity || '-'}</p>
-              ${log.condition ? `<p style="font-size:11px; color:var(--text-muted);">備註：${log.condition}</p>` : ''}
-              ${mediaHtml}
+      if (sortedLogs.length === 0) {
+        logsContainer.innerHTML = `<p style="font-size:11.5px; color:#94a3b8; text-align:center; padding:12px;">暫無母體紀錄</p>`;
+      } else {
+        logsContainer.innerHTML = sortedLogs.map(log => {
+          const mediaHtml = (log.media && log.media.length > 0) ? `
+            <div class="preview-grid">
+              ${log.media.map(m => m.type === 'video'
+                ? `<video src="${m.url}" controls onclick="openMediaLightbox('${m.url}', 'video')" style="height:56px; border-radius:8px; cursor:zoom-in;"></video>`
+                : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image')" style="height:56px; width:56px; object-fit:cover; border-radius:8px; cursor:zoom-in;">`
+              ).join('')}
             </div>
-            <button onclick="deleteMaternalLog('${log.id}')" style="color:#94a3b8; font-weight:700; padding:2px 6px;">✕</button>
-          </div>
-        `;
-      }).join('');
+          ` : '';
+          const partsLine = [];
+          if (log.feeling) partsLine.push(`<strong>感覺：</strong>${log.feeling}`);
+          if (log.activity) partsLine.push(`<strong>活動：</strong>${log.activity}`);
+          return `
+            <div class="flex-between" style="align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:9px 10px; font-size:12px;">
+              <div style="flex:1;">
+                <div class="flex-center" style="flex-wrap:wrap; gap:5px; margin-bottom:3px;">
+                  <strong>${formatDisplayDate(log.date)} ${log.time || ''}</strong>
+                  ${log.mood ? `<span class="badge" style="background:var(--rose-100); color:var(--rose-700);">${log.mood}</span>` : ''}
+                  ${log.bleeding ? `<span class="badge" style="background:${log.bleeding === '正常無出血' ? 'var(--emerald-100)' : 'var(--amber-100)'}; color:${log.bleeding === '正常無出血' ? 'var(--emerald-800)' : 'var(--amber-800)'};">${log.bleeding}</span>` : ''}
+                </div>
+                ${partsLine.length > 0 ? `<p>${partsLine.join(' ｜ ')}</p>` : ''}
+                ${log.condition ? `<p style="font-size:11px; color:var(--text-muted);">備註：${log.condition}</p>` : ''}
+                ${mediaHtml}
+              </div>
+              <button onclick="deleteMaternalLog('${log.id}')" style="color:#94a3b8; font-weight:700; padding:2px 6px;">✕</button>
+            </div>
+          `;
+        }).join('');
+      }
 
       renderLocalAlarms();
     }
@@ -3171,6 +3298,9 @@
         updatedBy: cfg.userName
       });
       await persistAndSync();
+      // 儲存後重設回空白狀態
+      document.getElementById('mat-mood').value = '';
+      document.getElementById('mat-bleeding').value = '';
       document.getElementById('mat-feeling').value = '';
       document.getElementById('mat-activity').value = '';
       document.getElementById('mat-condition').value = '';
@@ -3457,7 +3587,7 @@
     }, 2000);
 
     // =========================================================================
-    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像時序總覽（含分類頁面按鈕）
+    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像時序總覽（自動跳轉分類 + 編輯/刪除）
     // =========================================================================
     function renderHistoryAndGalleryTab() {
       const mhList = document.getElementById('medical-history-list');
@@ -3561,7 +3691,7 @@
             source: `📅 月曆 (${ev.category})`,
             mediaCategory: m.mediaCategory || (ev.category === '入院' ? '出院紀錄' : '轉介信'),
             date: ev.date || '',
-            caption: ev.title || '覆診/住院附件',
+            caption: m.customCaption || ev.title || '覆診/住院附件',
             ts: m.addedAt || ev.updatedAt || 0
           });
         });
@@ -3580,7 +3710,7 @@
             source: '🤰 母體日記',
             mediaCategory: m.mediaCategory || '自訂',
             date: ml.date || '',
-            caption: ml.feeling || ml.mood || '母體紀錄附件',
+            caption: m.customCaption || ml.feeling || ml.mood || '母體紀錄附件',
             ts: m.addedAt || ml.updatedAt || 0
           });
         });
@@ -3613,7 +3743,7 @@
           source: '🕊️ 天使BB紀念冊',
           mediaCategory: m.mediaCategory || '超聲波',
           date: m.date || '2026-05-18',
-          caption: '18/5/2026 紀念影像',
+          caption: m.customCaption || '18/5/2026 紀念影像',
           ts: appState.angelMemorial.updatedAt || 0
         });
       });
@@ -3636,6 +3766,7 @@
       if (list[idx]) openMediaLightbox(list[idx].url, list[idx].type, list[idx].caption, list, idx);
     }
 
+    // 選擇分類後自動跳轉到該分類頁面
     async function updateUnifiedMediaCategory(uid, selectedVal) {
       let finalCat = selectedVal;
       if (selectedVal === 'CUSTOM') {
@@ -3651,25 +3782,88 @@
       const kind = parts[0];
       if (kind === 'twin') {
         const item = (appState.twinMedia || []).find(x => x.id === parts[1]);
-        if (item) item.mediaCategory = finalCat;
+        if (item) { item.mediaCategory = finalCat; item.updatedAt = Date.now(); }
       } else if (kind === 'event') {
         const ev = (appState.events || []).find(x => x.id === parts[1]);
         const idx = parseInt(parts[2], 10);
-        if (ev && ev.media && ev.media[idx]) ev.media[idx].mediaCategory = finalCat;
+        if (ev && ev.media && ev.media[idx]) { ev.media[idx].mediaCategory = finalCat; ev.updatedAt = Date.now(); }
       } else if (kind === 'maternal') {
         const ml = (appState.maternalLogs || []).find(x => x.id === parts[1]);
         const idx = parseInt(parts[2], 10);
-        if (ml && ml.media && ml.media[idx]) ml.media[idx].mediaCategory = finalCat;
+        if (ml && ml.media && ml.media[idx]) { ml.media[idx].mediaCategory = finalCat; ml.updatedAt = Date.now(); }
       } else if (kind === 'med') {
         const med = (appState.medications || []).find(x => x.id === parts[1]);
-        if (med) med.imageCategory = finalCat;
+        if (med) { med.imageCategory = finalCat; med.updatedAt = Date.now(); }
       } else if (kind === 'angel') {
         const idx = parseInt(parts[1], 10);
-        if (appState.angelMemorial?.media?.[idx]) appState.angelMemorial.media[idx].mediaCategory = finalCat;
+        if (appState.angelMemorial?.media?.[idx]) { appState.angelMemorial.media[idx].mediaCategory = finalCat; appState.angelMemorial.updatedAt = Date.now(); }
+      }
+
+      // 自動跳到所選的新分類頁面
+      currentAllMediaFilter = finalCat;
+      await persistAndSync();
+      showToast(`🏷️ 已歸類為「${finalCat}」並自動跳轉至該分類`);
+    }
+
+    // 編輯全庫影像標題/備註
+    async function editUnifiedMediaCaption(uid) {
+      const targetItem = getUnifiedMediaList().find(x => x.uid === uid);
+      if (!targetItem) return;
+      const nextCap = prompt('編輯影像標題 / 備註：', targetItem.caption || '');
+      if (nextCap === null) return;
+      const trimmed = nextCap.trim();
+
+      const parts = uid.split(':');
+      const kind = parts[0];
+      if (kind === 'twin') {
+        const item = (appState.twinMedia || []).find(x => x.id === parts[1]);
+        if (item) { item.caption = trimmed; item.updatedAt = Date.now(); }
+      } else if (kind === 'event') {
+        const ev = (appState.events || []).find(x => x.id === parts[1]);
+        const idx = parseInt(parts[2], 10);
+        if (ev && ev.media && ev.media[idx]) { ev.media[idx].customCaption = trimmed; ev.updatedAt = Date.now(); }
+      } else if (kind === 'maternal') {
+        const ml = (appState.maternalLogs || []).find(x => x.id === parts[1]);
+        const idx = parseInt(parts[2], 10);
+        if (ml && ml.media && ml.media[idx]) { ml.media[idx].customCaption = trimmed; ml.updatedAt = Date.now(); }
+      } else if (kind === 'med') {
+        const med = (appState.medications || []).find(x => x.id === parts[1]);
+        if (med && trimmed) { med.name = trimmed; med.updatedAt = Date.now(); }
+      } else if (kind === 'angel') {
+        const idx = parseInt(parts[1], 10);
+        if (appState.angelMemorial?.media?.[idx]) { appState.angelMemorial.media[idx].customCaption = trimmed; appState.angelMemorial.updatedAt = Date.now(); }
       }
 
       await persistAndSync();
-      showToast(`🏷️ 已更新影像分類為「${finalCat}」`);
+      showToast('✏️ 已更新影像備註並同步');
+    }
+
+    // 刪除全庫影像
+    async function deleteUnifiedMedia(uid) {
+      const parts = uid.split(':');
+      const kind = parts[0];
+      if (kind === 'twin') {
+        const id = parts[1];
+        appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
+        appState.twinMedia = (appState.twinMedia || []).filter(x => x.id !== id);
+      } else if (kind === 'event') {
+        const ev = (appState.events || []).find(x => x.id === parts[1]);
+        const idx = parseInt(parts[2], 10);
+        if (ev && ev.media) { ev.media.splice(idx, 1); ev.updatedAt = Date.now(); }
+      } else if (kind === 'maternal') {
+        const ml = (appState.maternalLogs || []).find(x => x.id === parts[1]);
+        const idx = parseInt(parts[2], 10);
+        if (ml && ml.media) { ml.media.splice(idx, 1); ml.updatedAt = Date.now(); }
+      } else if (kind === 'med') {
+        const med = (appState.medications || []).find(x => x.id === parts[1]);
+        if (med) { med.image = ''; med.updatedAt = Date.now(); }
+      } else if (kind === 'angel') {
+        const idx = parseInt(parts[1], 10);
+        if (appState.angelMemorial?.media) { appState.angelMemorial.media.splice(idx, 1); appState.angelMemorial.updatedAt = Date.now(); }
+      }
+
+      await persistAndSync();
+      showToast('🗑️ 已刪除該影像並同步');
     }
 
     function renderAllMediaTimeline() {
@@ -3715,6 +3909,7 @@
           ? new Date(item.ts).toLocaleString('zh-HK', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
           : formatDisplayDate(item.date);
         const isCustom = !presetCats.includes(item.mediaCategory);
+        const safeUid = item.uid.replace(/'/g, "\\'");
 
         return `
           <div class="media-thumb-card">
@@ -3724,7 +3919,7 @@
             }
             <span class="badge" style="background:var(--sky-100); color:var(--sky-700); align-self:flex-start;">${item.source}</span>
             <p style="font-size:10.5px; font-weight:700; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.caption}</p>
-            <select onchange="updateUnifiedMediaCategory('${item.uid}', this.value)" style="padding:3px 4px; font-size:10px; border-radius:6px; background:#fff; width:100%;">
+            <select onchange="updateUnifiedMediaCategory('${safeUid}', this.value)" style="padding:3px 4px; font-size:10px; border-radius:6px; background:#fff; width:100%;">
               <option value="超聲波" ${item.mediaCategory === '超聲波' ? 'selected' : ''}>分類：超聲波</option>
               <option value="轉介信" ${item.mediaCategory === '轉介信' ? 'selected' : ''}>分類：轉介信</option>
               <option value="藥單" ${item.mediaCategory === '藥單' ? 'selected' : ''}>分類：藥單</option>
@@ -3732,6 +3927,10 @@
               ${isCustom ? `<option value="${item.mediaCategory}" selected>分類：${item.mediaCategory}</option>` : ''}
               <option value="CUSTOM">自訂分類...</option>
             </select>
+            <div style="display:flex; gap:4px; margin-top:1px;">
+              <button type="button" onclick="editUnifiedMediaCaption('${safeUid}')" class="btn btn-soft" style="flex:1; padding:3px 2px; font-size:10px;">編輯</button>
+              <button type="button" onclick="deleteUnifiedMedia('${safeUid}')" class="btn btn-soft-rose" style="flex:1; padding:3px 2px; font-size:10px;">刪除</button>
+            </div>
             <span style="font-size:9px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">#${filtered.length - idx} · ${timeText}</span>
           </div>
         `;
@@ -3974,11 +4173,12 @@
     // 9. 安全運動建議
     // =========================================================================
     function renderExerciseTab() {
-      const ga = getGestationalAgeForDate(new Date());
-      document.getElementById('exercise-ga-tag').textContent = `目前孕週：${ga.label}`;
+      const infoA = getTwinGestationalInfo('A');
+      const infoB = getTwinGestationalInfo('B');
+      document.getElementById('exercise-ga-tag').textContent = `大孖 ${infoA.liveFull} · 細孖 ${infoB.liveFull}`;
 
       const latestLog = [...(appState.maternalLogs || [])].sort((a, b) => ((b.date || '') + (b.time || '')).localeCompare((a.date || '') + (a.time || '')))[0];
-      const hasBleeding = latestLog && latestLog.bleeding !== '正常無出血';
+      const hasBleeding = latestLog && latestLog.bleeding && latestLog.bleeding !== '正常無出血';
 
       const alertBox = document.getElementById('exercise-dynamic-alert');
       if (hasBleeding) {
@@ -3990,7 +4190,7 @@
         alertBox.style.background = 'var(--emerald-50)';
         alertBox.style.border = '1px solid #a7f3d0';
         alertBox.style.color = 'var(--emerald-800)';
-        alertBox.innerHTML = `<strong>✅ 動態安全提示：</strong>目前孕 ${ga.label}，最近紀錄無異常出血（最近活動：${latestLog ? latestLog.activity || '日常休息' : '日常休息'}）。在無疲倦或腹緊的前提下，可進行溫和舒緩活動。`;
+        alertBox.innerHTML = `<strong>✅ 動態安全提示：</strong>目前大孖 ${infoA.liveFull}、細孖 ${infoB.liveFull}，最近紀錄無異常出血。在無疲倦或腹緊的前提下，可進行溫和舒緩活動。`;
       }
 
       const cards = [
@@ -4090,6 +4290,8 @@
       const now = new Date();
       document.getElementById('mat-hour').value = String(now.getHours()).padStart(2, '0');
       document.getElementById('mat-min').value = String(Math.floor(now.getMinutes() / 15) * 15).padStart(2, '0');
+      document.getElementById('mat-mood').value = '';
+      document.getElementById('mat-bleeding').value = '';
       document.getElementById('alarm-hour').value = '09';
       document.getElementById('alarm-min').value = '00';
 
