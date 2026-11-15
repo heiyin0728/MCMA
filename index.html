@@ -534,6 +534,7 @@
     .btn-purple { background: var(--purple-600); color: #fff; }
     .btn-soft { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
     .btn-soft-rose { background: var(--rose-50); color: var(--rose-700); border: 1px solid var(--rose-200); }
+    .btn-soft-emerald { background: var(--emerald-50); color: var(--emerald-800); border: 1px solid #a7f3d0; }
 
     /* 鬧鐘深色卡片 */
     .alarm-card {
@@ -879,7 +880,8 @@
             <h3 id="calendar-month-title" style="font-size: 16px; font-weight: 800; min-width: 105px; text-align: center;">2026年 11月</h3>
             <button onclick="changeCalendarMonth(1)" class="btn btn-soft" style="padding: 6px 10px;">›</button>
           </div>
-          <div class="flex-center">
+          <div class="flex-center" style="flex-wrap: wrap;">
+            <button onclick="triggerManualWifeCalendarExport()" id="gcal-sync-btn" class="btn btn-soft-emerald" title="月曆或更期有任何改動會自動背景同步至老婆 Google 日曆，亦可點擊立即全量匯出">📅 同步老婆日曆</button>
             <button onclick="jumpToToday()" class="btn btn-soft-rose">今日</button>
             <button onclick="openEventEditor(null, getTodayStr())" class="btn btn-dark">+ 新增日程/住院</button>
           </div>
@@ -892,6 +894,7 @@
           <span><b style="color:#f59e0b;">■</b> 住院(跨日)</span>
           <span><b style="color:#10b981;">■</b> 睇中醫</span>
           <span><span class="badge" style="background:#e2e8f0; color:#334155;">更</span> 工作更期</span>
+          <span id="gcal-auto-status-hint" style="color: var(--emerald-800); font-weight: 600;">· 已啟用自動匯出至老婆日曆</span>
         </div>
 
         <div class="cal-weekdays">
@@ -1101,12 +1104,12 @@
         </div>
       </div>
 
-      <!-- 全庫所有上載影像時序總覽 -->
+      <!-- 全庫所有上載影像時序總覽（支援直接編輯日期） -->
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div>
             <h3 style="font-size: 14px; font-weight: 800;">🗂️ 全庫上載影像時序總覽</h3>
-            <p style="font-size: 11px; color: var(--text-muted);">選擇分類篩選或更改圖片類別（更改分類後畫面維持停留於「全部」），支援隨時編輯備註或刪除影像</p>
+            <p style="font-size: 11px; color: var(--text-muted);">支援直接更改每張影像的日期、分類（更改分類後停留於「全部」）、編輯備註或刪除影像</p>
           </div>
           <span id="all-media-count-badge" class="badge" style="background: var(--rose-100); color: var(--rose-700);">0 個</span>
         </div>
@@ -1168,7 +1171,7 @@
   <!-- ==================== 彈出視窗群 ==================== -->
   <div id="modal-backdrop" onclick="handleBackdropClick(event)" class="modal-backdrop hidden">
 
-    <!-- 1. 胎兒成長曲線（加入 LMP 推算週數 + 即日推算週數 + 最後產檢週數） -->
+    <!-- 1. 胎兒成長曲線 -->
     <div id="modal-twin" class="modal-box hidden">
       <div class="modal-header">
         <div class="flex-center" style="flex-wrap: wrap;">
@@ -1289,7 +1292,7 @@
           👈 左右滑動或點擊頂部 ‹ › 可切換至前一日 / 後一日 👉
         </div>
 
-        <!-- 工作更期自訂管理（全部同步） -->
+        <!-- 工作更期自訂管理 -->
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="margin-bottom: 6px;">
             <label class="label-sm" style="margin: 0;">💼 當日工作更期 <span id="current-day-shift-badge" class="badge" style="background:#e2e8f0; color:#334155; margin-left:4px;">無/未定</span></label>
@@ -1308,7 +1311,7 @@
 
         <div>
           <div class="flex-between" style="margin-bottom: 6px;">
-            <h4 style="font-size: 12px; font-weight: 800;">📅 當日覆診 / 住院行程 (點擊縮圖放大)</h4>
+            <h4 style="font-size: 12px; font-weight: 800;">📅 當日覆診 / 住院行程 (儲存後自動同步老婆日曆)</h4>
             <button type="button" onclick="handleClearAndResetEventForm()" class="btn btn-soft-rose" style="padding: 3px 8px; font-size: 11px;">+ 清空重填</button>
           </div>
           <div id="cal-day-events-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
@@ -1528,7 +1531,7 @@
     <!-- 7. 多戶口家庭即時雲端同步設定彈窗 -->
     <div id="modal-sync" class="modal-box hidden" style="max-width: 480px;">
       <div class="modal-header">
-        <h3 style="font-size: 14px; font-weight: 800;">☁️ 多戶口家庭雲端同步設定</h3>
+        <h3 style="font-size: 14px; font-weight: 800;">☁️ 多戶口家庭雲端與日曆同步設定</h3>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <div class="modal-body" style="display: flex; flex-direction: column; gap: 10px; font-size: 12px;">
@@ -1561,9 +1564,34 @@
           </div>
         </div>
 
+        <!-- Google 老婆日曆自動同步選項 -->
         <div style="background: var(--emerald-50); border: 1px solid #a7f3d0; border-radius: 12px; padding: 10px;">
-          <strong style="color: var(--emerald-800); display: block; margin-bottom: 4px;">🛡️ 本機雙重永久防遺失保護</strong>
-          <p style="font-size: 11px; color: #065f46;">所有資料已雙重寫入手機 <strong>localStorage</strong> 與 <strong>IndexedDB</strong>，更新網頁檔案或重開 App 後自動無損回復。</p>
+          <div class="flex-between" style="margin-bottom: 6px;">
+            <strong style="color: var(--emerald-800);">📅 老婆 Google 日曆自動匯出設定</strong>
+            <span class="badge" style="background: var(--emerald-100); color: var(--emerald-800);">GAS 已連結</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; color: #065f46;">
+            <label class="flex-center" style="cursor: pointer;">
+              <input type="checkbox" id="gcal-auto-enabled" onchange="saveGcalPreferences()" style="width: 15px; height: 15px;">
+              <span>月曆行程或工作更期有改動時<strong>自動匯出</strong>至老婆日曆</span>
+            </label>
+            <label class="flex-center" style="cursor: pointer;">
+              <input type="checkbox" id="gcal-include-shifts" onchange="saveGcalPreferences()" style="width: 15px; height: 15px;">
+              <span>匯出時連同<strong>工作更期</strong>（早更/中更/放假等）一併寫入日曆</span>
+            </label>
+            <label class="flex-center" style="cursor: pointer;">
+              <input type="checkbox" id="gcal-include-ga" onchange="saveGcalPreferences()" style="width: 15px; height: 15px;">
+              <span>於日曆活動備註附上當日<strong>大孖/細孖推算孕週</strong></span>
+            </label>
+          </div>
+          <div style="margin-top: 8px; display: flex; justify-content: flex-end;">
+            <button type="button" onclick="triggerManualWifeCalendarExport()" class="btn btn-teal" style="padding: 5px 10px; font-size: 11px;">立即全量同步至老婆日曆</button>
+          </div>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
+          <strong style="color: #1e293b; display: block; margin-bottom: 4px;">🛡️ 本機雙重永久防遺失保護</strong>
+          <p style="font-size: 11px; color: #475569;">所有資料已雙重寫入手機 <strong>localStorage</strong> 與 <strong>IndexedDB</strong>，更新網頁檔案或重開 App 後自動無損回復。</p>
           <p id="local-storage-meta" style="font-size: 10.5px; color: #047857; margin-top: 4px; font-family: monospace;"></p>
         </div>
 
@@ -1603,7 +1631,6 @@
       return { weeks, days, totalDays: diffDays, label: `${weeks}週${days}日`, short: `${weeks}w${days}d` };
     }
 
-    // 計算指定日期時，大孖 (BB A) 與細孖 (BB B) 各自的推算週數
     function getTwinGAOnTargetDate(twinId, targetDateObj) {
       const list = [...(appState.twinMeasurements[twinId] || [])]
         .filter(x => x.date && x.usGa)
@@ -1635,7 +1662,6 @@
       return { valid: true, weeks: w, days: d, label: `${w}週${d}日`, short: `${w}w${d}d` };
     }
 
-    // 取得大孖 / 細孖「即日推算週數」、「最後產檢週數」及「LMP推算週數」
     function getTwinGestationalInfo(twinId) {
       const list = [...(appState.twinMeasurements[twinId] || [])]
         .filter(x => x.date && x.usGa)
@@ -1691,7 +1717,6 @@
       return `${parseInt(parts[2], 10)}/${parseInt(parts[1], 10)}`;
     }
 
-    // 所有紀錄缺省時間一律顯示為 --:--
     function formatDisplayTime(timeStr) {
       return (timeStr && String(timeStr).trim()) ? String(timeStr).trim() : '--:--';
     }
@@ -1704,6 +1729,7 @@
     const LOCAL_ALARM_KEY = 'MCMA_LOCAL_DEVICE_ALARMS_ONLY';
     const SHORTCUT_NAME_KEY = 'MCMA_IOS_SHORTCUT_NAME';
     const SYNC_CONFIG_KEY = 'MCMA_MULTI_USER_SYNC_CONFIG';
+    const GCAL_PREFS_KEY = 'MCMA_WIFE_GCAL_PREFS';
     const IDB_NAME = 'MCMA_Guardian_DB';
     const IDB_STORE = 'app_snapshots';
 
@@ -1848,7 +1874,156 @@
     let tempMedImage = '';
 
     // =========================================================================
-    // 3. 多戶口家庭雲端同步引擎（所有工作更期及更期管理全面同步）
+    // 2B. Google Apps Script 自動匯出至「老婆」Google 日曆引擎
+    // =========================================================================
+    const WIFE_GCAL_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwfGrkqKzKIy02vY7zk-BRVdwgihOUJ9WQAM-Li6PjFWeiwc_YPjrmrAltZf5fgiKTj/exec';
+    let gcalAutoExportTimer = null;
+    let isExportingToGcal = false;
+
+    function getGcalPrefs() {
+      try {
+        const raw = localStorage.getItem(GCAL_PREFS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            autoEnabled: parsed.autoEnabled !== false,
+            includeShifts: parsed.includeShifts !== false,
+            includeGa: parsed.includeGa !== false
+          };
+        }
+      } catch (e) {}
+      return { autoEnabled: true, includeShifts: true, includeGa: true };
+    }
+
+    function saveGcalPreferences() {
+      const prefs = {
+        autoEnabled: document.getElementById('gcal-auto-enabled').checked,
+        includeShifts: document.getElementById('gcal-include-shifts').checked,
+        includeGa: document.getElementById('gcal-include-ga').checked
+      };
+      try {
+        localStorage.setItem(GCAL_PREFS_KEY, JSON.stringify(prefs));
+      } catch (e) {}
+      updateGcalStatusUI('idle');
+      showToast(prefs.autoEnabled ? '✅ 已開啟月曆改動自動匯出至老婆日曆' : '⏸️ 已暫停自動匯出（仍可手動一鍵同步）');
+    }
+
+    function updateGcalStatusUI(stateMode, customText) {
+      const btn = document.getElementById('gcal-sync-btn');
+      const hint = document.getElementById('gcal-auto-status-hint');
+      const prefs = getGcalPrefs();
+      if (btn) {
+        if (stateMode === 'syncing') btn.textContent = '⏳ 匯出老婆日曆中...';
+        else if (stateMode === 'done') btn.textContent = '✅ 已同步老婆日曆';
+        else if (stateMode === 'error') btn.textContent = '⚠️ 日曆同步異常';
+        else btn.textContent = '📅 同步老婆日曆';
+      }
+      if (hint) {
+        if (customText) {
+          hint.textContent = `· ${customText}`;
+        } else {
+          hint.textContent = prefs.autoEnabled ? '· 已啟用改動自動匯出至老婆日曆' : '· 手動匯出模式';
+        }
+      }
+    }
+
+    function scheduleAutoExportToWifeCalendar() {
+      const prefs = getGcalPrefs();
+      if (!prefs.autoEnabled) return;
+      if (gcalAutoExportTimer) clearTimeout(gcalAutoExportTimer);
+      updateGcalStatusUI('syncing', '偵測到日曆改動，準備自動匯出...');
+      gcalAutoExportTimer = setTimeout(() => {
+        exportToWifeGoogleCalendar(false);
+      }, 1500);
+    }
+
+    async function triggerManualWifeCalendarExport() {
+      if (gcalAutoExportTimer) clearTimeout(gcalAutoExportTimer);
+      await exportToWifeGoogleCalendar(true);
+    }
+
+    async function exportToWifeGoogleCalendar(showFeedback = false) {
+      if (isExportingToGcal) return;
+      isExportingToGcal = true;
+      updateGcalStatusUI('syncing', '正在寫入老婆日曆...');
+
+      try {
+        const prefs = getGcalPrefs();
+        const allDates = new Set([
+          ...(appState.events || []).map(e => e.date).filter(Boolean),
+          ...Object.keys(appState.shifts || {})
+        ]);
+
+        const gaMap = {};
+        if (prefs.includeGa) {
+          allDates.forEach(iso => {
+            const p = iso.split('-');
+            if (p.length === 3) {
+              const dObj = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+              const gaA = getTwinGAOnTargetDate('A', dObj);
+              const gaB = getTwinGAOnTargetDate('B', dObj);
+              if (gaA.valid || gaB.valid) {
+                gaMap[iso] = `大孖 A ${gaA.label || '-'} / 細孖 B ${gaB.label || '-'}`;
+              }
+            }
+          });
+        }
+
+        const cleanEvents = (appState.events || []).map(ev => ({
+          id: ev.id,
+          date: ev.date || '',
+          time: ev.time || '',
+          endDate: ev.endDate || '',
+          endTime: ev.endTime || '',
+          category: ev.category === '入院' ? '住院' : (ev.category || '覆診'),
+          location: ev.location || '',
+          title: ev.title || ''
+        }));
+
+        const payload = {
+          events: cleanEvents,
+          shifts: prefs.includeShifts ? (appState.shifts || {}) : {},
+          exportShifts: prefs.includeShifts,
+          includeGaInDesc: prefs.includeGa,
+          gaMap
+        };
+
+        const res = await fetch(WIFE_GCAL_WEBAPP_URL, {
+          method: 'POST',
+          mode: 'cors',
+          credentials: 'omit',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const nowTimeStr = new Date().toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit', hour12: false });
+        if (res.ok) {
+          let resultData = null;
+          try { resultData = await res.json(); } catch (e) {}
+          if (resultData && resultData.ok === false) {
+            updateGcalStatusUI('error', `同步失敗：${resultData.error || '權限錯誤'}`);
+            if (showFeedback) showToast(`❌ 老婆日曆同步失敗：${resultData.error}`);
+          } else {
+            const detailMsg = resultData
+              ? `新增 ${resultData.created || 0} 項、更新 ${resultData.updated || 0} 項`
+              : '已完成同步';
+            updateGcalStatusUI('done', `老婆日曆已於 ${nowTimeStr} 自動同步`);
+            if (showFeedback) showToast(`📅 已成功匯出至老婆日曆 (${detailMsg})`);
+          }
+        } else {
+          updateGcalStatusUI('error', `HTTP ${res.status}`);
+          if (showFeedback) showToast(`⚠️ 連線 Google 日曆失敗 (HTTP ${res.status})`);
+        }
+      } catch (err) {
+        updateGcalStatusUI('error', '無法連線 Google Script');
+        if (showFeedback) showToast('⚠️ 無法連線 Google Apps Script，請確認網路連線');
+      } finally {
+        isExportingToGcal = false;
+      }
+    }
+
+    // =========================================================================
+    // 3. 多戶口家庭雲端同步引擎
     // =========================================================================
     const LOCKED_FIREBASE_URL = 'https://homestocktake-default-rtdb.firebaseio.com';
     let isSyncingNow = false;
@@ -1893,7 +2068,6 @@
       return Array.from(map.values());
     }
 
-    // 合併逐日工作更期與更期選項管理（確保跨裝置全部同步且不遺失）
     function mergeShiftsAndMeta(local, remote) {
       const localShifts = local.shifts || {};
       const remoteShifts = remote.shifts || {};
@@ -2036,12 +2210,15 @@
       updateLocalMetaDisplay();
     }
 
-    async function persistAndSync() {
+    async function persistAndSync(options = {}) {
       const cfg = getSyncConfig();
       appState.updatedAt = Date.now();
       appState.lastEditor = cfg.userName;
       saveLocalOnly();
       renderAll();
+      if (options.exportCalendar) {
+        scheduleAutoExportToWifeCalendar();
+      }
       await syncWithCloud(false, true);
     }
 
@@ -2053,6 +2230,14 @@
       const shiftsSig = JSON.stringify(st.shifts || {});
       const optsSig = (st.shiftOptions || []).join(',');
       return `${st.updatedAt}_${(st.events || []).length}_${(st.maternalLogs || []).length}_${(st.twinMedia || []).length}_${optsSig}_${shiftsSig}`;
+    }
+
+    function computeCalendarSignature(st) {
+      const evCore = (st.events || []).map(e => ({
+        id: e.id, date: e.date, time: e.time, endDate: e.endDate, endTime: e.endTime,
+        category: e.category, location: e.location, title: e.title
+      }));
+      return JSON.stringify({ events: evCore, shifts: st.shifts || {} });
     }
 
     async function syncWithCloud(showToastMsg = false, hasLocalChanges = false) {
@@ -2068,6 +2253,7 @@
       setSyncUI('syncing', '同步中...');
 
       try {
+        const prevCalSig = computeCalendarSignature(appState);
         const remote = await fetchRemoteState(cfg);
         let receivedRemote = false;
 
@@ -2082,6 +2268,10 @@
               renderCalendarDayEvents(selectedCalendarDate);
             }
             receivedRemote = true;
+            // 若遠端家庭成員修改了月曆或工作更期，本機亦自動同步匯出至老婆日曆
+            if (computeCalendarSignature(appState) !== prevCalSig) {
+              scheduleAutoExportToWifeCalendar();
+            }
           }
         }
 
@@ -2113,9 +2303,13 @@
 
     function openSyncModal() {
       const cfg = getSyncConfig();
+      const prefs = getGcalPrefs();
       document.getElementById('sync-user-name').value = cfg.userName;
       document.getElementById('sync-code-input').value = cfg.familyCode;
       document.getElementById('sync-firebase-url').value = LOCKED_FIREBASE_URL;
+      document.getElementById('gcal-auto-enabled').checked = prefs.autoEnabled;
+      document.getElementById('gcal-include-shifts').checked = prefs.includeShifts;
+      document.getElementById('gcal-include-ga').checked = prefs.includeGa;
       updateLocalMetaDisplay();
       openModal('modal-sync');
     }
@@ -2178,9 +2372,9 @@
           const imported = JSON.parse(e.target.result);
           if (imported && imported.twinMeasurements) {
             appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...imported });
-            await persistAndSync();
+            await persistAndSync({ exportCalendar: true });
             closeAllModals();
-            showToast('✅ 成功匯入備份並同步至 Firebase');
+            showToast('✅ 成功匯入備份並同步至 Firebase 與老婆日曆');
           } else {
             showToast('❌ 備份檔案格式不正確');
           }
@@ -2370,14 +2564,12 @@
       renderExerciseTab();
     }
 
-    // 主頁面頂部徽章改為用 LMP 計算孕週
     function renderHeader() {
       const lmpGa = getGestationalAgeForDate(new Date());
       document.getElementById('header-ga-badge').textContent = `LMP ${lmpGa.label} (${lmpGa.short})`;
       document.getElementById('header-edd-text').textContent = getCalculatedEDD();
     }
 
-    // 針對單一指標向歷史紀錄獨立回溯尋找最近一筆非空數值（例如 1/11 的 FHR、5/11 的 CRL）
     function getLatestValidTwinMetric(sortedListDesc, fieldKey) {
       for (const rec of sortedListDesc) {
         if (rec[fieldKey] !== '' && rec[fieldKey] !== undefined && rec[fieldKey] !== null) {
@@ -2487,7 +2679,6 @@
       return { p50, p10: 120, p90: 175, unit: 'bpm' };
     }
 
-    // 胎兒卡片彈窗頁面：上方加入用 LMP 推算的週數
     function openTwinModal(twinId) {
       currentTwinModalId = twinId;
       const gaInfo = getTwinGestationalInfo(twinId);
@@ -2727,7 +2918,7 @@
     }
 
     // =========================================================================
-    // 6. 互動月曆與工作更期自訂排序/管理（住院、標題備註選填、無時間顯示 --:--）
+    // 6. 互動月曆與工作更期自訂排序/管理（改動自動匯出至老婆日曆）
     // =========================================================================
     const CATEGORY_CLASS = {
       '公立覆診': 'cat-public',
@@ -2947,9 +3138,9 @@
         appState.shifts[selectedCalendarDate] = shiftVal;
       }
       appState.shiftMeta[selectedCalendarDate] = Date.now();
-      await persistAndSync();
+      await persistAndSync({ exportCalendar: true });
       renderShiftSelectorButtons();
-      showToast(`已更新 ${formatDisplayDate(selectedCalendarDate)} 更期為「${shiftVal || '無/未定'}」並同步`);
+      showToast(`已更新 ${formatDisplayDate(selectedCalendarDate)} 更期為「${shiftVal || '無/未定'}」並自動同步日曆`);
     }
 
     async function applyCustomDayShiftOnly() {
@@ -2977,9 +3168,9 @@
       appState.shiftMeta[selectedCalendarDate] = Date.now();
       appState.shiftOptionsUpdatedAt = Date.now();
       document.getElementById('custom-shift-input').value = '';
-      await persistAndSync();
+      await persistAndSync({ exportCalendar: true });
       renderShiftSelectorButtons();
-      showToast(`✅ 已新增「${val}」至更期按鈕並同步`);
+      showToast(`✅ 已新增「${val}」並自動同步老婆日曆`);
     }
 
     async function deleteShiftOption(idx) {
@@ -3162,7 +3353,6 @@
       renderEventMediaPreview();
     }
 
-    // 行程標題/備註可選填
     async function saveCalendarEvent(e) {
       e.preventDefault();
       const cfg = getSyncConfig();
@@ -3189,22 +3379,22 @@
       if (idx >= 0) appState.events[idx] = record;
       else appState.events.push(record);
 
-      await persistAndSync();
+      await persistAndSync({ exportCalendar: true });
       if (date) openCalendarDayModal(date);
       else closeAllModals();
-      showToast('✅ 行程已儲存並即時同步');
+      showToast('✅ 行程已儲存並自動匯出至老婆日曆');
     }
 
     async function deleteCalendarEvent(evId) {
       appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), evId]));
       appState.events = appState.events.filter(item => item.id !== evId);
-      await persistAndSync();
+      await persistAndSync({ exportCalendar: true });
       renderCalendarDayEvents(selectedCalendarDate);
       showToast('🗑️ 已刪除行程');
     }
 
     // =========================================================================
-    // 7. 母體狀況、用藥清單與本機鬧鐘（鬧鐘預設為開啟當時時間）
+    // 7. 母體狀況、用藥清單與本機鬧鐘
     // =========================================================================
     function renderMaternalTab() {
       const today = getTodayStr();
@@ -3708,7 +3898,7 @@
     }, 2000);
 
     // =========================================================================
-    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像（更改分類後停留於「全部」）
+    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像（支援直接編輯日期）
     // =========================================================================
     function renderHistoryAndGalleryTab() {
       const mhList = document.getElementById('medical-history-list');
@@ -3812,7 +4002,7 @@
             type: m.type || 'image',
             source: `📅 月曆 (${catLabel})`,
             mediaCategory: m.mediaCategory || (catLabel === '住院' ? '出院紀錄' : '轉介信'),
-            date: ev.date || '',
+            date: m.customDate !== undefined ? m.customDate : (ev.date || ''),
             caption: m.customCaption || ev.title || '覆診/住院附件',
             ts: m.addedAt || ev.updatedAt || 0
           });
@@ -3831,7 +4021,7 @@
             type: m.type || 'image',
             source: '🤰 母體日記',
             mediaCategory: m.mediaCategory || '自訂',
-            date: ml.date || '',
+            date: m.customDate !== undefined ? m.customDate : (ml.date || ''),
             caption: m.customCaption || ml.feeling || ml.mood || '母體紀錄附件',
             ts: m.addedAt || ml.updatedAt || 0
           });
@@ -3848,7 +4038,7 @@
           type: 'image',
           source: `💊 藥物清單 (${med.type})`,
           mediaCategory: med.imageCategory || '藥單',
-          date: '',
+          date: med.imageDate || '',
           caption: med.name || '藥物包裝',
           ts: med.updatedAt || 0
         });
@@ -3883,12 +4073,38 @@
       const list = cachedFilteredUnifiedMedia.map(item => ({
         url: item.url,
         type: item.type,
-        caption: `[${item.mediaCategory}] ${item.source} · ${item.caption}`
+        caption: `[${item.mediaCategory}] ${item.source} · ${item.caption} (${formatDisplayDate(item.date)})`
       }));
       if (list[idx]) openMediaLightbox(list[idx].url, list[idx].type, list[idx].caption, list, idx);
     }
 
-    // 更改圖片類別後，畫面停留於「全部」類別
+    // 更改全庫影像日期（支援所有來源影像）
+    async function updateUnifiedMediaDate(uid, newDate) {
+      const parts = uid.split(':');
+      const kind = parts[0];
+      if (kind === 'twin') {
+        const item = (appState.twinMedia || []).find(x => x.id === parts[1]);
+        if (item) { item.date = newDate || ''; item.updatedAt = Date.now(); }
+      } else if (kind === 'event') {
+        const ev = (appState.events || []).find(x => x.id === parts[1]);
+        const idx = parseInt(parts[2], 10);
+        if (ev && ev.media && ev.media[idx]) { ev.media[idx].customDate = newDate || ''; ev.updatedAt = Date.now(); }
+      } else if (kind === 'maternal') {
+        const ml = (appState.maternalLogs || []).find(x => x.id === parts[1]);
+        const idx = parseInt(parts[2], 10);
+        if (ml && ml.media && ml.media[idx]) { ml.media[idx].customDate = newDate || ''; ml.updatedAt = Date.now(); }
+      } else if (kind === 'med') {
+        const med = (appState.medications || []).find(x => x.id === parts[1]);
+        if (med) { med.imageDate = newDate || ''; med.updatedAt = Date.now(); }
+      } else if (kind === 'angel') {
+        const idx = parseInt(parts[1], 10);
+        if (appState.angelMemorial?.media?.[idx]) { appState.angelMemorial.media[idx].date = newDate || ''; appState.angelMemorial.updatedAt = Date.now(); }
+      }
+
+      await persistAndSync();
+      showToast('📅 已更新影像日期並同步');
+    }
+
     async function updateUnifiedMediaCategory(uid, selectedVal) {
       let finalCat = selectedVal;
       if (selectedVal === 'CUSTOM') {
@@ -4038,6 +4254,7 @@
             }
             <span class="badge" style="background:var(--sky-100); color:var(--sky-700); align-self:flex-start;">${item.source}</span>
             <p style="font-size:10.5px; font-weight:700; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.caption}</p>
+            <input type="date" value="${item.date || ''}" onchange="updateUnifiedMediaDate('${safeUid}', this.value)" title="編輯影像日期" style="padding:2px 4px; font-size:10px; border-radius:6px; background:#fff; width:100%;">
             <select onchange="updateUnifiedMediaCategory('${safeUid}', this.value)" style="padding:3px 4px; font-size:10px; border-radius:6px; background:#fff; width:100%;">
               <option value="超聲波" ${item.mediaCategory === '超聲波' ? 'selected' : ''}>分類：超聲波</option>
               <option value="轉介信" ${item.mediaCategory === '轉介信' ? 'selected' : ''}>分類：轉介信</option>
@@ -4331,7 +4548,7 @@
     }
 
     // =========================================================================
-    // 10. 彈窗與時間選單初始化（鬧鐘預設為開啟當時時間）
+    // 10. 彈窗與時間選單初始化
     // =========================================================================
     function openModal(modalId) {
       document.getElementById('modal-backdrop').classList.remove('hidden');
@@ -4359,80 +4576,78 @@
     });
 
     function populateFullTimeSelects() {
-      let hoursHtml = `<option value="">--時</option>`;
+      let hoursHtml = `<option value="">-- 時 --</option>`;
       for (let h = 0; h < 24; h++) {
-        const val = String(h).padStart(2, '0');
-        hoursHtml += `<option value="${val}">${val}時</option>`;
+        const hh = String(h).padStart(2, '0');
+        hoursHtml += `<option value="${hh}">${hh} 時</option>`;
       }
 
-      let alarmMinsHtml = `<option value="">--分</option>`;
-      for (let m = 0; m < 60; m++) {
-        const val = String(m).padStart(2, '0');
-        alarmMinsHtml += `<option value="${val}">${val}分</option>`;
-      }
-
-      let quarterMinsHtml = `<option value="">--分</option>`;
-      ['00', '15', '30', '45'].forEach(val => {
-        quarterMinsHtml += `<option value="${val}">${val}分</option>`;
+      let quarterMinsHtml = `<option value="">-- 分 --</option>`;
+      ['00', '15', '30', '45'].forEach(mm => {
+        quarterMinsHtml += `<option value="${mm}">${mm} 分</option>`;
       });
 
-      ['mat-hour', 'alarm-hour', 'tm-hour', 'ev-hour', 'ev-end-hour'].forEach(id => {
+      ['ev-hour', 'ev-end-hour', 'mat-hour', 'tm-hour'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = hoursHtml;
       });
-
-      const alarmMinEl = document.getElementById('alarm-min');
-      if (alarmMinEl) alarmMinEl.innerHTML = alarmMinsHtml;
-
-      ['mat-min', 'tm-min', 'ev-min', 'ev-end-min'].forEach(id => {
+      ['ev-min', 'ev-end-min', 'mat-min', 'tm-min'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = quarterMinsHtml;
       });
+
+      const alarmHourEl = document.getElementById('alarm-hour');
+      const alarmMinEl = document.getElementById('alarm-min');
+      if (alarmHourEl) {
+        let ah = `<option value="">-- 時 --</option>`;
+        for (let h = 0; h < 24; h++) ah += `<option value="${String(h).padStart(2, '0')}">${String(h).padStart(2, '0')} 時</option>`;
+        alarmHourEl.innerHTML = ah;
+      }
+      if (alarmMinEl) {
+        let am = `<option value="">-- 分 --</option>`;
+        for (let m = 0; m < 60; m++) am += `<option value="${String(m).padStart(2, '0')}">${String(m).padStart(2, '0')} 分</option>`;
+        alarmMinEl.innerHTML = am;
+      }
     }
 
-    function showToast(message) {
+    function showToast(msg) {
       const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = 'toast-msg';
-      toast.textContent = message;
-      container.appendChild(toast);
+      const el = document.createElement('div');
+      el.className = 'toast-msg';
+      el.textContent = msg;
+      container.appendChild(el);
       setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.25s';
-        setTimeout(() => toast.remove(), 260);
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.3s';
+        setTimeout(() => el.remove(), 300);
       }, 2800);
     }
 
+    // 啟動應用程式
     window.addEventListener('DOMContentLoaded', async () => {
       populateFullTimeSelects();
       document.getElementById('mat-date').value = getTodayStr();
-      const now = new Date();
-      const nowHourStr = String(now.getHours()).padStart(2, '0');
-      const nowMinStr = String(now.getMinutes()).padStart(2, '0');
-
-      document.getElementById('mat-hour').value = nowHourStr;
-      document.getElementById('mat-min').value = String(Math.floor(now.getMinutes() / 15) * 15).padStart(2, '0');
-      document.getElementById('mat-mood').value = '';
-      document.getElementById('mat-bleeding').value = '';
-
-      // 鬧鐘預設為當時時間
-      document.getElementById('alarm-hour').value = nowHourStr;
-      document.getElementById('alarm-min').value = nowMinStr;
-
       initHorizontalSwipe();
-      switchTab(0);
-      renderAll();
+      updateGcalStatusUI('idle');
 
-      const idbState = await readFromIDB();
-      if (idbState && idbState.twinMeasurements && (idbState.updatedAt || 0) > (appState.updatedAt || 0)) {
-        appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...idbState });
+      const idbSnapshot = await readFromIDB();
+      if (idbSnapshot && (idbSnapshot.updatedAt || 0) > (appState.updatedAt || 0)) {
+        appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...idbSnapshot });
         saveLocalOnly();
-        renderAll();
+      } else {
+        saveLocalOnly();
       }
 
-      syncWithCloud(false, false);
+      renderAll();
+      manageWakeLock();
+
+      await syncWithCloud(false, false);
+      setInterval(() => syncWithCloud(false, false), 6000);
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) syncWithCloud(false, false);
+        if (document.visibilityState === 'visible') {
+          syncWithCloud(false, false);
+          manageWakeLock();
+        }
       });
     });
   </script>
