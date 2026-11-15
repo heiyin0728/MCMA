@@ -129,7 +129,7 @@
       gap: 10px;
     }
 
-    /* 影像庫專用雙卡片並排網格（嚴格限制兩張卡片在頁面內，不超出邊界） */
+    /* 影像庫專用雙卡片並排網格 */
     .media-grid-2 {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -450,7 +450,7 @@
       justify-content: center;
     }
 
-    /* 月曆樣式（星期一為第一天、星期日為最後一天；本月深色、上下月淺色） */
+    /* 月曆樣式 */
     .cal-weekdays {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -637,7 +637,7 @@
       justify-content: center;
     }
 
-    /* 全螢幕圖片/影片燈箱（支援左右滑動切換前後圖片） */
+    /* 全螢幕圖片/影片燈箱 */
     .lightbox-overlay {
       position: fixed;
       inset: 0;
@@ -738,7 +738,7 @@
   <!-- Toast 提示容器 -->
   <div id="toast-container"></div>
 
-  <!-- 全螢幕圖片/影片放大檢視器（支援左右滑動切換前後圖片） -->
+  <!-- 全螢幕圖片/影片放大檢視器 -->
   <div id="media-lightbox" onclick="closeMediaLightbox(event)" class="lightbox-overlay hidden">
     <div style="width:100%; max-width:94vw; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; color:#fff; gap:8px;">
       <div style="min-width:0;">
@@ -774,7 +774,7 @@
           <div style="min-width: 0;">
             <div class="flex-center" style="flex-wrap: wrap; gap: 5px;">
               <h1 style="font-size: 16px; font-weight: 800; color: #0f172a;">MCMA守護寶</h1>
-              <span id="header-ga-badge" class="ga-badge">計算中...</span>
+              <span id="header-ga-badge" class="ga-badge">LMP 計算中...</span>
             </div>
             <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
               預產期：<strong id="header-edd-text" style="color: #334155;">27/6/2027</strong>
@@ -827,7 +827,7 @@
     <!-- ==================== 分頁 0：主頁概覽 ==================== -->
     <section id="tab-0" class="tab-panel">
       <div class="grid-2" style="margin-bottom: 12px;">
-        <!-- BB A 卡片（主頁只顯示即時推算當日週數，不截斷） -->
+        <!-- BB A 卡片 -->
         <div onclick="openTwinModal('A')" class="twin-card twin-card-a">
           <div class="flex-between" style="align-items: flex-start; margin-bottom: 6px; gap: 4px;">
             <div class="flex-center" style="min-width: 0; gap: 6px;">
@@ -847,7 +847,7 @@
           <div id="twin-A-summary"></div>
         </div>
 
-        <!-- BB B 卡片（主頁只顯示即時推算當日週數，不截斷） -->
+        <!-- BB B 卡片 -->
         <div onclick="openTwinModal('B')" class="twin-card twin-card-b">
           <div class="flex-between" style="align-items: flex-start; margin-bottom: 6px; gap: 4px;">
             <div class="flex-center" style="min-width: 0; gap: 6px;">
@@ -871,7 +871,7 @@
       <!-- 雙胎發育同步對比條 -->
       <div id="twin-pace-strip" class="card flex-between" style="padding: 10px 14px; font-size: 12px; flex-wrap: wrap;"></div>
 
-      <!-- 互動月曆（第一天星期一、最後一天星期日；本月深色、上下月淺色） -->
+      <!-- 互動月曆 -->
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 10px;">
           <div class="flex-center">
@@ -881,7 +881,7 @@
           </div>
           <div class="flex-center">
             <button onclick="jumpToToday()" class="btn btn-soft-rose">今日</button>
-            <button onclick="openEventEditor(null, getTodayStr())" class="btn btn-dark">+ 新增日程/入院</button>
+            <button onclick="openEventEditor(null, getTodayStr())" class="btn btn-dark">+ 新增日程/住院</button>
           </div>
         </div>
 
@@ -889,7 +889,7 @@
           <span><b style="color:#3b82f6;">■</b> 公立</span>
           <span><b style="color:#f43f5e;">■</b> 私家</span>
           <span><b style="color:#dc2626;">■</b> 急症室</span>
-          <span><b style="color:#f59e0b;">■</b> 入院(跨日)</span>
+          <span><b style="color:#f59e0b;">■</b> 住院(跨日)</span>
           <span><b style="color:#10b981;">■</b> 睇中醫</span>
           <span><span class="badge" style="background:#e2e8f0; color:#334155;">更</span> 工作更期</span>
         </div>
@@ -910,7 +910,7 @@
     <!-- ==================== 分頁 1：母體與用藥 ==================== -->
     <section id="tab-1" class="tab-panel hidden">
       <div class="grid-resp-2">
-        <!-- 今日母體概覽（縮小字體，若無輸入項目顯示空白） -->
+        <!-- 今日母體概覽 -->
         <div class="card">
           <div class="flex-between" style="margin-bottom: 8px;">
             <h3 style="font-size: 13px; font-weight: 800;">🤰 今日母體概覽</h3>
@@ -929,7 +929,7 @@
         </div>
       </div>
 
-      <!-- 記錄母體當刻活動、心情與身體狀況（除日期時間外，所有項目預設空白） -->
+      <!-- 記錄母體當刻活動、心情與身體狀況 -->
       <div class="card">
         <h3 style="font-size: 14px; font-weight: 800; margin-bottom: 10px;">📝 記錄母體當刻活動、心情與身體狀況</h3>
         <form onsubmit="saveMaternalLog(event)" style="display: flex; flex-direction: column; gap: 10px;">
@@ -1101,12 +1101,12 @@
         </div>
       </div>
 
-      <!-- 全庫所有上載影像時序總覽（分類切換 + 編輯與刪除功能） -->
+      <!-- 全庫所有上載影像時序總覽 -->
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div>
             <h3 style="font-size: 14px; font-weight: 800;">🗂️ 全庫上載影像時序總覽</h3>
-            <p style="font-size: 11px; color: var(--text-muted);">選擇分類後自動跳轉至該分類頁面，支援隨時編輯備註或刪除影像</p>
+            <p style="font-size: 11px; color: var(--text-muted);">選擇分類篩選或更改圖片類別（更改分類後畫面維持停留於「全部」），支援隨時編輯備註或刪除影像</p>
           </div>
           <span id="all-media-count-badge" class="badge" style="background: var(--rose-100); color: var(--rose-700);">0 個</span>
         </div>
@@ -1118,7 +1118,7 @@
       </div>
     </section>
 
-    <!-- ==================== 分頁 3（最後一頁）：安全運動 ==================== -->
+    <!-- ==================== 分頁 3：安全運動 ==================== -->
     <section id="tab-3" class="tab-panel hidden">
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 10px;">
@@ -1168,7 +1168,7 @@
   <!-- ==================== 彈出視窗群 ==================== -->
   <div id="modal-backdrop" onclick="handleBackdropClick(event)" class="modal-backdrop hidden">
 
-    <!-- 1. 胎兒成長曲線（彈窗內同時顯示「即日推算週數」及「最後產檢週數」，並支援左右滑動切換大/細孖） -->
+    <!-- 1. 胎兒成長曲線（加入 LMP 推算週數 + 即日推算週數 + 最後產檢週數） -->
     <div id="modal-twin" class="modal-box hidden">
       <div class="modal-header">
         <div class="flex-center" style="flex-wrap: wrap;">
@@ -1179,7 +1179,7 @@
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <div class="modal-body" id="modal-twin-body" style="display: flex; flex-direction: column; gap: 12px;">
-        <div id="twin-modal-ga-compare" class="grid-2" style="gap: 8px;"></div>
+        <div id="twin-modal-ga-compare" class="grid-resp-3" style="gap: 8px;"></div>
 
         <div style="font-size: 11px; color: var(--text-muted); text-align: center; background: #f8fafc; padding: 4px 8px; border-radius: 8px;">
           👈 在此頁面左右滑動可快速切換瀏覽大孖 (BB A) 與細孖 (BB B) 👉
@@ -1271,7 +1271,7 @@
       </div>
     </div>
 
-    <!-- 2. 月曆單日詳情與工作更期自訂管理彈窗（支援左右滑動切換前後一日 + 工作更期自訂排序） -->
+    <!-- 2. 月曆單日詳情與工作更期自訂管理彈窗 -->
     <div id="modal-calendar-day" class="modal-box hidden">
       <div class="modal-header">
         <div class="flex-center" style="gap: 6px;">
@@ -1289,7 +1289,7 @@
           👈 左右滑動或點擊頂部 ‹ › 可切換至前一日 / 後一日 👉
         </div>
 
-        <!-- 工作更期自訂管理（支援新增、刪減及自訂左右排序） -->
+        <!-- 工作更期自訂管理（全部同步） -->
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="margin-bottom: 6px;">
             <label class="label-sm" style="margin: 0;">💼 當日工作更期 <span id="current-day-shift-badge" class="badge" style="background:#e2e8f0; color:#334155; margin-left:4px;">無/未定</span></label>
@@ -1302,7 +1302,7 @@
             <button type="button" onclick="addShiftOptionAndApply()" class="btn btn-sky" style="padding: 6px 10px;">+ 加入按鈕</button>
           </div>
           <p id="shift-manage-hint" class="hidden" style="font-size: 10.5px; color: var(--rose-600); margin-top: 5px; font-weight: 600;">
-            💡 管理與排序模式已開啟：點擊「‹」「›」可調整更期按鈕排序，點擊「✕」可刪減該更期選項。
+            💡 管理與排序模式已開啟：點擊「‹」「›」可調整更期按鈕排序，點擊「✕」可刪減該更期選項（全部變更即時同步）。
           </p>
         </div>
 
@@ -1315,7 +1315,7 @@
         </div>
 
         <form id="cal-event-form" onsubmit="saveCalendarEvent(event)" style="background: var(--rose-50); border: 1px solid var(--rose-200); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-          <h4 id="cal-form-heading" style="font-size: 12px; font-weight: 800;">➕ 新增 / 編輯行程 (支援分開設定入院及出院時間)</h4>
+          <h4 id="cal-form-heading" style="font-size: 12px; font-weight: 800;">➕ 新增 / 編輯行程 (支援分開設定住院及出院時間)</h4>
           <input type="hidden" id="ev-id">
           <div>
             <label class="label-sm">類別</label>
@@ -1323,13 +1323,13 @@
               <option value="公立覆診">公立覆診 (藍色)</option>
               <option value="私家覆診">私家覆診 (粉紫)</option>
               <option value="急症室">急症室 (紅色)</option>
-              <option value="入院">入院 (橙黃 · 支援跨日及出入時間)</option>
+              <option value="住院">住院 (橙黃 · 支援跨日及出入時間)</option>
               <option value="睇中醫">睇中醫 (綠色)</option>
             </select>
           </div>
 
           <div style="background: rgba(255,255,255,0.75); border: 1px solid #fecdd3; border-radius: 10px; padding: 8px;">
-            <label class="label-sm" style="color: var(--rose-700);">🏥 入院 / 開始日期及時間 (可留空)</label>
+            <label class="label-sm" style="color: var(--rose-700);">🏥 住院 / 開始日期及時間 (可留空)</label>
             <div class="grid-2">
               <input type="date" id="ev-date" onchange="syncMinEndDate()">
               <div style="display: flex; gap: 4px;">
@@ -1366,8 +1366,8 @@
           </div>
 
           <div>
-            <label class="label-sm">標題 / 備註</label>
-            <input type="text" id="ev-title" required placeholder="例如：早孕期超聲波 / 安胎住院觀察">
+            <label class="label-sm">標題 / 備註 (選填 / 可留空)</label>
+            <input type="text" id="ev-title" placeholder="選填，例如：早孕期超聲波 / 安胎住院觀察">
           </div>
 
           <div>
@@ -1584,9 +1584,9 @@
 
   <script>
     // =========================================================================
-    // 1. 隱形基準計算與大孖(BB A)、細孖(BB B)雙週數計算引擎
+    // 1. 隱形 LMP 基準計算與大孖(BB A)、細孖(BB B)雙週數計算引擎
     // =========================================================================
-    const INTERNAL_BASE_MS = new Date(2026, 8, 19, 0, 0, 0).getTime();
+    const INTERNAL_BASE_MS = new Date(2026, 8, 19, 0, 0, 0).getTime(); // 2026-09-19 (LMP)
     const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
     function getCalculatedEDD() {
@@ -1635,14 +1635,16 @@
       return { valid: true, weeks: w, days: d, label: `${w}週${d}日`, short: `${w}w${d}d` };
     }
 
-    // 取得大孖 / 細孖「即日推算週數」及「最後產檢週數」（供主頁與內頁分別調用）
+    // 取得大孖 / 細孖「即日推算週數」、「最後產檢週數」及「LMP推算週數」
     function getTwinGestationalInfo(twinId) {
       const list = [...(appState.twinMeasurements[twinId] || [])]
         .filter(x => x.date && x.usGa)
         .sort((a, b) => b.date.localeCompare(a.date));
       const latest = list[0];
 
-      const todayGA = getTwinGAOnTargetDate(twinId, new Date());
+      const todayDate = new Date();
+      const todayGA = getTwinGAOnTargetDate(twinId, todayDate);
+      const lmpGA = getGestationalAgeForDate(todayDate);
       let lastScanDate = '12/11/2026';
       let lastScanGa = twinId === 'A' ? '7週2日 (7w2d)' : '7週0日 (7w0d)';
 
@@ -1658,6 +1660,7 @@
         liveShort: `即日 ${todayGA.label}`,
         liveFull: todayGA.label,
         liveCompact: todayGA.short,
+        lmpFull: `${lmpGA.label} (${lmpGA.short})`,
         lastScanDate,
         lastScanGa
       };
@@ -1688,8 +1691,13 @@
       return `${parseInt(parts[2], 10)}/${parseInt(parts[1], 10)}`;
     }
 
+    // 所有紀錄缺省時間一律顯示為 --:--
+    function formatDisplayTime(timeStr) {
+      return (timeStr && String(timeStr).trim()) ? String(timeStr).trim() : '--:--';
+    }
+
     // =========================================================================
-    // 2. 雙層本機永久儲存 (localStorage + IndexedDB，具備無痕模式容錯)
+    // 2. 雙層本機永久儲存 (localStorage + IndexedDB)
     // =========================================================================
     const STORAGE_KEY = 'MCMA_GUARDIAN_PERMANENT_DATA';
     const LEGACY_KEYS = ['MCMA_GUARDIAN_DATA_V1', 'MCMA_STATE_DATA'];
@@ -1703,6 +1711,7 @@
 
     const DEFAULT_STATE = {
       updatedAt: 0,
+      shiftOptionsUpdatedAt: 0,
       lastEditor: '',
       twinAvatars: { A: '', B: '' },
       twinMeasurements: {
@@ -1719,10 +1728,11 @@
       },
       shiftOptions: [...DEFAULT_SHIFT_OPTIONS],
       shifts: { '2026-11-14': '放假', '2026-11-15': '放假', '2026-11-16': '早更' },
+      shiftMeta: {},
       events: [
         {
           id: 'ev-hosp-sample', date: '2026-11-01', time: '14:00', endDate: '2026-11-04', endTime: '11:30',
-          category: '入院', location: 'TMH',
+          category: '住院', location: 'TMH',
           title: '孕初期流啡安胎住院觀察 (1/11 至 4/11)',
           media: [], updatedAt: 1730440800000, updatedBy: '系統預設'
         },
@@ -1758,6 +1768,15 @@
       },
       deletedIds: []
     };
+
+    function migrateLegacyHospCategory(stateObj) {
+      if (stateObj && Array.isArray(stateObj.events)) {
+        stateObj.events.forEach(ev => {
+          if (ev.category === '入院') ev.category = '住院';
+        });
+      }
+      return stateObj;
+    }
 
     function openGuardianIDB() {
       return new Promise((resolve, reject) => {
@@ -1806,7 +1825,7 @@
           const raw = localStorage.getItem(k);
           if (raw) {
             const parsed = JSON.parse(raw);
-            if (parsed && parsed.twinMeasurements) return { ...DEFAULT_STATE, ...parsed };
+            if (parsed && parsed.twinMeasurements) return migrateLegacyHospCategory({ ...DEFAULT_STATE, ...parsed });
           }
         } catch (e) {}
       }
@@ -1829,7 +1848,7 @@
     let tempMedImage = '';
 
     // =========================================================================
-    // 3. 多戶口家庭雲端同步引擎（已鎖定 homestocktake-default-rtdb.firebaseio.com）
+    // 3. 多戶口家庭雲端同步引擎（所有工作更期及更期管理全面同步）
     // =========================================================================
     const LOCKED_FIREBASE_URL = 'https://homestocktake-default-rtdb.firebaseio.com';
     let isSyncingNow = false;
@@ -1874,26 +1893,72 @@
       return Array.from(map.values());
     }
 
+    // 合併逐日工作更期與更期選項管理（確保跨裝置全部同步且不遺失）
+    function mergeShiftsAndMeta(local, remote) {
+      const localShifts = local.shifts || {};
+      const remoteShifts = remote.shifts || {};
+      const localMeta = local.shiftMeta || {};
+      const remoteMeta = remote.shiftMeta || {};
+      const allDates = new Set([...Object.keys(localShifts), ...Object.keys(remoteShifts), ...Object.keys(localMeta), ...Object.keys(remoteMeta)]);
+
+      const mergedShifts = {};
+      const mergedMeta = {};
+      const remoteOverallNewer = (remote.updatedAt || 0) >= (local.updatedAt || 0);
+
+      allDates.forEach(dateKey => {
+        const lTs = localMeta[dateKey] || 0;
+        const rTs = remoteMeta[dateKey] || 0;
+        let useRemote = false;
+
+        if (rTs > lTs) useRemote = true;
+        else if (lTs > rTs) useRemote = false;
+        else useRemote = remoteOverallNewer;
+
+        const chosenVal = useRemote ? remoteShifts[dateKey] : localShifts[dateKey];
+        const chosenTs = Math.max(lTs, rTs);
+
+        if (chosenVal) {
+          mergedShifts[dateKey] = chosenVal;
+        }
+        if (chosenTs > 0 || chosenVal) {
+          mergedMeta[dateKey] = chosenTs;
+        }
+      });
+
+      const localOptTs = local.shiftOptionsUpdatedAt || local.updatedAt || 0;
+      const remoteOptTs = remote.shiftOptionsUpdatedAt || remote.updatedAt || 0;
+      const useRemoteOpts = remoteOptTs >= localOptTs;
+      const mergedShiftOptions = useRemoteOpts && Array.isArray(remote.shiftOptions)
+        ? [...remote.shiftOptions]
+        : (Array.isArray(local.shiftOptions) ? [...local.shiftOptions] : [...DEFAULT_SHIFT_OPTIONS]);
+
+      return {
+        shifts: mergedShifts,
+        shiftMeta: mergedMeta,
+        shiftOptions: mergedShiftOptions,
+        shiftOptionsUpdatedAt: Math.max(localOptTs, remoteOptTs)
+      };
+    }
+
     function smartMergeStates(local, remote) {
       if (!remote || !remote.twinMeasurements) return { state: local, changed: false };
       const deletedSet = new Set([...(local.deletedIds || []), ...(remote.deletedIds || [])]);
       const remoteNewer = (remote.updatedAt || 0) > (local.updatedAt || 0);
+      const shiftMerged = mergeShiftsAndMeta(local, remote);
 
-      const merged = {
+      const merged = migrateLegacyHospCategory({
         ...DEFAULT_STATE,
         ...(remoteNewer ? remote : local),
         updatedAt: Math.max(local.updatedAt || 0, remote.updatedAt || 0),
         lastEditor: remoteNewer ? (remote.lastEditor || '') : (local.lastEditor || ''),
         deletedIds: Array.from(deletedSet),
-        shiftOptions: remoteNewer && Array.isArray(remote.shiftOptions)
-          ? remote.shiftOptions
-          : (Array.isArray(local.shiftOptions) ? local.shiftOptions : [...DEFAULT_SHIFT_OPTIONS]),
+        shiftOptions: shiftMerged.shiftOptions,
+        shiftOptionsUpdatedAt: shiftMerged.shiftOptionsUpdatedAt,
+        shifts: shiftMerged.shifts,
+        shiftMeta: shiftMerged.shiftMeta,
         twinAvatars: remoteNewer
           ? { ...local.twinAvatars, ...remote.twinAvatars }
           : { ...remote.twinAvatars, ...local.twinAvatars },
-        shifts: remoteNewer
-          ? { ...local.shifts, ...remote.shifts }
-          : { ...remote.shifts, ...local.shifts },
         twinMeasurements: {
           A: mergeArrayById(local.twinMeasurements?.A, remote.twinMeasurements?.A, deletedSet),
           B: mergeArrayById(local.twinMeasurements?.B, remote.twinMeasurements?.B, deletedSet)
@@ -1906,7 +1971,7 @@
         angelMemorial: ((remote.angelMemorial?.updatedAt || 0) > (local.angelMemorial?.updatedAt || 0))
           ? remote.angelMemorial
           : local.angelMemorial
-      };
+      });
 
       const changed = JSON.stringify(merged) !== JSON.stringify(local);
       return { state: merged, changed };
@@ -1984,9 +2049,15 @@
       await syncWithCloud(true, false);
     }
 
+    function computeStateSignature(st) {
+      const shiftsSig = JSON.stringify(st.shifts || {});
+      const optsSig = (st.shiftOptions || []).join(',');
+      return `${st.updatedAt}_${(st.events || []).length}_${(st.maternalLogs || []).length}_${(st.twinMedia || []).length}_${optsSig}_${shiftsSig}`;
+    }
+
     async function syncWithCloud(showToastMsg = false, hasLocalChanges = false) {
       if (isSyncingNow) return;
-      const currentSig = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}_${(appState.shiftOptions || []).join(',')}`;
+      const currentSig = computeStateSignature(appState);
       if (!hasLocalChanges && !showToastMsg && lastSyncedSignature === currentSig && appState.updatedAt > 0) {
         return;
       }
@@ -2006,6 +2077,10 @@
             appState = merged.state;
             saveLocalOnly();
             renderAll();
+            if (!document.getElementById('modal-calendar-day').classList.contains('hidden')) {
+              renderShiftSelectorButtons();
+              renderCalendarDayEvents(selectedCalendarDate);
+            }
             receivedRemote = true;
           }
         }
@@ -2017,7 +2092,7 @@
         }
 
         if ((remote || pushOk) && !window._lastSyncErr) {
-          lastSyncedSignature = `${appState.updatedAt}_${(appState.events || []).length}_${(appState.maternalLogs || []).length}_${(appState.twinMedia || []).length}_${(appState.shiftOptions || []).join(',')}`;
+          lastSyncedSignature = computeStateSignature(appState);
           setSyncUI('ok', '已同步');
           if (receivedRemote) {
             const who = remote.lastEditor ? ` (${remote.lastEditor})` : '';
@@ -2102,7 +2177,7 @@
         try {
           const imported = JSON.parse(e.target.result);
           if (imported && imported.twinMeasurements) {
-            appState = { ...DEFAULT_STATE, ...imported };
+            appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...imported });
             await persistAndSync();
             closeAllModals();
             showToast('✅ 成功匯入備份並同步至 Firebase');
@@ -2117,7 +2192,7 @@
     }
 
     // =========================================================================
-    // 4. 分頁切換 + 左右滑動支援（含主畫面分頁、大/細孖彈窗、日程詳情彈窗前後一日）
+    // 4. 分頁切換 + 左右滑動支援
     // =========================================================================
     function switchTab(index) {
       if (index < 0 || index > 3) return;
@@ -2243,7 +2318,6 @@
         }, { passive: true });
       }
 
-      // 編輯日程彈窗左右滑動切換前一日 / 後一日
       const calDayModal = document.getElementById('modal-calendar-day');
       if (calDayModal) {
         let cdStartX = 0, cdStartY = 0;
@@ -2285,7 +2359,7 @@
     }
 
     // =========================================================================
-    // 5. 頂部大孖/細孖雙週數顯示、主頁卡片與成長曲線內頁
+    // 5. 頂部 LMP 徽章、主頁卡片獨立回溯各項最後檢查數據、成長曲線頁面
     // =========================================================================
     function renderAll() {
       renderHeader();
@@ -2296,11 +2370,21 @@
       renderExerciseTab();
     }
 
+    // 主頁面頂部徽章改為用 LMP 計算孕週
     function renderHeader() {
-      const infoA = getTwinGestationalInfo('A');
-      const infoB = getTwinGestationalInfo('B');
-      document.getElementById('header-ga-badge').textContent = `A:${infoA.liveCompact} / B:${infoB.liveCompact}`;
+      const lmpGa = getGestationalAgeForDate(new Date());
+      document.getElementById('header-ga-badge').textContent = `LMP ${lmpGa.label} (${lmpGa.short})`;
       document.getElementById('header-edd-text').textContent = getCalculatedEDD();
+    }
+
+    // 針對單一指標向歷史紀錄獨立回溯尋找最近一筆非空數值（例如 1/11 的 FHR、5/11 的 CRL）
+    function getLatestValidTwinMetric(sortedListDesc, fieldKey) {
+      for (const rec of sortedListDesc) {
+        if (rec[fieldKey] !== '' && rec[fieldKey] !== undefined && rec[fieldKey] !== null) {
+          return { value: rec[fieldKey], date: rec.date || '' };
+        }
+      }
+      return null;
     }
 
     function renderTwinCards() {
@@ -2315,37 +2399,53 @@
         if (liveGaEl) liveGaEl.textContent = gaInfo.liveShort;
 
         const list = [...(appState.twinMeasurements[id] || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        const latest = list[0];
         const summaryEl = document.getElementById(`twin-${id}-summary`);
 
-        if (!latest) {
+        if (list.length === 0) {
           summaryEl.innerHTML = `<p style="font-size:11px; color:#94a3b8;">暫無量度紀錄，點擊新增</p>`;
           return;
         }
 
+        const latestAny = list[0];
+        const latestCrl = getLatestValidTwinMetric(list, 'crl');
+        const latestFhr = getLatestValidTwinMetric(list, 'fhr');
+        const latestEfw = getLatestValidTwinMetric(list, 'efw');
+
+        const extraItems = [];
+        if (latestEfw) extraItems.push(`EFW: ${latestEfw.value}g (${formatShortDate(latestEfw.date)})`);
+
         summaryEl.innerHTML = `
           <div style="font-size: 11px; color: var(--text-muted);">
-            <span>最後檢查：${formatDisplayDate(latest.date)}</span>
+            <span>最後產檢：${formatDisplayDate(latestAny.date)}</span>
           </div>
           <div class="grid-2" style="gap: 6px;">
             <div class="stat-box">
-              <span style="font-size: 10px; color: #94a3b8; display: block;">CRL 頭臀長</span>
-              <strong style="font-size: 12px;">${latest.crl ? latest.crl + ' mm' : '-'}</strong>
+              <div class="flex-between" style="gap:2px;">
+                <span style="font-size: 10px; color: #94a3b8;">CRL 頭臀長</span>
+                ${latestCrl && latestCrl.date ? `<span style="font-size: 9px; color: #64748b;">${formatShortDate(latestCrl.date)}</span>` : ''}
+              </div>
+              <strong style="font-size: 12px;">${latestCrl ? latestCrl.value + ' mm' : '-'}</strong>
             </div>
             <div class="stat-box">
-              <span style="font-size: 10px; color: #94a3b8; display: block;">FHR 胎心率</span>
-              <strong style="font-size: 12px; color: var(--rose-600);">${latest.fhr ? latest.fhr + ' bpm' : '-'}</strong>
+              <div class="flex-between" style="gap:2px;">
+                <span style="font-size: 10px; color: #94a3b8;">FHR 胎心率</span>
+                ${latestFhr && latestFhr.date ? `<span style="font-size: 9px; color: #64748b;">${formatShortDate(latestFhr.date)}</span>` : ''}
+              </div>
+              <strong style="font-size: 12px; color: var(--rose-600);">${latestFhr ? latestFhr.value + ' bpm' : '-'}</strong>
             </div>
           </div>
+          ${extraItems.length > 0 ? `<div style="font-size:10px; color:#475569; margin-top:4px;">${extraItems.join(' · ')}</div>` : ''}
         `;
       });
 
-      const latestA = [...(appState.twinMeasurements.A || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
-      const latestB = [...(appState.twinMeasurements.B || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+      const listA = [...(appState.twinMeasurements.A || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      const listB = [...(appState.twinMeasurements.B || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      const crlA = getLatestValidTwinMetric(listA, 'crl');
+      const crlB = getLatestValidTwinMetric(listB, 'crl');
       const paceEl = document.getElementById('twin-pace-strip');
-      if (latestA && latestB && latestA.crl && latestB.crl) {
-        const diff = Math.abs(latestA.crl - latestB.crl).toFixed(1);
-        const pct = ((diff / Math.max(latestA.crl, latestB.crl)) * 100).toFixed(0);
+      if (crlA && crlB) {
+        const diff = Math.abs(Number(crlA.value) - Number(crlB.value)).toFixed(1);
+        const pct = ((diff / Math.max(Number(crlA.value), Number(crlB.value))) * 100).toFixed(0);
         paceEl.innerHTML = `
           <div>⚖️ <strong>雙胎生長同步對比：</strong>CRL 相差 <strong>${diff}mm</strong> (${pct}%)</div>
           <span class="badge" style="background:${pct <= 15 ? 'var(--emerald-100)' : 'var(--amber-100)'}; color:${pct <= 15 ? 'var(--emerald-800)' : 'var(--amber-800)'};">
@@ -2387,6 +2487,7 @@
       return { p50, p10: 120, p90: 175, unit: 'bpm' };
     }
 
+    // 胎兒卡片彈窗頁面：上方加入用 LMP 推算的週數
     function openTwinModal(twinId) {
       currentTwinModalId = twinId;
       const gaInfo = getTwinGestationalInfo(twinId);
@@ -2401,13 +2502,17 @@
         const themeBorder = twinId === 'A' ? 'var(--sky-200)' : 'var(--pink-200)';
         const themeCol = twinId === 'A' ? 'var(--sky-700)' : 'var(--pink-700)';
         compareBox.innerHTML = `
+          <div style="background:var(--rose-50); border:1px solid var(--rose-200); border-radius:10px; padding:8px 10px;">
+            <span style="font-size:10.5px; color:#475569; display:block;">🗓️ LMP 推算週數</span>
+            <strong style="font-size:13.5px; color:var(--rose-700);">${gaInfo.lmpFull}</strong>
+          </div>
           <div style="background:${themeBg}; border:1px solid ${themeBorder}; border-radius:10px; padding:8px 10px;">
             <span style="font-size:10.5px; color:#475569; display:block;">📅 即日推算週數 (${formatDisplayDate(getTodayStr())})</span>
-            <strong style="font-size:14px; color:${themeCol};">${gaInfo.liveFull}</strong>
+            <strong style="font-size:13.5px; color:${themeCol};">${gaInfo.liveFull}</strong>
           </div>
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px;">
             <span style="font-size:10.5px; color:#475569; display:block;">🩺 最後產檢週數 (${gaInfo.lastScanDate})</span>
-            <strong style="font-size:14px; color:#0f172a;">${gaInfo.lastScanGa}</strong>
+            <strong style="font-size:13.5px; color:#0f172a;">${gaInfo.lastScanGa}</strong>
           </div>
         `;
       }
@@ -2605,7 +2710,7 @@
       container.innerHTML = list.map(item => `
         <div class="flex-between" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; font-size:12px;">
           <div>
-            <strong>${formatDisplayDate(item.date)} ${item.time || ''}</strong> <span style="color:var(--rose-600); font-weight:700;">${item.usGa || ''}</span>
+            <strong>${formatDisplayDate(item.date)} ${formatDisplayTime(item.time)}</strong> <span style="color:var(--rose-600); font-weight:700;">${item.usGa || ''}</span>
             <div style="font-size:11px; color:#475569; margin-top:2px;">
               ${item.crl ? `CRL: <b>${item.crl}mm</b> · ` : ''}
               ${item.fhr ? `FHR: <b>${item.fhr}bpm</b> · ` : ''}
@@ -2622,12 +2727,13 @@
     }
 
     // =========================================================================
-    // 6. 互動月曆（每日同時顯示大孖與細孖週數）與工作更期自訂排序/管理
+    // 6. 互動月曆與工作更期自訂排序/管理（住院、標題備註選填、無時間顯示 --:--）
     // =========================================================================
     const CATEGORY_CLASS = {
       '公立覆診': 'cat-public',
       '私家覆診': 'cat-private',
       '急症室': 'cat-ae',
+      '住院': 'cat-hosp',
       '入院': 'cat-hosp',
       '睇中醫': 'cat-tcm'
     };
@@ -2680,15 +2786,16 @@
       }
 
       const bars = dayEvents.slice(0, 3).map(ev => {
-        const cls = CATEGORY_CLASS[ev.category] || 'cat-public';
+        const catLabel = ev.category === '入院' ? '住院' : ev.category;
+        const cls = CATEGORY_CLASS[catLabel] || 'cat-public';
         const isRange = ev.endDate && ev.endDate > ev.date;
-        let txt = ev.category;
+        let txt = catLabel;
         if (isRange) {
-          if (dateStr === ev.date) txt = `${ev.category}(入${ev.time ? ' ' + ev.time : ''})`;
-          else if (dateStr === ev.endDate) txt = `${ev.category}(出${ev.endTime ? ' ' + ev.endTime : ''})`;
-          else txt = `${ev.category}中`;
-        } else if (ev.category === '入院' && (ev.time || ev.endTime)) {
-          txt = `入院 ${ev.time || ''}${ev.endTime ? '-' + ev.endTime : ''}`;
+          if (dateStr === ev.date) txt = `${catLabel}(住${ev.time ? ' ' + ev.time : ''})`;
+          else if (dateStr === ev.endDate) txt = `${catLabel}(出${ev.endTime ? ' ' + ev.endTime : ''})`;
+          else txt = `${catLabel}中`;
+        } else if (catLabel === '住院' && (ev.time || ev.endTime)) {
+          txt = `住院 ${ev.time || ''}${ev.endTime ? '-' + ev.endTime : ''}`;
         }
         return `<div class="cal-ev-tag ${cls}">${txt}</div>`;
       }).join('');
@@ -2826,16 +2933,23 @@
       if (targetIdx < 0 || targetIdx >= appState.shiftOptions.length) return;
       const arr = appState.shiftOptions;
       [arr[idx], arr[targetIdx]] = [arr[targetIdx], arr[idx]];
+      appState.shiftOptionsUpdatedAt = Date.now();
       await persistAndSync();
       renderShiftSelectorButtons();
+      showToast('🔄 更期排序已同步');
     }
 
     async function setDayShift(shiftVal) {
-      if (!shiftVal) delete appState.shifts[selectedCalendarDate];
-      else appState.shifts[selectedCalendarDate] = shiftVal;
+      if (!appState.shiftMeta) appState.shiftMeta = {};
+      if (!shiftVal) {
+        delete appState.shifts[selectedCalendarDate];
+      } else {
+        appState.shifts[selectedCalendarDate] = shiftVal;
+      }
+      appState.shiftMeta[selectedCalendarDate] = Date.now();
       await persistAndSync();
       renderShiftSelectorButtons();
-      showToast(`已更新 ${formatDisplayDate(selectedCalendarDate)} 更期為「${shiftVal || '無/未定'}」`);
+      showToast(`已更新 ${formatDisplayDate(selectedCalendarDate)} 更期為「${shiftVal || '無/未定'}」並同步`);
     }
 
     async function applyCustomDayShiftOnly() {
@@ -2858,19 +2972,23 @@
       if (!appState.shiftOptions.includes(val)) {
         appState.shiftOptions.push(val);
       }
+      if (!appState.shiftMeta) appState.shiftMeta = {};
       appState.shifts[selectedCalendarDate] = val;
+      appState.shiftMeta[selectedCalendarDate] = Date.now();
+      appState.shiftOptionsUpdatedAt = Date.now();
       document.getElementById('custom-shift-input').value = '';
       await persistAndSync();
       renderShiftSelectorButtons();
-      showToast(`✅ 已新增「${val}」至更期按鈕並套用當日`);
+      showToast(`✅ 已新增「${val}」至更期按鈕並同步`);
     }
 
     async function deleteShiftOption(idx) {
       if (!Array.isArray(appState.shiftOptions)) return;
       const removed = appState.shiftOptions.splice(idx, 1)[0];
+      appState.shiftOptionsUpdatedAt = Date.now();
       await persistAndSync();
       renderShiftSelectorButtons();
-      showToast(`🗑️ 已刪除「${removed}」更期按鈕`);
+      showToast(`🗑️ 已刪除「${removed}」更期按鈕並同步`);
     }
 
     function renderCalendarDayEvents(dateStr) {
@@ -2883,10 +3001,11 @@
       }
 
       container.innerHTML = dayEvents.map(ev => {
-        const cls = CATEGORY_CLASS[ev.category] || 'cat-public';
+        const catLabel = ev.category === '入院' ? '住院' : ev.category;
+        const cls = CATEGORY_CLASS[catLabel] || 'cat-public';
         const hasEnd = ev.endDate || ev.endTime;
         const rangeText = hasEnd
-          ? `入院/開始：${formatShortDate(ev.date)} ${ev.time || ''} → 出院/結束：${formatShortDate(ev.endDate || ev.date)} ${ev.endTime || ''}`
+          ? `住院/開始：${formatShortDate(ev.date)} ${formatDisplayTime(ev.time)} → 出院/結束：${formatShortDate(ev.endDate || ev.date)} ${formatDisplayTime(ev.endTime)}`
           : '';
         const rangeTag = rangeText ? `<span class="badge" style="background:var(--amber-100); color:var(--amber-800);">${rangeText}</span>` : '';
 
@@ -2904,12 +3023,12 @@
             <div class="flex-between" style="align-items:flex-start;">
               <div>
                 <div class="flex-center" style="flex-wrap:wrap; gap:5px;">
-                  <span class="cal-ev-tag ${cls}" style="margin:0; font-size:10px;">${ev.category}</span>
-                  ${ev.time ? `<strong style="font-size:12px;">${ev.time}</strong>` : ''}
+                  <span class="cal-ev-tag ${cls}" style="margin:0; font-size:10px;">${catLabel}</span>
+                  <strong style="font-size:12px;">${formatDisplayTime(ev.time)}</strong>
                   ${rangeTag}
                   ${ev.location ? `<span style="font-size:11px; color:#64748b;">📍 ${ev.location}</span>` : ''}
                 </div>
-                <p style="font-size:12px; font-weight:700; margin-top:4px;">${ev.title}</p>
+                <p style="font-size:12px; font-weight:700; margin-top:4px;">${ev.title || catLabel}</p>
               </div>
               <div class="flex-center" style="gap:4px;">
                 <button onclick="editCalendarEvent('${ev.id}')" class="btn btn-soft" style="padding:4px 8px; font-size:11px;">編輯</button>
@@ -2925,7 +3044,8 @@
     function openEventMediaLightbox(evId, startIdx) {
       const ev = (appState.events || []).find(x => x.id === evId);
       if (!ev || !ev.media) return;
-      const items = ev.media.map(m => ({ url: m.url, type: m.type || 'image', caption: `📅 ${ev.category} · ${ev.title}` }));
+      const catLabel = ev.category === '入院' ? '住院' : ev.category;
+      const items = ev.media.map(m => ({ url: m.url, type: m.type || 'image', caption: `📅 ${catLabel} · ${ev.title || catLabel}` }));
       openMediaLightbox(items[startIdx].url, items[startIdx].type, items[startIdx].caption, items, startIdx);
     }
 
@@ -2961,7 +3081,7 @@
     }
 
     function resetEventFormForDate(dateStr) {
-      document.getElementById('cal-form-heading').textContent = '➕ 新增 / 編輯行程 (支援分開設定入院及出院時間)';
+      document.getElementById('cal-form-heading').textContent = '➕ 新增 / 編輯行程 (支援分開設定住院及出院時間)';
       document.getElementById('ev-id').value = '';
       document.getElementById('ev-date').value = dateStr || '';
       document.getElementById('ev-end-date').value = '';
@@ -2998,10 +3118,10 @@
       const [eh, em] = (ev.endTime || '').split(':');
       document.getElementById('ev-end-hour').value = eh || '';
       document.getElementById('ev-end-min').value = em || '';
-      document.getElementById('ev-category').value = ev.category;
+      document.getElementById('ev-category').value = ev.category === '入院' ? '住院' : ev.category;
       document.getElementById('ev-location').value = ev.location || '';
       document.getElementById('ev-location-preset').value = ['TMH', 'TSWH', 'BH', '健康院'].includes(ev.location) ? ev.location : '';
-      document.getElementById('ev-title').value = ev.title;
+      document.getElementById('ev-title').value = ev.title || '';
       tempEventMedia = [...(ev.media || [])];
       renderEventMediaPreview();
     }
@@ -3042,6 +3162,7 @@
       renderEventMediaPreview();
     }
 
+    // 行程標題/備註可選填
     async function saveCalendarEvent(e) {
       e.preventDefault();
       const cfg = getSyncConfig();
@@ -3060,7 +3181,8 @@
 
       const category = document.getElementById('ev-category').value;
       const location = document.getElementById('ev-location').value.trim();
-      const title = document.getElementById('ev-title').value.trim();
+      const titleInput = document.getElementById('ev-title').value.trim();
+      const title = titleInput || category;
 
       const idx = appState.events.findIndex(item => item.id === id);
       const record = { id, date, time, endDate, endTime, category, location, title, media: [...tempEventMedia], updatedAt: Date.now(), updatedBy: cfg.userName };
@@ -3082,7 +3204,7 @@
     }
 
     // =========================================================================
-    // 7. 母體狀況（預設空白、無輸入時顯示空白）、用藥清單與本機鬧鐘
+    // 7. 母體狀況、用藥清單與本機鬧鐘（鬧鐘預設為開啟當時時間）
     // =========================================================================
     function renderMaternalTab() {
       const today = getTodayStr();
@@ -3100,7 +3222,7 @@
         : '';
       const bleedingText = todayLog ? (todayLog.bleeding || '') : '';
       const eventsText = todayEvents.length > 0
-        ? todayEvents.map(e => (e.time ? e.time + ' ' : '') + e.category).join('、')
+        ? todayEvents.map(e => `${formatDisplayTime(e.time)} ${e.category === '入院' ? '住院' : e.category}`).join('、')
         : '';
 
       document.getElementById('maternal-today-summary').innerHTML = `
@@ -3157,7 +3279,7 @@
             <div class="flex-between" style="align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:9px 10px; font-size:12px;">
               <div style="flex:1;">
                 <div class="flex-center" style="flex-wrap:wrap; gap:5px; margin-bottom:3px;">
-                  <strong>${formatDisplayDate(log.date)} ${log.time || ''}</strong>
+                  <strong>${formatDisplayDate(log.date)} ${formatDisplayTime(log.time)}</strong>
                   ${log.mood ? `<span class="badge" style="background:var(--rose-100); color:var(--rose-700);">${log.mood}</span>` : ''}
                   ${log.bleeding ? `<span class="badge" style="background:${log.bleeding === '正常無出血' ? 'var(--emerald-100)' : 'var(--amber-100)'}; color:${log.bleeding === '正常無出血' ? 'var(--emerald-800)' : 'var(--amber-800)'};">${log.bleeding}</span>` : ''}
                 </div>
@@ -3298,7 +3420,6 @@
         updatedBy: cfg.userName
       });
       await persistAndSync();
-      // 儲存後重設回空白狀態
       document.getElementById('mat-mood').value = '';
       document.getElementById('mat-bleeding').value = '';
       document.getElementById('mat-feeling').value = '';
@@ -3587,7 +3708,7 @@
     }, 2000);
 
     // =========================================================================
-    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像時序總覽（自動跳轉分類 + 編輯/刪除）
+    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像（更改分類後停留於「全部」）
     // =========================================================================
     function renderHistoryAndGalleryTab() {
       const mhList = document.getElementById('medical-history-list');
@@ -3679,6 +3800,7 @@
       });
 
       (appState.events || []).forEach(ev => {
+        const catLabel = ev.category === '入院' ? '住院' : ev.category;
         (ev.media || []).forEach((m, mIdx) => {
           if (!m.url) return;
           unified.push({
@@ -3688,8 +3810,8 @@
             subIdx: mIdx,
             url: m.url,
             type: m.type || 'image',
-            source: `📅 月曆 (${ev.category})`,
-            mediaCategory: m.mediaCategory || (ev.category === '入院' ? '出院紀錄' : '轉介信'),
+            source: `📅 月曆 (${catLabel})`,
+            mediaCategory: m.mediaCategory || (catLabel === '住院' ? '出院紀錄' : '轉介信'),
             date: ev.date || '',
             caption: m.customCaption || ev.title || '覆診/住院附件',
             ts: m.addedAt || ev.updatedAt || 0
@@ -3766,7 +3888,7 @@
       if (list[idx]) openMediaLightbox(list[idx].url, list[idx].type, list[idx].caption, list, idx);
     }
 
-    // 選擇分類後自動跳轉到該分類頁面
+    // 更改圖片類別後，畫面停留於「全部」類別
     async function updateUnifiedMediaCategory(uid, selectedVal) {
       let finalCat = selectedVal;
       if (selectedVal === 'CUSTOM') {
@@ -3799,13 +3921,11 @@
         if (appState.angelMemorial?.media?.[idx]) { appState.angelMemorial.media[idx].mediaCategory = finalCat; appState.angelMemorial.updatedAt = Date.now(); }
       }
 
-      // 自動跳到所選的新分類頁面
-      currentAllMediaFilter = finalCat;
+      currentAllMediaFilter = 'ALL';
       await persistAndSync();
-      showToast(`🏷️ 已歸類為「${finalCat}」並自動跳轉至該分類`);
+      showToast(`🏷️ 已歸類為「${finalCat}」（停留於全部類別）`);
     }
 
-    // 編輯全庫影像標題/備註
     async function editUnifiedMediaCaption(uid) {
       const targetItem = getUnifiedMediaList().find(x => x.uid === uid);
       if (!targetItem) return;
@@ -3838,7 +3958,6 @@
       showToast('✏️ 已更新影像備註並同步');
     }
 
-    // 刪除全庫影像
     async function deleteUnifiedMedia(uid) {
       const parts = uid.split(':');
       const kind = parts[0];
@@ -4212,7 +4331,7 @@
     }
 
     // =========================================================================
-    // 10. 彈窗與時間選單初始化
+    // 10. 彈窗與時間選單初始化（鬧鐘預設為開啟當時時間）
     // =========================================================================
     function openModal(modalId) {
       document.getElementById('modal-backdrop').classList.remove('hidden');
@@ -4288,12 +4407,17 @@
       populateFullTimeSelects();
       document.getElementById('mat-date').value = getTodayStr();
       const now = new Date();
-      document.getElementById('mat-hour').value = String(now.getHours()).padStart(2, '0');
+      const nowHourStr = String(now.getHours()).padStart(2, '0');
+      const nowMinStr = String(now.getMinutes()).padStart(2, '0');
+
+      document.getElementById('mat-hour').value = nowHourStr;
       document.getElementById('mat-min').value = String(Math.floor(now.getMinutes() / 15) * 15).padStart(2, '0');
       document.getElementById('mat-mood').value = '';
       document.getElementById('mat-bleeding').value = '';
-      document.getElementById('alarm-hour').value = '09';
-      document.getElementById('alarm-min').value = '00';
+
+      // 鬧鐘預設為當時時間
+      document.getElementById('alarm-hour').value = nowHourStr;
+      document.getElementById('alarm-min').value = nowMinStr;
 
       initHorizontalSwipe();
       switchTab(0);
@@ -4301,7 +4425,7 @@
 
       const idbState = await readFromIDB();
       if (idbState && idbState.twinMeasurements && (idbState.updatedAt || 0) > (appState.updatedAt || 0)) {
-        appState = { ...DEFAULT_STATE, ...idbState };
+        appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...idbState });
         saveLocalOnly();
         renderAll();
       }
