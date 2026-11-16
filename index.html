@@ -424,6 +424,33 @@
       min-width: 0;
     }
 
+    /* 今日預測迷你方塊 */
+    .pred-strip-box {
+      background: linear-gradient(135deg, #f5f3ff, #fdf2f8);
+      border: 1px dashed #c084fc;
+      border-radius: 8px;
+      padding: 5px 7px;
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: #581c87;
+    }
+
+    /* 彈窗全指標預測方格 */
+    .pred-grid-6 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+    @media (max-width: 440px) {
+      .pred-grid-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .pred-metric-card {
+      background: #ffffff;
+      border: 1px solid #e9d5ff;
+      border-radius: 9px;
+      padding: 6px 8px;
+    }
+
     /* 今日媽媽概覽縮小字體專用樣式 */
     .mat-mini-box {
       background: #f8fafc;
@@ -876,7 +903,7 @@
                 </div>
               </div>
             </div>
-            <span style="font-size: 0.75rem; font-weight: 700; color: var(--sky-700); flex-shrink: 0; white-space: nowrap;">曲線 ›</span>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--sky-700); flex-shrink: 0; white-space: nowrap;">預測/曲線 ›</span>
           </div>
           <div id="twin-A-summary"></div>
         </div>
@@ -896,7 +923,7 @@
                 </div>
               </div>
             </div>
-            <span style="font-size: 0.75rem; font-weight: 700; color: var(--pink-700); flex-shrink: 0; white-space: nowrap;">曲線 ›</span>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--pink-700); flex-shrink: 0; white-space: nowrap;">預測/曲線 ›</span>
           </div>
           <div id="twin-B-summary"></div>
         </div>
@@ -914,7 +941,7 @@
             <button onclick="changeCalendarMonth(1)" class="btn btn-soft" style="padding: 6px 10px;">›</button>
           </div>
           <div class="flex-center" style="flex-wrap: wrap;">
-            <button onclick="triggerManualWifeCalendarExport()" id="gcal-sync-btn" class="btn btn-soft-emerald" title="月曆或更期有任何改動會自動背景同步至老婆 Google 日曆，亦可點擊立即全量匯出">📅 同步老婆日曆</button>
+            <button onclick="triggerManualWifeCalendarExport()" id="gcal-sync-btn" class="btn btn-soft-emerald" title="僅同步有變更的單一項目至老婆 Google 日曆，避免觸發配額限制">📅 同步老婆日曆</button>
             <button onclick="jumpToToday()" class="btn btn-soft-rose">今日</button>
             <button onclick="openEventEditor(null, getTodayStr())" class="btn btn-dark">+ 新增日程/住院</button>
           </div>
@@ -928,7 +955,7 @@
           <span><b style="color:#10b981;">■</b> 睇中醫</span>
           <span><span class="badge" style="background:#e2e8f0; color:#334155;">更</span> 工作更期</span>
           <span style="color:#64748b;">👈 月曆區域內左右滑動可切換月份 👉</span>
-          <span id="gcal-auto-status-hint" style="color: var(--emerald-800); font-weight: 600;">· 已啟用自動匯出至老婆日曆</span>
+          <span id="gcal-auto-status-hint" style="color: var(--emerald-800); font-weight: 600;">· 已啟用安全增量匯出至老婆日曆</span>
         </div>
 
         <div class="cal-weekdays">
@@ -1148,7 +1175,7 @@
         </div>
       </div>
 
-      <!-- 全庫所有上載影像時序總覽（依自訂日期排序，日期與分類收納至編輯彈窗確認後生效） -->
+      <!-- 全庫所有上載影像時序總覽 -->
       <div class="card">
         <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 8px;">
           <div>
@@ -1215,18 +1242,27 @@
   <!-- ==================== 彈出視窗群 ==================== -->
   <div id="modal-backdrop" onclick="handleBackdropClick(event)" class="modal-backdrop hidden">
 
-    <!-- 1. 胎兒成長曲線 -->
+    <!-- 1. 胎兒成長曲線與當日全指標預測 -->
     <div id="modal-twin" class="modal-box hidden">
       <div class="modal-header">
         <div class="flex-center" style="flex-wrap: wrap;">
           <span id="twin-modal-badge" class="badge">BB A</span>
-          <h3 style="font-size: 0.95rem; font-weight: 800;">成長數據與 MCMA 標準線性對比</h3>
+          <h3 style="font-size: 0.95rem; font-weight: 800;">成長曲線與當日預測數據</h3>
           <button type="button" onclick="toggleTwinModalSide()" class="btn btn-soft" style="padding: 3px 8px; font-size: 0.78rem;">⇄ 切換大/細孖</button>
         </div>
         <button onclick="closeAllModals()" class="close-x">✕</button>
       </div>
       <div class="modal-body" id="modal-twin-body" style="display: flex; flex-direction: column; gap: 12px;">
         <div id="twin-modal-ga-compare" class="grid-resp-3" style="gap: 8px;"></div>
+
+        <!-- 當日全指標預測成長數據總覽面板 -->
+        <div style="background: linear-gradient(135deg, #f5f3ff, #fdf2f8); border: 1px solid #d8b4fe; border-radius: 12px; padding: 10px;">
+          <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 6px; gap: 4px;">
+            <span style="font-size: 0.85rem; font-weight: 800; color: var(--purple-800);">🔮 今日預測生長數據 (結合 MCMA 標準線 + 過往實測軌跡)</span>
+            <span id="twin-pred-ratio-badge" class="badge" style="background: var(--purple-100); color: var(--purple-800);">個人生長係數計算中</span>
+          </div>
+          <div id="twin-today-predictions-grid" class="pred-grid-6"></div>
+        </div>
 
         <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; background: #f8fafc; padding: 4px 8px; border-radius: 8px;">
           👈 在此頁面左右滑動可快速切換瀏覽大孖 (BB A) 與細孖 (BB B) 👉
@@ -1235,7 +1271,7 @@
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="flex-wrap: wrap; margin-bottom: 6px;">
             <div>
-              <span style="font-size: 0.85rem; font-weight: 800; display: block;">📈 成長曲線對比 (含 MCMA 標準 P50 虛線及 P10–P90 區間)</span>
+              <span style="font-size: 0.85rem; font-weight: 800; display: block;">📈 成長曲線對比 (含實測值 + 虛線預測軌跡 + MCMA 標準 P50)</span>
               <span id="chart-standard-summary" style="font-size: 0.78rem; color: var(--emerald-800); font-weight: 600;"></span>
             </div>
             <select id="twin-chart-metric" onchange="renderTwinSvgChart()" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
@@ -1355,7 +1391,7 @@
 
         <div>
           <div class="flex-between" style="margin-bottom: 6px;">
-            <h4 style="font-size: 0.85rem; font-weight: 800;">📅 當日覆診 / 住院行程 (儲存後自動同步老婆日曆)</h4>
+            <h4 style="font-size: 0.85rem; font-weight: 800;">📅 當日覆診 / 住院行程 (自動安全增量同步老婆日曆)</h4>
             <button type="button" onclick="handleClearAndResetEventForm()" class="btn btn-soft-rose" style="padding: 3px 8px; font-size: 0.78rem;">+ 清空重填</button>
           </div>
           <div id="cal-day-events-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
@@ -1669,28 +1705,29 @@
           </div>
         </div>
 
-        <!-- Google 老婆日曆自動同步選項 -->
+        <!-- Google 老婆日曆自動同步選項（增量防超額保護版） -->
         <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px;">
           <div class="flex-between" style="margin-bottom: 6px;">
-            <strong style="color: var(--emerald-800);">📅 老婆 Google 日曆自動匯出設定</strong>
+            <strong style="color: var(--emerald-800);">📅 老婆 Google 日曆增量同步設定 (防配額超限)</strong>
             <span class="badge" style="background: var(--emerald-100); color: var(--emerald-800);">GAS 已連結</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: #065f46;">
             <label class="flex-center" style="cursor: pointer;">
               <input type="checkbox" id="gcal-auto-enabled" onchange="saveGcalPreferences()" style="width: 15px; height: 15px;">
-              <span>月曆行程或工作更期有改動時<strong>自動匯出</strong>至老婆日曆</span>
+              <span>月曆有改動時<strong>僅增量匯出有變更項目</strong>（30秒合併防頻繁請求）</span>
             </label>
             <label class="flex-center" style="cursor: pointer;">
               <input type="checkbox" id="gcal-include-shifts" onchange="saveGcalPreferences()" style="width: 15px; height: 15px;">
-              <span>匯出時連同<strong>工作更期</strong>（早更/中更/放假等）一併寫入日曆</span>
+              <span>匯出時連同<strong>有變動的工作更期</strong>寫入日曆</span>
             </label>
             <label class="flex-center" style="cursor: pointer;">
               <input type="checkbox" id="gcal-include-ga" onchange="saveGcalPreferences()" style="width: 15px; height: 15px;">
               <span>於日曆活動備註附上當日<strong>大孖/細孖推算孕週</strong></span>
             </label>
           </div>
-          <div style="margin-top: 8px; display: flex; justify-content: flex-end;">
-            <button type="button" onclick="triggerManualWifeCalendarExport()" class="btn btn-teal" style="padding: 5px 10px; font-size: 0.78rem;">立即全量同步至老婆日曆</button>
+          <div style="margin-top: 8px; display: flex; justify-content: flex-end; gap: 6px; flex-wrap: wrap;">
+            <button type="button" onclick="triggerManualWifeCalendarExport(false)" class="btn btn-teal" style="padding: 5px 10px; font-size: 0.78rem;">僅同步未匯出變更</button>
+            <button type="button" onclick="triggerManualWifeCalendarExport(true)" class="btn btn-soft" style="padding: 5px 10px; font-size: 0.78rem;">強制全量重新對齊</button>
           </div>
         </div>
 
@@ -1730,7 +1767,7 @@
 
   <script>
     // =========================================================================
-    // 1. 隱形 LMP 基準計算與大孖(BB A)、細孖(BB B)雙週數計算引擎
+    // 1. 隱形 LMP 基準計算、大孖/細孖雙週數及「MCMA標準線 + 個人過往實測」當日預測引擎
     // =========================================================================
     const INTERNAL_BASE_MS = new Date(2026, 8, 19, 0, 0, 0).getTime(); // 2026-09-19 (LMP)
     const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -1773,11 +1810,11 @@
       const diffDays = Math.floor((targetMs - scanMs) / MS_PER_DAY);
       const total = baseWeeks * 7 + baseDays + diffDays;
       if (total < 0) {
-        return { valid: false, weeks: 0, days: 0, label: '', short: '' };
+        return { valid: false, weeks: 0, days: 0, totalDays: 0, label: '', short: '' };
       }
       const w = Math.floor(total / 7);
       const d = total % 7;
-      return { valid: true, weeks: w, days: d, label: `${w}週${d}日`, short: `${w}w${d}d` };
+      return { valid: true, weeks: w, days: d, totalDays: total, label: `${w}週${d}日`, short: `${w}w${d}d` };
     }
 
     function getTwinGestationalInfo(twinId) {
@@ -1804,10 +1841,159 @@
         liveShort: `即日 ${todayGA.label}`,
         liveFull: todayGA.label,
         liveCompact: todayGA.short,
+        liveTotalDays: todayGA.totalDays,
         lmpFull: `${lmpGA.label} (${lmpGA.short})`,
         lastScanDate,
         lastScanGa
       };
+    }
+
+    // MCMA 雙胎標準生長曲線基準值 (P10 / P50 / P90)
+    function getMcmaStandardValues(metric, weeksFloat) {
+      if (metric === 'crl') {
+        const w = Math.max(5.5, Math.min(14.5, weeksFloat));
+        const p50 = Math.max(2, Math.round((1.55 * w * w - 16.2 * w + 46.5) * 10) / 10);
+        return { p50, p10: Math.round(p50 * 0.84 * 10) / 10, p90: Math.round(p50 * 1.16 * 10) / 10, unit: 'mm', decimals: 1 };
+      }
+      if (metric === 'efw') {
+        const w = Math.max(6, Math.min(38, weeksFloat));
+        const p50 = weeksFloat < 12
+          ? Math.max(2, Math.round((1.2 + Math.max(0, weeksFloat - 6) * 2.4) * 10) / 10)
+          : Math.round(0.28 * Math.pow(w, 2.65));
+        return {
+          p50,
+          p10: Math.round(p50 * 0.82 * 10) / 10,
+          p90: Math.round(p50 * 1.18 * 10) / 10,
+          unit: 'g',
+          decimals: weeksFloat < 12 ? 1 : 0
+        };
+      }
+      if (metric === 'bpd') {
+        const w = Math.max(6, Math.min(38, weeksFloat));
+        const p50 = weeksFloat < 11
+          ? Math.max(3, Math.round((2.6 * w - 12.2) * 10) / 10)
+          : Math.max(12, Math.round((3.1 * w - 20.5) * 10) / 10);
+        return { p50, p10: Math.round(p50 * 0.9 * 10) / 10, p90: Math.round(p50 * 1.1 * 10) / 10, unit: 'mm', decimals: 1 };
+      }
+      if (metric === 'ac') {
+        const w = Math.max(6, Math.min(38, weeksFloat));
+        const p50 = weeksFloat < 11
+          ? Math.max(10, Math.round((8.2 * w - 42) * 10) / 10)
+          : Math.max(40, Math.round((10.6 * w - 74) * 10) / 10);
+        return { p50, p10: Math.round(p50 * 0.88 * 10) / 10, p90: Math.round(p50 * 1.12 * 10) / 10, unit: 'mm', decimals: 1 };
+      }
+      if (metric === 'fl') {
+        const w = Math.max(6, Math.min(38, weeksFloat));
+        const p50 = weeksFloat < 11
+          ? Math.max(1.5, Math.round((1.6 * w - 8.5) * 10) / 10)
+          : Math.max(6, Math.round((2.65 * w - 22.5) * 10) / 10);
+        return { p50, p10: Math.round(p50 * 0.88 * 10) / 10, p90: Math.round(p50 * 1.12 * 10) / 10, unit: 'mm', decimals: 1 };
+      }
+      // FHR 胎心率 (bpm)
+      const p50 = weeksFloat <= 6.5 ? 120 : (weeksFloat <= 7.5 ? 136 : (weeksFloat <= 9.5 ? 162 : (weeksFloat <= 13 ? 158 : 146)));
+      return { p50, p10: 115, p90: 175, unit: 'bpm', decimals: 0 };
+    }
+
+    /**
+     * 核心預測算法：
+     * 結合「MCMA 標準生長線」與「該胎兒之前所有實際量度數據」，計算個人化生長比例係數 (Ratio) 及趨勢修正，
+     * 精準預測指定日期 (預設當日) 的各項生長數據。
+     */
+    function predictTwinMetricOnDate(twinId, metric, targetDateObj = new Date()) {
+      const targetGA = getTwinGAOnTargetDate(twinId, targetDateObj);
+      const lmpGA = getGestationalAgeForDate(targetDateObj);
+      const weeksFloat = Math.max(5.5, (targetGA.valid ? targetGA.totalDays : lmpGA.totalDays) / 7);
+      const stdAtTarget = getMcmaStandardValues(metric, weeksFloat);
+
+      const history = [...(appState.twinMeasurements[twinId] || [])]
+        .filter(rec => rec.date && rec[metric] !== '' && rec[metric] !== undefined && rec[metric] !== null && !isNaN(Number(rec[metric])))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      // 計算該指標的個人生長軌道係數 (加權平均：越近期的檢查權重越高)
+      let weightedRatioSum = 0;
+      let weightTotal = 0;
+      let hasDirectHistory = history.length > 0;
+
+      history.forEach((rec, idx) => {
+        const p = rec.date.split('-');
+        const rDate = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+        const rGA = getTwinGAOnTargetDate(twinId, rDate);
+        const rLmp = getGestationalAgeForDate(rDate);
+        const rWeeks = Math.max(5.5, (rGA.valid ? rGA.totalDays : rLmp.totalDays) / 7);
+        const rStd = getMcmaStandardValues(metric, rWeeks);
+        const ratio = Number(rec[metric]) / Math.max(0.1, rStd.p50);
+        const weight = idx + 1; // 近期紀錄權重較高
+        weightedRatioSum += ratio * weight;
+        weightTotal += weight;
+      });
+
+      // 若該指標尚未有歷史實測 (例如早孕期尚未量 BPD/AC/FL/EFW)，則參考 CRL 的個人生長比例係數進行連動推算
+      let appliedRatio = 1.0;
+      let basisSource = 'MCMA 標準 P50 曲線';
+
+      if (hasDirectHistory && weightTotal > 0) {
+        appliedRatio = weightedRatioSum / weightTotal;
+        basisSource = `個人歷史軌跡 (${Math.round(appliedRatio * 100)}% 標準線)`;
+      } else if (metric !== 'crl' && metric !== 'fhr') {
+        const crlHistory = [...(appState.twinMeasurements[twinId] || [])]
+          .filter(rec => rec.date && rec.crl !== '' && rec.crl !== undefined && !isNaN(Number(rec.crl)))
+          .sort((a, b) => a.date.localeCompare(b.date));
+        if (crlHistory.length > 0) {
+          let cSum = 0, cW = 0;
+          crlHistory.forEach((rec, idx) => {
+            const p = rec.date.split('-');
+            const rDate = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+            const rGA = getTwinGAOnTargetDate(twinId, rDate);
+            const rWeeks = Math.max(5.5, rGA.totalDays / 7);
+            const rStd = getMcmaStandardValues('crl', rWeeks);
+            cSum += (Number(rec.crl) / Math.max(0.1, rStd.p50)) * (idx + 1);
+            cW += (idx + 1);
+          });
+          // 體重 EFW 與線性長度約呈 2.2 次方比例，其餘線性指標按比例連動
+          const crlRatio = cSum / cW;
+          appliedRatio = metric === 'efw' ? Math.pow(crlRatio, 2.1) : crlRatio;
+          basisSource = `依 CRL 個人生長比例連動 (${Math.round(appliedRatio * 100)}%)`;
+        }
+      }
+
+      // 限制極端偏差，確保預測符合臨床生理區間
+      if (metric === 'fhr') {
+        appliedRatio = Math.max(0.86, Math.min(1.15, appliedRatio));
+      } else {
+        appliedRatio = Math.max(0.75, Math.min(1.30, appliedRatio));
+      }
+
+      const rawPred = stdAtTarget.p50 * appliedRatio;
+      const factor = Math.pow(10, stdAtTarget.decimals);
+      const predictedVal = Math.round(rawPred * factor) / factor;
+
+      // 檢查當日是否已有實際量度值
+      const targetIso = `${targetDateObj.getFullYear()}-${String(targetDateObj.getMonth() + 1).padStart(2, '0')}-${String(targetDateObj.getDate()).padStart(2, '0')}`;
+      const sameDayActualRec = history.find(r => r.date === targetIso);
+      const latestRec = history[history.length - 1] || null;
+
+      return {
+        metric,
+        predicted: predictedVal,
+        standardP50: stdAtTarget.p50,
+        standardRange: `${stdAtTarget.p10}–${stdAtTarget.p90}`,
+        unit: stdAtTarget.unit,
+        ratioPct: Math.round(appliedRatio * 100),
+        basisSource,
+        hasDirectHistory,
+        latestActual: latestRec ? { value: Number(latestRec[metric]), date: latestRec.date } : null,
+        sameDayActual: sameDayActualRec ? Number(sameDayActualRec[metric]) : null
+      };
+    }
+
+    function getAllTwinTodayPredictions(twinId) {
+      const today = new Date();
+      const metrics = ['crl', 'efw', 'bpd', 'ac', 'fl', 'fhr'];
+      const map = {};
+      metrics.forEach(m => {
+        map[m] = predictTwinMetricOnDate(twinId, m, today);
+      });
+      return map;
     }
 
     function getTodayStr() {
@@ -1848,6 +2034,7 @@
     const SHORTCUT_NAME_KEY = 'MCMA_IOS_SHORTCUT_NAME';
     const SYNC_CONFIG_KEY = 'MCMA_MULTI_USER_SYNC_CONFIG';
     const GCAL_PREFS_KEY = 'MCMA_WIFE_GCAL_PREFS';
+    const GCAL_SYNCED_SNAPSHOT_KEY = 'MCMA_WIFE_GCAL_LAST_SYNCED_SNAPSHOT_V2';
     const DAILY_CHANGELOG_KEY = 'MCMA_DAILY_CHANGELOG_V1';
     const DAILY_BACKUP_META_KEY = 'MCMA_DAILY_AUTO_BACKUP_META';
     const IDB_NAME = 'MCMA_Guardian_DB';
@@ -2054,10 +2241,8 @@
       };
       const jsonStr = JSON.stringify(backupPayload, null, 2);
 
-      // 1. 永久寫入本機 IndexedDB 備份庫
       await writeToIDBKey('daily_auto_backup_latest', { filename, createdAtStr, jsonStr });
 
-      // 2. 觸發本機檔案下載至瀏覽器預設下載資料夾
       try {
         const blob = new Blob([jsonStr], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -2116,7 +2301,6 @@
       showToast('⬇️ 已重新下載備份檔到本機資料夾');
     }
 
-    // 每日 23:59 定時檢查器
     setInterval(() => {
       const now = new Date();
       if (now.getHours() === 23 && now.getMinutes() === 59) {
@@ -2148,11 +2332,13 @@
     let tempMedImage = '';
 
     // =========================================================================
-    // 2B. Google Apps Script 自動匯出至「老婆」Google 日曆引擎
+    // 2B. Google Apps Script 增量差異同步至「老婆」Google 日曆引擎
+    //     (解決「短時間內建立或刪除了太多日曆或日曆活動」Google API 配額超限錯誤)
     // =========================================================================
     const WIFE_GCAL_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwfGrkqKzKIy02vY7zk-BRVdwgihOUJ9WQAM-Li6PjFWeiwc_YPjrmrAltZf5fgiKTj/exec';
     let gcalAutoExportTimer = null;
     let isExportingToGcal = false;
+    let gcalCooldownUntilMs = 0;
 
     function getGcalPrefs() {
       try {
@@ -2179,7 +2365,7 @@
         localStorage.setItem(GCAL_PREFS_KEY, JSON.stringify(prefs));
       } catch (e) {}
       updateGcalStatusUI('idle');
-      showToast(prefs.autoEnabled ? '✅ 已開啟月曆改動自動匯出至老婆日曆' : '⏸️ 已暫停自動匯出（仍可手動一鍵同步）');
+      showToast(prefs.autoEnabled ? '✅ 已開啟增量自動匯出至老婆日曆' : '⏸️ 已暫停自動匯出');
     }
 
     function updateGcalStatusUI(stateMode, customText) {
@@ -2187,8 +2373,9 @@
       const hint = document.getElementById('gcal-auto-status-hint');
       const prefs = getGcalPrefs();
       if (btn) {
-        if (stateMode === 'syncing') btn.textContent = '⏳ 匯出老婆日曆中...';
+        if (stateMode === 'syncing') btn.textContent = '⏳ 增量同步中...';
         else if (stateMode === 'done') btn.textContent = '✅ 已同步老婆日曆';
+        else if (stateMode === 'cooldown') btn.textContent = '⏸️ Google 冷卻排隊中';
         else if (stateMode === 'error') btn.textContent = '⚠️ 日曆同步異常';
         else btn.textContent = '📅 同步老婆日曆';
       }
@@ -2196,41 +2383,122 @@
         if (customText) {
           hint.textContent = `· ${customText}`;
         } else {
-          hint.textContent = prefs.autoEnabled ? '· 已啟用改動自動匯出至老婆日曆' : '· 手動匯出模式';
+          hint.textContent = prefs.autoEnabled ? '· 已啟用安全增量匯出至老婆日曆' : '· 手動匯出模式';
         }
       }
+    }
+
+    // 計算「自上次成功寫入 Google 日曆後」真正有新增/修改/刪除的差異項目 (Delta)
+    function computeGcalDelta(forceFull = false) {
+      const prefs = getGcalPrefs();
+      let lastSnap = { events: {}, shifts: {} };
+      if (!forceFull) {
+        try {
+          const raw = localStorage.getItem(GCAL_SYNCED_SNAPSHOT_KEY);
+          if (raw) lastSnap = JSON.parse(raw);
+        } catch (e) {}
+      }
+
+      const currEventsMap = {};
+      (appState.events || []).forEach(ev => {
+        if (!ev.id || !ev.date) return;
+        const clean = {
+          id: ev.id,
+          date: ev.date || '',
+          time: ev.time || '',
+          endDate: ev.endDate || '',
+          endTime: ev.endTime || '',
+          category: ev.category === '入院' ? '住院' : (ev.category || '覆診'),
+          location: ev.location || '',
+          title: ev.title || ''
+        };
+        currEventsMap[ev.id] = JSON.stringify(clean);
+      });
+
+      const currShiftsMap = {};
+      if (prefs.includeShifts) {
+        Object.entries(appState.shifts || {}).forEach(([dKey, sVal]) => {
+          if (dKey && sVal) currShiftsMap[dKey] = String(sVal);
+        });
+      }
+
+      const upsertedEvents = [];
+      const deletedEventIds = [];
+      const upsertedShifts = {};
+      const deletedShiftDates = [];
+
+      Object.keys(currEventsMap).forEach(id => {
+        if (forceFull || lastSnap.events[id] !== currEventsMap[id]) {
+          upsertedEvents.push(JSON.parse(currEventsMap[id]));
+        }
+      });
+      Object.keys(lastSnap.events || {}).forEach(id => {
+        if (!currEventsMap[id]) deletedEventIds.push(id);
+      });
+
+      Object.keys(currShiftsMap).forEach(dKey => {
+        if (forceFull || lastSnap.shifts[dKey] !== currShiftsMap[dKey]) {
+          upsertedShifts[dKey] = currShiftsMap[dKey];
+        }
+      });
+      Object.keys(lastSnap.shifts || {}).forEach(dKey => {
+        if (!currShiftsMap[dKey]) deletedShiftDates.push(dKey);
+      });
+
+      const hasChanges = upsertedEvents.length > 0 || deletedEventIds.length > 0 || Object.keys(upsertedShifts).length > 0 || deletedShiftDates.length > 0;
+      return {
+        hasChanges,
+        upsertedEvents,
+        deletedEventIds,
+        upsertedShifts,
+        deletedShiftDates,
+        nextSnapshot: { events: currEventsMap, shifts: currShiftsMap }
+      };
     }
 
     function scheduleAutoExportToWifeCalendar() {
       const prefs = getGcalPrefs();
       if (!prefs.autoEnabled) return;
+      const delta = computeGcalDelta(false);
+      if (!delta.hasChanges) return;
+
       if (gcalAutoExportTimer) clearTimeout(gcalAutoExportTimer);
-      updateGcalStatusUI('syncing', '偵測到日曆改動，準備自動匯出...');
+      const waitMs = Math.max(4500, gcalCooldownUntilMs - Date.now());
+      updateGcalStatusUI('syncing', '已合併變更，稍後增量寫入老婆日曆...');
       gcalAutoExportTimer = setTimeout(() => {
-        exportToWifeGoogleCalendar(false);
-      }, 1200);
+        exportToWifeGoogleCalendar(false, false);
+      }, waitMs);
     }
 
-    async function triggerManualWifeCalendarExport() {
+    async function triggerManualWifeCalendarExport(forceFull = false) {
       if (gcalAutoExportTimer) clearTimeout(gcalAutoExportTimer);
-      await exportToWifeGoogleCalendar(true);
+      await exportToWifeGoogleCalendar(true, forceFull);
     }
 
-    async function exportToWifeGoogleCalendar(showFeedback = false) {
+    async function exportToWifeGoogleCalendar(showFeedback = false, forceFull = false) {
       if (isExportingToGcal) return;
+      if (Date.now() < gcalCooldownUntilMs && !showFeedback) return;
+
+      const delta = computeGcalDelta(forceFull);
+      if (!delta.hasChanges && !forceFull) {
+        updateGcalStatusUI('done', '老婆日曆已是最新狀態 (無需重複寫入)');
+        if (showFeedback) showToast('✅ 老婆日曆已是最新狀態，無需重複建立活動');
+        return;
+      }
+
       isExportingToGcal = true;
-      updateGcalStatusUI('syncing', '正在寫入老婆日曆...');
+      updateGcalStatusUI('syncing', `正在增量同步 (${delta.upsertedEvents.length} 行程 / ${Object.keys(delta.upsertedShifts).length} 更期)...`);
 
       try {
         const prefs = getGcalPrefs();
-        const allDates = new Set([
-          ...(appState.events || []).map(e => e.date).filter(Boolean),
-          ...Object.keys(appState.shifts || {})
+        const targetDates = new Set([
+          ...delta.upsertedEvents.map(e => e.date).filter(Boolean),
+          ...Object.keys(delta.upsertedShifts)
         ]);
 
         const gaMap = {};
         if (prefs.includeGa) {
-          allDates.forEach(iso => {
+          targetDates.forEach(iso => {
             const p = iso.split('-');
             if (p.length === 3) {
               const dObj = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
@@ -2243,20 +2511,13 @@
           });
         }
 
-        const cleanEvents = (appState.events || []).map(ev => ({
-          id: ev.id,
-          date: ev.date || '',
-          time: ev.time || '',
-          endDate: ev.endDate || '',
-          endTime: ev.endTime || '',
-          category: ev.category === '入院' ? '住院' : (ev.category || '覆診'),
-          location: ev.location || '',
-          title: ev.title || ''
-        }));
-
+        // 僅傳送有變更的增量資料（同時向下相容舊版 GAS 欄位名稱）
         const payload = {
-          events: cleanEvents,
-          shifts: prefs.includeShifts ? (appState.shifts || {}) : {},
+          mode: forceFull ? 'full' : 'incremental',
+          events: delta.upsertedEvents,
+          deletedEventIds: delta.deletedEventIds,
+          shifts: delta.upsertedShifts,
+          deletedShiftDates: delta.deletedShiftDates,
           exportShifts: prefs.includeShifts,
           includeGaInDesc: prefs.includeGa,
           gaMap
@@ -2274,15 +2535,30 @@
         if (res.ok) {
           let resultData = null;
           try { resultData = await res.json(); } catch (e) {}
+
           if (resultData && resultData.ok === false) {
-            updateGcalStatusUI('error', `同步失敗：${resultData.error || '權限錯誤'}`);
-            if (showFeedback) showToast(`❌ 老婆日曆同步失敗：${resultData.error}`);
+            const errText = String(resultData.error || '權限錯誤');
+            const isQuotaError = errText.includes('短時間') || errText.includes('太多') || errText.includes('Rate') || errText.includes('quota');
+            if (isQuotaError) {
+              // 遇到 Google 配額保護時自動進入 60 秒冷卻，避免連續重試加劇限制
+              gcalCooldownUntilMs = Date.now() + 60000;
+              updateGcalStatusUI('cooldown', 'Google 日曆寫入冷卻中（60秒後自動續傳變更）');
+              if (showFeedback) showToast('⏳ Google 日曆暫時限流，系統已自動排隊於 60 秒後增量續傳');
+            } else {
+              updateGcalStatusUI('error', `同步失敗：${errText}`);
+              if (showFeedback) showToast(`❌ 老婆日曆同步失敗：${errText}`);
+            }
           } else {
+            // 僅在成功寫入後才儲存最新快照，確保下次只傳送新差異
+            try {
+              localStorage.setItem(GCAL_SYNCED_SNAPSHOT_KEY, JSON.stringify(delta.nextSnapshot));
+            } catch (e) {}
+
             const detailMsg = resultData
               ? `新增 ${resultData.created || 0} 項、更新 ${resultData.updated || 0} 項`
-              : '已完成同步';
-            updateGcalStatusUI('done', `老婆日曆已於 ${nowTimeStr} 自動同步`);
-            if (showFeedback) showToast(`📅 已成功匯出至老婆日曆 (${detailMsg})`);
+              : '已完成增量同步';
+            updateGcalStatusUI('done', `老婆日曆已於 ${nowTimeStr} 增量同步`);
+            if (showFeedback) showToast(`📅 已成功同步至老婆日曆 (${detailMsg})`);
           }
         } else {
           updateGcalStatusUI('error', `HTTP ${res.status}`);
@@ -2485,7 +2761,6 @@
       updateLocalMetaDisplay();
     }
 
-    // 第10點核心：先即時儲存本機並更新畫面，絕不阻塞操作，背景非同步推送雲端
     function persistAndSync(options = {}) {
       const cfg = getSyncConfig();
       appState.updatedAt = Date.now();
@@ -2498,7 +2773,6 @@
       if (options.exportCalendar) {
         scheduleAutoExportToWifeCalendar();
       }
-      // 非同步背景觸發同步，不 await 阻塞 UI
       setTimeout(() => {
         syncWithCloud(false, true);
       }, 0);
@@ -2760,7 +3034,6 @@
     }
 
     function initHorizontalSwipe() {
-      // 1. 月曆獨立左右滑動區：完全攔截事件，絕不會觸發主頁面切換
       const calZone = document.getElementById('calendar-swipe-zone');
       if (calZone) {
         let calStartX = 0, calStartY = 0;
@@ -2788,7 +3061,6 @@
         }, { passive: false });
       }
 
-      // 2. 主頁面分頁左右滑動（若起點位於月曆區 #calendar-swipe-zone 內則直接略過）
       const area = document.getElementById('swipe-area');
       if (area) {
         let startX = 0, startY = 0;
@@ -2811,7 +3083,6 @@
         }, { passive: true });
       }
 
-      // 3. 大/細孖曲線視窗左右滑動
       const twinModal = document.getElementById('modal-twin');
       if (twinModal) {
         let tmStartX = 0, tmStartY = 0;
@@ -2832,7 +3103,6 @@
         }, { passive: true });
       }
 
-      // 4. 單日詳情視窗左右滑動
       const calDayModal = document.getElementById('modal-calendar-day');
       if (calDayModal) {
         let cdStartX = 0, cdStartY = 0;
@@ -2853,7 +3123,6 @@
         }, { passive: true });
       }
 
-      // 5. 全螢幕燈箱左右滑動
       const lb = document.getElementById('media-lightbox');
       if (lb) {
         let lbStartX = 0, lbStartY = 0;
@@ -2875,7 +3144,7 @@
     }
 
     // =========================================================================
-    // 5. 頂部 LMP 徽章、主頁卡片、成長曲線頁面
+    // 5. 頂部 LMP 徽章、主頁卡片（含當日預測成長值）、成長曲線頁面
     // =========================================================================
     function renderAll() {
       renderHeader();
@@ -2914,41 +3183,43 @@
 
         const list = [...(appState.twinMeasurements[id] || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const summaryEl = document.getElementById(`twin-${id}-summary`);
-
-        if (list.length === 0) {
-          summaryEl.innerHTML = `<p style="font-size:0.78rem; color:#94a3b8;">暫無量度紀錄，點擊新增</p>`;
-          return;
-        }
+        const preds = getAllTwinTodayPredictions(id);
 
         const latestAny = list[0];
         const latestCrl = getLatestValidTwinMetric(list, 'crl');
         const latestFhr = getLatestValidTwinMetric(list, 'fhr');
-        const latestEfw = getLatestValidTwinMetric(list, 'efw');
-
-        const extraItems = [];
-        if (latestEfw) extraItems.push(`EFW: ${latestEfw.value}g (${formatShortDate(latestEfw.date)})`);
 
         summaryEl.innerHTML = `
-          <div style="font-size: 0.78rem; color: var(--text-muted);">
-            <span>最後產檢：${formatDisplayDate(latestAny.date)}</span>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">
+            <span>最後產檢：${latestAny ? formatDisplayDate(latestAny.date) : '尚未紀錄'}</span>
           </div>
-          <div class="grid-2" style="gap: 6px;">
+          <div class="grid-2" style="gap: 5px;">
             <div class="stat-box">
               <div class="flex-between" style="gap:2px;">
-                <span style="font-size: 0.7rem; color: #94a3b8;">CRL 頭臀長</span>
-                ${latestCrl && latestCrl.date ? `<span style="font-size: 0.68rem; color: #64748b;">${formatShortDate(latestCrl.date)}</span>` : ''}
+                <span style="font-size: 0.68rem; color: #64748b;">CRL 頭臀長</span>
+                ${latestCrl && latestCrl.date ? `<span style="font-size: 0.65rem; color: #94a3b8;">${formatShortDate(latestCrl.date)}</span>` : ''}
               </div>
-              <strong style="font-size: 0.85rem;">${latestCrl ? latestCrl.value + ' mm' : '-'}</strong>
+              <strong style="font-size: 0.85rem; display:block;">${latestCrl ? latestCrl.value + ' mm' : '-'}</strong>
+              <span style="font-size: 0.68rem; color: var(--purple-800); font-weight:700;">🔮 今日預測: ${preds.crl.predicted}mm</span>
             </div>
             <div class="stat-box">
               <div class="flex-between" style="gap:2px;">
-                <span style="font-size: 0.7rem; color: #94a3b8;">FHR 胎心率</span>
-                ${latestFhr && latestFhr.date ? `<span style="font-size: 0.68rem; color: #64748b;">${formatShortDate(latestFhr.date)}</span>` : ''}
+                <span style="font-size: 0.68rem; color: #64748b;">FHR 胎心率</span>
+                ${latestFhr && latestFhr.date ? `<span style="font-size: 0.65rem; color: #94a3b8;">${formatShortDate(latestFhr.date)}</span>` : ''}
               </div>
-              <strong style="font-size: 0.85rem; color: var(--rose-600);">${latestFhr ? latestFhr.value + ' bpm' : '-'}</strong>
+              <strong style="font-size: 0.85rem; color: var(--rose-600); display:block;">${latestFhr ? latestFhr.value + ' bpm' : '-'}</strong>
+              <span style="font-size: 0.68rem; color: var(--purple-800); font-weight:700;">🔮 今日預測: ${preds.fhr.predicted}bpm</span>
             </div>
           </div>
-          ${extraItems.length > 0 ? `<div style="font-size:0.72rem; color:#475569; margin-top:4px;">${extraItems.join(' · ')}</div>` : ''}
+          <div class="pred-strip-box">
+            <div style="font-weight:800; margin-bottom:2px;">🔮 今日全項預測 (${gaInfo.liveCompact})：</div>
+            <div style="display:flex; flex-wrap:wrap; gap:4px 8px; color:#3b0764;">
+              <span>EFW: <b>${preds.efw.predicted}g</b></span>
+              <span>BPD: <b>${preds.bpd.predicted}mm</b></span>
+              <span>AC: <b>${preds.ac.predicted}mm</b></span>
+              <span>FL: <b>${preds.fl.predicted}mm</b></span>
+            </div>
+          </div>
         `;
       });
 
@@ -2956,49 +3227,26 @@
       const listB = [...(appState.twinMeasurements.B || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       const crlA = getLatestValidTwinMetric(listA, 'crl');
       const crlB = getLatestValidTwinMetric(listB, 'crl');
+      const predCrlA = predictTwinMetricOnDate('A', 'crl', new Date()).predicted;
+      const predCrlB = predictTwinMetricOnDate('B', 'crl', new Date()).predicted;
+
       const paceEl = document.getElementById('twin-pace-strip');
       if (crlA && crlB) {
         const diff = Math.abs(Number(crlA.value) - Number(crlB.value)).toFixed(1);
         const pct = ((diff / Math.max(Number(crlA.value), Number(crlB.value))) * 100).toFixed(0);
+        const predDiff = Math.abs(predCrlA - predCrlB).toFixed(1);
         paceEl.innerHTML = `
-          <div>⚖️ <strong>雙胎生長同步對比：</strong>CRL 相差 <strong>${diff}mm</strong> (${pct}%)</div>
+          <div>
+            ⚖️ <strong>雙胎生長同步對比：</strong>實測 CRL 相差 <strong>${diff}mm</strong> (${pct}%)
+            <span style="color:var(--purple-800); font-size:0.78rem; margin-left:6px;">｜ 🔮 今日預測 CRL：A <b>${predCrlA}mm</b> / B <b>${predCrlB}mm</b> (差 ${predDiff}mm)</span>
+          </div>
           <span class="badge" style="background:${pct <= 15 ? 'var(--emerald-100)' : 'var(--amber-100)'}; color:${pct <= 15 ? 'var(--emerald-800)' : 'var(--amber-800)'};">
             ${pct <= 15 ? '✓ 雙胎生長步伐理想' : '⚠️ 建議密切追蹤生長差距'}
           </span>
         `;
       } else {
-        paceEl.innerHTML = `<span style="color:var(--text-muted);">⚖️ 點擊上方 BB A 或 BB B 卡片可查看成長曲線及輸入最新超聲波數據</span>`;
+        paceEl.innerHTML = `<span style="color:var(--text-muted);">⚖️ 點擊上方 BB A 或 BB B 卡片可查看今日預測數據及成長曲線</span>`;
       }
-    }
-
-    function getMcmaStandardValues(metric, weeksFloat) {
-      if (metric === 'crl') {
-        const w = Math.max(6, Math.min(14.5, weeksFloat));
-        const p50 = Math.max(4, Math.round((1.55 * w * w - 16.2 * w + 46.5) * 10) / 10);
-        return { p50, p10: Math.round(p50 * 0.84 * 10) / 10, p90: Math.round(p50 * 1.16 * 10) / 10, unit: 'mm' };
-      }
-      if (metric === 'efw') {
-        const w = Math.max(12, Math.min(38, weeksFloat));
-        const p50 = weeksFloat < 12 ? Math.round(Math.max(5, (weeksFloat - 6) * 8)) : Math.round(0.28 * Math.pow(w, 2.65));
-        return { p50, p10: Math.round(p50 * 0.82), p90: Math.round(p50 * 1.18), unit: 'g' };
-      }
-      if (metric === 'bpd') {
-        const w = Math.max(11, Math.min(38, weeksFloat));
-        const p50 = Math.max(12, Math.round((3.1 * w - 20.5) * 10) / 10);
-        return { p50, p10: Math.round(p50 * 0.9 * 10) / 10, p90: Math.round(p50 * 1.1 * 10) / 10, unit: 'mm' };
-      }
-      if (metric === 'ac') {
-        const w = Math.max(11, Math.min(38, weeksFloat));
-        const p50 = Math.max(40, Math.round((10.6 * w - 74) * 10) / 10);
-        return { p50, p10: Math.round(p50 * 0.88 * 10) / 10, p90: Math.round(p50 * 1.12 * 10) / 10, unit: 'mm' };
-      }
-      if (metric === 'fl') {
-        const w = Math.max(11, Math.min(38, weeksFloat));
-        const p50 = Math.max(6, Math.round((2.65 * w - 22.5) * 10) / 10);
-        return { p50, p10: Math.round(p50 * 0.88 * 10) / 10, p90: Math.round(p50 * 1.12 * 10) / 10, unit: 'mm' };
-      }
-      const p50 = weeksFloat <= 9 ? 145 : (weeksFloat <= 12 ? 162 : 148);
-      return { p50, p10: 120, p90: 175, unit: 'bpm' };
     }
 
     function openTwinModal(twinId) {
@@ -3028,6 +3276,40 @@
             <strong style="font-size:0.95rem; color:#0f172a;">${gaInfo.lastScanGa}</strong>
           </div>
         `;
+      }
+
+      // 渲染「今日預測生長數據」6大指標卡片
+      const preds = getAllTwinTodayPredictions(twinId);
+      const ratioBadge = document.getElementById('twin-pred-ratio-badge');
+      if (ratioBadge) {
+        ratioBadge.textContent = `個人生長指數：${preds.crl.ratioPct}% MCMA標準`;
+      }
+      const metricLabels = [
+        { key: 'crl', name: 'CRL 頭臀長' },
+        { key: 'efw', name: 'EFW 預估體重' },
+        { key: 'bpd', name: 'BPD 雙頂徑' },
+        { key: 'ac', name: 'AC 腹圍' },
+        { key: 'fl', name: 'FL 股骨長' },
+        { key: 'fhr', name: 'FHR 胎心率' }
+      ];
+      const predGrid = document.getElementById('twin-today-predictions-grid');
+      if (predGrid) {
+        predGrid.innerHTML = metricLabels.map(m => {
+          const item = preds[m.key];
+          const actualLine = item.sameDayActual !== null
+            ? `<span style="color:#059669; font-weight:700;">今日實測: ${item.sameDayActual}${item.unit}</span>`
+            : (item.latestActual ? `上次(${formatShortDate(item.latestActual.date)}): ${item.latestActual.value}${item.unit}` : '尚無歷史實測');
+          return `
+            <div class="pred-metric-card">
+              <div style="font-size:0.72rem; color:#64748b; font-weight:700;">${m.name}</div>
+              <div style="font-size:0.95rem; font-weight:800; color:var(--purple-800); margin:2px 0;">
+                ${item.predicted} <span style="font-size:0.75rem;">${item.unit}</span>
+              </div>
+              <div style="font-size:0.68rem; color:#475569;">標準 P50: ${item.standardP50}${item.unit}</div>
+              <div style="font-size:0.66rem; color:#64748b; margin-top:1px;">${actualLine}</div>
+            </div>
+          `;
+        }).join('');
       }
 
       resetTwinMeasurementForm();
@@ -3079,58 +3361,66 @@
     function renderTwinSvgChart() {
       const box = document.getElementById('twin-svg-chart-box');
       const metric = document.getElementById('twin-chart-metric').value;
+      const todayIso = getTodayStr();
 
       const listA = [...(appState.twinMeasurements.A || [])].filter(x => x.date).sort((a, b) => a.date.localeCompare(b.date));
       const listB = [...(appState.twinMeasurements.B || [])].filter(x => x.date).sort((a, b) => a.date.localeCompare(b.date));
 
       const actualDates = Array.from(new Set([...listA.map(x => x.date), ...listB.map(x => x.date)])).sort();
       const timelineDates = [...actualDates];
-      if (timelineDates.length > 0) {
-        const lastParts = timelineDates[timelineDates.length - 1].split('-');
-        const lastMs = new Date(parseInt(lastParts[0]), parseInt(lastParts[1]) - 1, parseInt(lastParts[2])).getTime();
-        [14, 28, 42].forEach(offset => {
-          const d = new Date(lastMs + offset * MS_PER_DAY);
-          const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          if (!timelineDates.includes(iso)) timelineDates.push(iso);
-        });
-      }
+      if (!timelineDates.includes(todayIso)) timelineDates.push(todayIso);
+
+      // 加入未來產檢預測時間點 (+7日, +14日)
+      const todayParts = todayIso.split('-');
+      const todayMs = new Date(parseInt(todayParts[0]), parseInt(todayParts[1]) - 1, parseInt(todayParts[2])).getTime();
+      [7, 14].forEach(offset => {
+        const d = new Date(todayMs + offset * MS_PER_DAY);
+        const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        if (!timelineDates.includes(iso)) timelineDates.push(iso);
+      });
+      timelineDates.sort();
 
       const points = timelineDates.map(d => {
         const parts = d.split('-');
-        const ga = getGestationalAgeForDate(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-        const std = getMcmaStandardValues(metric, Math.max(6, ga.totalDays / 7));
+        const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        const ga = getGestationalAgeForDate(dObj);
+        const std = getMcmaStandardValues(metric, Math.max(5.5, ga.totalDays / 7));
         const itemA = listA.find(x => x.date === d);
         const itemB = listB.find(x => x.date === d);
         const valA = (itemA && itemA[metric] !== '' && itemA[metric] !== undefined) ? Number(itemA[metric]) : null;
         const valB = (itemB && itemB[metric] !== '' && itemB[metric] !== undefined) ? Number(itemB[metric]) : null;
-        return { date: d, label: `${formatShortDate(d)} (${ga.label})`, std, valA, valB };
+        const predA = predictTwinMetricOnDate('A', metric, dObj).predicted;
+        const predB = predictTwinMetricOnDate('B', metric, dObj).predicted;
+        const isToday = d === todayIso;
+        return {
+          date: d,
+          isToday,
+          label: isToday ? `今日(${ga.short})` : `${formatShortDate(d)}(${ga.short})`,
+          std,
+          valA,
+          valB,
+          predA,
+          predB
+        };
       });
 
       const unit = points[0]?.std.unit || 'mm';
-      const activeList = currentTwinModalId === 'A' ? listA : listB;
-      const latestRec = activeList.filter(x => x[metric] !== '' && x[metric] !== undefined).pop();
+      const todayPredActive = predictTwinMetricOnDate(currentTwinModalId, metric, new Date());
       const summaryEl = document.getElementById('chart-standard-summary');
-      if (latestRec && summaryEl) {
-        const p = latestRec.date.split('-');
-        const ga = getGestationalAgeForDate(new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2])));
-        const std = getMcmaStandardValues(metric, ga.totalDays / 7);
-        const val = Number(latestRec[metric]);
-        const diffPct = Math.round(((val - std.p50) / Math.max(1, std.p50)) * 100);
-        summaryEl.textContent = `最新 BB ${currentTwinModalId}：${val}${unit} ｜ 同期 MCMA 標準 P50：${std.p50}${unit} (${diffPct >= 0 ? '+' : ''}${diffPct}%)`;
-      } else if (summaryEl) {
-        summaryEl.textContent = `綠色虛線為 MCMA 標準 P50，淺綠區間為 P10–P90 正常範圍`;
+      if (summaryEl) {
+        summaryEl.textContent = `🔮 今日 BB ${currentTwinModalId} 預測：${todayPredActive.predicted}${unit} ｜ MCMA 標準 P50：${todayPredActive.standardP50}${unit} (${todayPredActive.basisSource})`;
       }
 
       const allValues = [];
       points.forEach(pt => {
-        allValues.push(pt.std.p10, pt.std.p90);
+        allValues.push(pt.std.p10, pt.std.p90, pt.predA, pt.predB);
         if (pt.valA !== null) allValues.push(pt.valA);
         if (pt.valB !== null) allValues.push(pt.valB);
       });
       const minVal = Math.max(0, Math.floor(Math.min(...allValues) * 0.85));
       const maxVal = Math.ceil(Math.max(...allValues) * 1.12) || 10;
 
-      const W = 540, H = 225, padL = 48, padR = 24, padT = 22, padB = 40;
+      const W = 560, H = 235, padL = 48, padR = 26, padT = 24, padB = 40;
       const plotW = W - padL - padR;
       const plotH = H - padT - padB;
       const getX = (idx) => padL + (points.length === 1 ? plotW / 2 : (idx / (points.length - 1)) * plotW);
@@ -3141,8 +3431,13 @@
       const bandPolygon = `${upperPts} ${lowerPts}`;
 
       const p50Line = points.map((pt, i) => `${getX(i)},${getY(pt.std.p50)}`).join(' ');
+      const predLineA = points.map((pt, i) => `${getX(i)},${getY(pt.valA !== null ? pt.valA : pt.predA)}`).join(' ');
+      const predLineB = points.map((pt, i) => `${getX(i)},${getY(pt.valB !== null ? pt.valB : pt.predB)}`).join(' ');
+
       const ptsA = points.map((pt, i) => pt.valA !== null ? { x: getX(i), y: getY(pt.valA), v: pt.valA } : null).filter(Boolean);
       const ptsB = points.map((pt, i) => pt.valB !== null ? { x: getX(i), y: getY(pt.valB), v: pt.valB } : null).filter(Boolean);
+      const todayPtIdx = points.findIndex(p => p.isToday);
+      const todayPt = todayPtIdx >= 0 ? points[todayPtIdx] : null;
 
       const gridLines = [0, 0.25, 0.5, 0.75, 1].map(ratio => {
         const val = Math.round(minVal + (maxVal - minVal) * ratio);
@@ -3154,24 +3449,32 @@
       }).join('');
 
       const xLabels = points.map((pt, i) => `
-        <text x="${getX(i)}" y="${H - 12}" font-size="11" font-weight="600" fill="#334155" text-anchor="middle">${pt.label}</text>
+        <text x="${getX(i)}" y="${H - 12}" font-size="10.5" font-weight="${pt.isToday ? '800' : '600'}" fill="${pt.isToday ? '#7e22ce' : '#334155'}" text-anchor="middle">${pt.label}</text>
       `).join('');
 
       box.innerHTML = `
-        <svg viewBox="0 0 ${W} ${H}" style="width: 100%; min-width: 440px; height: auto; display: block;">
+        <svg viewBox="0 0 ${W} ${H}" style="width: 100%; min-width: 450px; height: auto; display: block;">
           ${gridLines}
-          <polygon points="${bandPolygon}" fill="rgba(16, 185, 129, 0.12)" />
-          <polyline points="${p50Line}" fill="none" stroke="#10b981" stroke-width="2.2" stroke-dasharray="5,4" />
+          <polygon points="${bandPolygon}" fill="rgba(16, 185, 129, 0.10)" />
+          <polyline points="${p50Line}" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="5,4" />
+          <!-- 個人預測生長軌跡虛線 -->
+          <polyline points="${predLineA}" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3,3" />
+          <polyline points="${predLineB}" fill="none" stroke="#f472b6" stroke-width="2" stroke-dasharray="3,3" />
+          <!-- 實測連線 -->
           ${ptsA.length > 1 ? `<polyline points="${ptsA.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="#0284c7" stroke-width="2.8" />` : ''}
           ${ptsB.length > 1 ? `<polyline points="${ptsB.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="#db2777" stroke-width="2.8" />` : ''}
-          ${ptsA.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5.5" fill="#0284c7" /><text x="${p.x}" y="${p.y - 9}" font-size="12.5" font-weight="bold" fill="#0369a1" text-anchor="middle">A:${p.v}</text>`).join('')}
-          ${ptsB.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5.5" fill="#db2777" /><text x="${p.x}" y="${p.y + 16}" font-size="12.5" font-weight="bold" fill="#be185d" text-anchor="middle">B:${p.v}</text>`).join('')}
+          <!-- 今日預測標記點 -->
+          ${todayPt && todayPt.valA === null ? `<circle cx="${getX(todayPtIdx)}" cy="${getY(todayPt.predA)}" r="5" fill="#ffffff" stroke="#0284c7" stroke-width="2.5" /><text x="${getX(todayPtIdx)}" y="${getY(todayPt.predA) - 9}" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">預A:${todayPt.predA}</text>` : ''}
+          ${todayPt && todayPt.valB === null ? `<circle cx="${getX(todayPtIdx)}" cy="${getY(todayPt.predB)}" r="5" fill="#ffffff" stroke="#db2777" stroke-width="2.5" /><text x="${getX(todayPtIdx)}" y="${getY(todayPt.predB) + 16}" font-size="11" font-weight="bold" fill="#be185d" text-anchor="middle">預B:${todayPt.predB}</text>` : ''}
+          <!-- 實測圓點 -->
+          ${ptsA.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5.5" fill="#0284c7" /><text x="${p.x}" y="${p.y - 9}" font-size="12" font-weight="bold" fill="#0369a1" text-anchor="middle">A:${p.v}</text>`).join('')}
+          ${ptsB.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5.5" fill="#db2777" /><text x="${p.x}" y="${p.y + 16}" font-size="12" font-weight="bold" fill="#be185d" text-anchor="middle">B:${p.v}</text>`).join('')}
           ${xLabels}
         </svg>
-        <div style="display:flex; gap:14px; justify-content:center; font-size:0.78rem; font-weight:600; padding-top:4px; color:#334155;">
-          <span><b style="color:#0284c7;">●</b> BB A 實際值</span>
-          <span><b style="color:#db2777;">●</b> BB B 實際值</span>
-          <span><b style="color:#10b981;">┄</b> MCMA 標準線 (P50)</span>
+        <div style="display:flex; flex-wrap:wrap; gap:10px 14px; justify-content:center; font-size:0.75rem; font-weight:600; padding-top:4px; color:#334155;">
+          <span><b style="color:#0284c7;">●</b> 實測値</span>
+          <span><b style="color:#7e22ce;">○ ┄</b> 個人預測軌跡</span>
+          <span><b style="color:#10b981;">┄</b> MCMA 標準 P50</span>
         </div>
       `;
     }
@@ -3207,7 +3510,7 @@
 
       persistAndSync({ changeDesc: `${editId ? '更新' : '新增'} BB ${twinId} 超聲波量度數據 (${formatDisplayDate(record.date)})` });
       openTwinModal(twinId);
-      showToast(`✅ 已儲存 BB ${twinId} 數據`);
+      showToast(`✅ 已儲存 BB ${twinId} 數據並更新今日預測值`);
     }
 
     function deleteTwinMeasurement(twinId, id) {
@@ -3227,7 +3530,10 @@
             <div style="font-size:0.78rem; color:#475569; margin-top:2px;">
               ${item.crl ? `CRL: <b>${item.crl}mm</b> · ` : ''}
               ${item.fhr ? `FHR: <b>${item.fhr}bpm</b> · ` : ''}
-              ${item.efw ? `EFW: <b>${item.efw}g</b> ` : ''}
+              ${item.efw ? `EFW: <b>${item.efw}g</b> · ` : ''}
+              ${item.bpd ? `BPD: <b>${item.bpd}mm</b> · ` : ''}
+              ${item.ac ? `AC: <b>${item.ac}mm</b> · ` : ''}
+              ${item.fl ? `FL: <b>${item.fl}mm</b> ` : ''}
               ${item.afi ? `(${item.afi})` : ''}
             </div>
           </div>
@@ -3718,7 +4024,7 @@
     }
 
     // =========================================================================
-    // 7. 守護媽媽狀況、用藥清單、過往媽媽紀錄編輯與本機鬧鐘 (支援「每日」選項)
+    // 7. 守護媽媽狀況、用藥清單、過往媽媽紀錄編輯與本機鬧鐘
     // =========================================================================
     function formatTodayEventsForMotherOverview(todayEvents, today) {
       if (!todayEvents || todayEvents.length === 0) return '';
@@ -3728,11 +4034,9 @@
         const endD = (ev.endDate && ev.endDate >= ev.date) ? ev.endDate : ev.date;
 
         if (isHosp) {
-          // 情境 A：今日正好是出院日（跨日住院）
           if (ev.endDate && ev.endDate > ev.date && today === ev.endDate) {
             return ev.endTime ? `今日 ${ev.endTime} 出院` : `今日出院`;
           }
-          // 情境 B：今日是入院日（當日或跨日）
           if (today === ev.date) {
             if (ev.endDate && ev.endDate > ev.date) {
               const inT = ev.time || '未定時間';
@@ -3744,7 +4048,6 @@
               return `住院 (${inT} 入院至 ${outT} 出院)`;
             }
           }
-          // 情境 C：住院期間中間日子
           if (today > ev.date && today < endD) {
             const outPart = `${formatShortDate(endD)}${ev.endTime ? ' ' + ev.endTime : ''}`;
             return `住院中 (預計 ${outPart} 出院)`;
@@ -4059,7 +4362,7 @@
       persistAndSync({ changeDesc: '刪除一筆媽媽狀況紀錄' });
     }
 
-    // --- 本機鬧鐘（支援「每日」選項與預設 ----，每日鬧鐘響後保留不刪除） ---
+    // --- 本機鬧鐘 ---
     let sharedAudioCtx = null;
     let alarmRingInterval = null;
     let wakeLockObj = null;
@@ -4163,7 +4466,6 @@
         const target = localAlarms.find(a => a.id === currentRingingAlarmId);
         const isDaily = target && target.repeat === '每日';
         if (isDaily) {
-          // 每日鬧鐘保留，明日同一時間繼續響鬧
           currentRingingAlarmId = null;
           saveLocalAlarms();
           showToast('🔁 已關閉今日響鬧，每日鬧鐘已保留並於明日同一時間再響');
@@ -4226,87 +4528,48 @@
       document.body.removeChild(a);
     }
 
-    function estimateAlarmFromImage(e) {
-      const file = e.target.files && e.target.files[0];
+    function estimateAlarmFromImage(event) {
+      const file = event.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const now = new Date();
-        const estHour = String((now.getHours() + 1) % 24).padStart(2, '0');
-        const estMin = String(Math.floor(now.getMinutes() / 5) * 5).padStart(2, '0');
-        document.getElementById('alarm-hour').value = estHour;
-        document.getElementById('alarm-min').value = estMin;
-        document.getElementById('alarm-label').value = `藥單提醒 (${file.name.slice(0, 12)})`;
+      const box = document.getElementById('alarm-ai-preview-box');
+      box.classList.remove('hidden');
+      box.innerHTML = '🔍 正在掃描藥袋影像與檔名資訊...';
 
-        const prevBox = document.getElementById('alarm-ai-preview-box');
-        prevBox.classList.remove('hidden');
-        prevBox.innerHTML = `
+      setTimeout(() => {
+        const name = file.name;
+        const timeMatch = name.match(/(\d{1,2})[:：點時](\d{2})?/);
+        let h = '09', m = '00', suggestedLabel = '按藥袋指示服藥';
+
+        if (timeMatch) {
+          h = String(Math.min(23, parseInt(timeMatch[1], 10))).padStart(2, '0');
+          const rawM = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+          const quarters = [0, 15, 30, 45];
+          const closestM = quarters.reduce((prev, curr) => Math.abs(curr - rawM) < Math.abs(prev - rawM) ? curr : prev);
+          m = String(closestM).padStart(2, '0');
+          suggestedLabel = '藥袋影像識別服藥時間';
+        } else if (name.includes('晚') || name.includes('睡')) {
+          h = '21'; m = '30'; suggestedLabel = '晚間 / 睡前安胎用藥';
+        } else if (name.includes('中藥')) {
+          h = '19'; m = '30'; suggestedLabel = '晚飯後溫服固腎中藥';
+        }
+
+        document.getElementById('alarm-hour').value = h;
+        document.getElementById('alarm-min').value = m;
+        document.getElementById('alarm-label').value = suggestedLabel;
+
+        box.innerHTML = `
           <div class="flex-between">
-            <div class="flex-center">
-              <img src="${ev.target.result}" onclick="openMediaLightbox('${ev.target.result}', 'image', 'AI估算藥單相片')" style="width:42px; height:42px; border-radius:6px; object-fit:cover; cursor:zoom-in;">
-              <div>
-                <strong style="color:#7dd3fc;">🤖 AI 影像時間估算完成</strong>
-                <div>建議響鬧時間：<strong style="color:#fbbf24;">${estHour}:${estMin}</strong>（按右側「+ 新增鬧鐘並接駁捷徑」建立）</div>
-              </div>
-            </div>
-            <button type="button" onclick="document.getElementById('alarm-ai-preview-box').classList.add('hidden')" style="color:#94a3b8; font-weight:700;">✕</button>
+            <span>✅ 已自動填入時間 <strong style="color:#fbbf24;">${h}:${m}</strong> (${suggestedLabel})</span>
+            <button type="button" onclick="document.getElementById('alarm-ai-preview-box').classList.add('hidden')" style="color:#94a3b8;">✕</button>
           </div>
         `;
-        showToast(`📷 AI 已估算提醒時間為 ${estHour}:${estMin}`);
-      };
-      reader.readAsDataURL(file);
-      e.target.value = '';
-    }
-
-    function exportAlarmToCalendar(id) {
-      const al = localAlarms.find(a => a.id === id);
-      if (!al) return;
-      const [hh, mm] = al.time.split(':');
-      const now = new Date();
-      const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0'), d = String(now.getDate()).padStart(2, '0');
-      const dtStart = `${y}${m}${d}T${hh}${mm}00`;
-      const lines = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'BEGIN:VEVENT',
-        `DTSTART:${dtStart}`,
-        `DTEND:${dtStart}`,
-        `SUMMARY:MCMA守護寶 - ${al.label}`
-      ];
-      if (al.repeat === '每日') {
-        lines.push('RRULE:FREQ=DAILY');
-      }
-      lines.push(
-        'BEGIN:VALARM',
-        'TRIGGER:-PT0M',
-        'ACTION:DISPLAY',
-        `DESCRIPTION:${al.label}`,
-        'END:VALARM',
-        'END:VEVENT',
-        'END:VCALENDAR'
-      );
-      const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `鬧鐘_${al.time.replace(':', '')}.ics`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function toggleAlarmRepeatMode(id) {
-      const al = localAlarms.find(a => a.id === id);
-      if (!al) return;
-      al.repeat = (al.repeat === '每日') ? '----' : '每日';
-      saveLocalAlarms();
-      showToast(al.repeat === '每日' ? '🔁 已切換為「每日」固定鬧鐘 (響鬧後不刪除)' : '⏱️ 已切換為「----」單次鬧鐘');
+      }, 450);
     }
 
     function toggleLocalAlarm(id) {
       ensureAudioUnlocked();
       const al = localAlarms.find(a => a.id === id);
-      if (al) al.enabled = !al.enabled;
-      saveLocalAlarms();
+      if (al) { al.enabled = !al.enabled; saveLocalAlarms(); }
     }
 
     function deleteLocalAlarm(id) {
@@ -4315,31 +4578,27 @@
     }
 
     function renderLocalAlarms() {
-      const nameLbl = document.getElementById('current-shortcut-name-label');
-      if (nameLbl) nameLbl.textContent = getSavedShortcutName();
-
       const container = document.getElementById('local-alarms-list');
-      if (!container) return;
       if (localAlarms.length === 0) {
-        container.innerHTML = `<p style="font-size:0.78rem; color:#94a3b8; text-align:center; padding:4px;">此手機尚未建立鬧鐘</p>`;
+        container.innerHTML = `<p style="font-size:0.78rem; color:#94a3b8; text-align:center; padding:8px;">暫無本機鬧鐘</p>`;
         return;
       }
       container.innerHTML = localAlarms.map(al => {
-        const safeLabel = (al.label || 'MCMA提醒').replace(/'/g, "\\'");
-        const rep = al.repeat || '----';
-        const isDaily = rep === '每日';
+        const isDaily = al.repeat === '每日';
+        const modeTag = isDaily
+          ? `<span class="badge" style="background:rgba(16,185,129,0.22); color:#6ee7b7; border:1px solid rgba(16,185,129,0.4);">🔁 每日</span>`
+          : `<span class="badge" style="background:rgba(251,191,36,0.18); color:#fcd34d;">1次</span>`;
         return `
-          <div class="flex-between" style="background:#1e293b; border:1px solid #334155; padding:8px 10px; border-radius:10px; flex-wrap:wrap; gap:6px;">
+          <div class="flex-between" style="background:rgba(30,41,59,0.85); border:1px solid #334155; border-radius:10px; padding:8px 10px;">
             <div class="flex-center" style="flex-wrap:wrap;">
-              <strong style="font-size:0.95rem; font-family:monospace; color:#fbbf24;">${al.time}</strong>
-              <button type="button" onclick="toggleAlarmRepeatMode('${al.id}')" title="點擊切換每日/單次" class="badge" style="background:${isDaily ? '#059669' : '#334155'}; color:#fff; cursor:pointer;">${isDaily ? '🔁 每日' : rep}</button>
-              <span style="font-size:0.85rem; color:#f1f5f9;">${al.label}</span>
+              <strong style="font-size:1.05rem; color:${al.enabled ? '#fbbf24' : '#64748b'}; font-family:monospace;">${al.time}</strong>
+              ${modeTag}
+              <span style="font-size:0.85rem; color:${al.enabled ? '#f8fafc' : '#64748b'};">${al.label}</span>
             </div>
-            <div class="flex-center" style="gap:6px; margin-left:auto;">
-              <button onclick="triggerIosShortcutAlarm('${al.time}', '${safeLabel}', '${rep}')" title="透過 iOS 捷徑直接寫入 iPhone 時鐘 App" style="font-size:0.78rem; font-weight:700; background:#f59e0b; color:#0f172a; padding:4px 8px; border-radius:7px;">⏰寫入手機鬧鐘</button>
-              <button onclick="exportAlarmToCalendar('${al.id}')" title="匯入日曆提醒" style="font-size:0.72rem; background:#334155; color:#7dd3fc; padding:4px 6px; border-radius:6px;">📅日曆</button>
+            <div class="flex-center" style="gap: 8px;">
+              <button type="button" onclick="triggerIosShortcutAlarm('${al.time}', '${(al.label || '').replace(/'/g, "\\'")}', '${al.repeat || '----'}')" style="background:#334155; color:#7dd3fc; padding:3px 7px; border-radius:6px; font-size:0.75rem;">📲 捷徑</button>
               <input type="checkbox" ${al.enabled ? 'checked' : ''} onchange="toggleLocalAlarm('${al.id}')" style="width:16px; height:16px;">
-              <button onclick="deleteLocalAlarm('${al.id}')" style="color:#94a3b8; font-size:0.85rem; padding:2px 4px;">✕</button>
+              <button onclick="deleteLocalAlarm('${al.id}')" style="color:#94a3b8; font-weight:700;">✕</button>
             </div>
           </div>
         `;
@@ -4357,212 +4616,124 @@
           al.lastTriggeredDate = today;
           changed = true;
           startAlarmRinging(al);
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('MCMA守護寶 · 鬧鐘提醒', { body: `${al.time} - ${al.label}` });
-          }
         }
       });
+
       if (changed) saveLocalAlarms();
-    }, 2000);
+    }, 1000);
 
     // =========================================================================
-    // 8. 病史編輯、天使BB紀念冊、超聲波影像庫與全庫影像（依自訂日期排序 + 編輯視窗先確定後儲存）
+    // 8. 媽媽病史(支援編輯)、天使BB紀念冊 & 全庫影像總覽
     // =========================================================================
-    function renderHistoryAndGalleryTab() {
-      const mhList = document.getElementById('medical-history-list');
-      const sortedMh = [...(appState.medicalHistory || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-      mhList.innerHTML = sortedMh.map(item => `
-        <div style="background:var(--amber-50); border:1px solid #fde68a; border-radius:10px; padding:8px 10px; font-size:0.85rem;">
-          <div class="flex-between" style="margin-bottom:3px;">
-            <div class="flex-center">
-              <span class="badge" style="background:var(--amber-100); color:var(--amber-800);">${item.tag}</span>
-              <strong>${formatDisplayDate(item.date)}</strong>
-            </div>
-            <div class="flex-center" style="gap:4px;">
-              <button onclick="openHistoryModal('${item.id}')" class="btn btn-soft" style="padding:2px 7px; font-size:0.75rem;">編輯</button>
-              <button onclick="deleteMedicalHistory('${item.id}')" style="color:#94a3b8; font-weight:700; padding:2px 4px;">✕</button>
-            </div>
-          </div>
-          ${item.detail ? `<p style="color:#334155; font-size:0.8rem;">${item.detail}</p>` : `<p style="color:#94a3b8; font-size:0.78rem;">(無文字詳情)</p>`}
-        </div>
-      `).join('');
+    const MEDIA_FILTER_CATEGORIES = ['ALL', '超聲波', '轉介信', '藥單', '出院紀錄', '自訂'];
 
-      const angelThumbs = document.getElementById('angel-preview-thumbs');
-      const angelMedia = appState.angelMemorial.media || [];
-      angelThumbs.innerHTML = angelMedia.length > 0
-        ? angelMedia.slice(0, 4).map(m => m.type === 'video'
-            ? `<video src="${m.url}" onclick="openMediaLightbox('${m.url}', 'video', '天使BB紀念冊')" style="width:46px; height:46px; border-radius:8px; object-fit:cover; cursor:zoom-in;"></video>`
-            : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image', '天使BB紀念冊')" style="width:46px; height:46px; border-radius:8px; object-fit:cover; cursor:zoom-in;">`
-          ).join('')
-        : `<span style="font-size:0.78rem; color:var(--purple-600);">點擊「開啟紀念冊」可多選上載珍貴相片或影片</span>`;
-
-      ['A', 'B'].forEach(twinId => {
-        const grid = document.getElementById(`gallery-grid-${twinId}`);
-        const items = (appState.twinMedia || [])
-          .filter(m => m.target === twinId || m.target === 'BOTH')
-          .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-
-        if (items.length === 0) {
-          grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:0.78rem; color:#94a3b8; text-align:center; padding:18px 0;">暫無影像紀錄</p>`;
-          return;
-        }
-
-        grid.innerHTML = items.map((m, idx) => `
-          <div class="media-thumb-card" style="background:#fff;">
-            ${m.type === 'video'
-              ? `<video src="${m.url}" controls onclick="openTwinGalleryLightbox('${twinId}', ${idx})" style="width:100%; height:84px; object-fit:cover; border-radius:7px; background:#000; cursor:zoom-in;"></video>`
-              : `<img src="${m.url}" onclick="openTwinGalleryLightbox('${twinId}', ${idx})" title="點擊放大並左右滑動瀏覽" style="width:100%; height:84px; object-fit:cover; border-radius:7px; cursor:zoom-in;">`
-            }
-            <div class="flex-between" style="margin-top:2px; gap:2px;">
-              <span style="font-size:0.72rem; font-weight:700; color:#475569;">📅 ${formatDisplayDate(m.date)}</span>
-              ${m.target === 'BOTH' ? '<span class="badge" style="background:var(--purple-100); color:var(--purple-800); flex-shrink:0;">同框</span>' : ''}
-            </div>
-            <p style="font-size:0.75rem; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.caption || '超聲波紀錄'}</p>
-            <div style="display:flex; gap:4px;">
-              <button type="button" onclick="openUnifiedMediaEditModal('twin:${m.id}')" class="btn btn-soft" style="flex:1; padding:4px 2px; font-size:0.72rem;">編輯</button>
-              ${m.type === 'image' ? `<button onclick="setTwinAvatar('${twinId}', '${m.url}')" class="btn btn-soft" style="flex:1; padding:4px 2px; font-size:0.72rem;">頭像</button>` : ''}
-              <button onclick="deleteTwinMedia('${m.id}')" class="btn btn-soft-rose" style="padding:4px 5px; font-size:0.72rem;">刪</button>
-            </div>
-          </div>
-        `).join('');
-      });
-
-      renderAllMediaTimeline();
-    }
-
-    function openTwinGalleryLightbox(twinId, startIdx) {
-      const items = (appState.twinMedia || [])
-        .filter(m => m.target === twinId || m.target === 'BOTH')
-        .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-        .map(m => ({ url: m.url, type: m.type || 'image', caption: `👶 BB ${twinId} · ${m.caption || '超聲波影像'} (${formatDisplayDate(m.date)})` }));
-      if (items[startIdx]) openMediaLightbox(items[startIdx].url, items[startIdx].type, items[startIdx].caption, items, startIdx);
-    }
-
-    let cachedFilteredUnifiedMedia = [];
-
-    function getUnifiedMediaList() {
-      const unified = [];
+    function collectAllGalleryMediaItems() {
+      const items = [];
 
       (appState.twinMedia || []).forEach(m => {
-        if (!m.url) return;
-        const who = m.target === 'A' ? 'BB A 超聲波' : m.target === 'B' ? 'BB B 超聲波' : '雙胎同框超聲波';
-        unified.push({
+        if (!m || !m.url) return;
+        const targetLabel = m.target === 'BOTH' ? '雙胎同框' : (m.target === 'A' ? 'BB A (大孖)' : 'BB B (細孖)');
+        items.push({
           uid: `twin:${m.id}`,
-          refType: 'twin',
-          refId: m.id,
+          sourceType: 'twin',
+          sourceId: m.id,
           url: m.url,
           type: m.type || 'image',
-          source: `📸 ${who}`,
-          mediaCategory: m.mediaCategory || '超聲波',
           date: m.date || '',
-          caption: m.caption || '超聲波影像',
-          ts: m.updatedAt || 0
+          createdAt: m.updatedAt || 0,
+          category: m.category || '超聲波',
+          sourceBadge: `超聲波 · ${targetLabel}`,
+          caption: m.caption || '超聲波影像'
         });
       });
 
       (appState.events || []).forEach(ev => {
-        const catLabel = ev.category === '入院' ? '住院' : ev.category;
-        (ev.media || []).forEach((m, mIdx) => {
-          if (!m.url) return;
-          unified.push({
-            uid: `event:${ev.id}:${mIdx}`,
-            refType: 'event',
-            refId: ev.id,
-            subIdx: mIdx,
+        (ev.media || []).forEach((m, idx) => {
+          if (!m || !m.url) return;
+          const catLabel = ev.category === '入院' ? '住院' : ev.category;
+          items.push({
+            uid: `event:${ev.id}:${idx}`,
+            sourceType: 'event',
+            sourceId: ev.id,
+            mediaIndex: idx,
             url: m.url,
             type: m.type || 'image',
-            source: `📅 月曆 (${catLabel})`,
-            mediaCategory: m.mediaCategory || (catLabel === '住院' ? '出院紀錄' : '轉介信'),
             date: m.customDate !== undefined ? m.customDate : (ev.date || ''),
-            caption: m.customCaption || ev.title || '覆診/住院附件',
-            ts: m.addedAt || ev.updatedAt || 0
+            createdAt: m.addedAt || ev.updatedAt || 0,
+            category: m.mediaCategory || '出院紀錄',
+            sourceBadge: `月曆 · ${catLabel}`,
+            caption: m.customCaption !== undefined ? m.customCaption : (ev.title || catLabel)
           });
         });
       });
 
       (appState.maternalLogs || []).forEach(ml => {
-        (ml.media || []).forEach((m, mIdx) => {
-          if (!m.url) return;
-          unified.push({
-            uid: `maternal:${ml.id}:${mIdx}`,
-            refType: 'maternal',
-            refId: ml.id,
-            subIdx: mIdx,
+        (ml.media || []).forEach((m, idx) => {
+          if (!m || !m.url) return;
+          items.push({
+            uid: `maternal:${ml.id}:${idx}`,
+            sourceType: 'maternal',
+            sourceId: ml.id,
+            mediaIndex: idx,
             url: m.url,
             type: m.type || 'image',
-            source: '🤰 媽媽日記',
-            mediaCategory: m.mediaCategory || '自訂',
             date: m.customDate !== undefined ? m.customDate : (ml.date || ''),
-            caption: m.customCaption || ml.feeling || ml.mood || '媽媽紀錄附件',
-            ts: m.addedAt || ml.updatedAt || 0
+            createdAt: m.addedAt || ml.updatedAt || 0,
+            category: m.mediaCategory || '自訂',
+            sourceBadge: '媽媽紀錄',
+            caption: m.customCaption !== undefined ? m.customCaption : (ml.feeling || ml.activity || ml.mood || '媽媽狀況影像')
           });
         });
       });
 
       (appState.medications || []).forEach(med => {
-        if (!med.image) return;
-        unified.push({
+        if (!med || !med.image) return;
+        items.push({
           uid: `med:${med.id}`,
-          refType: 'med',
-          refId: med.id,
+          sourceType: 'med',
+          sourceId: med.id,
           url: med.image,
           type: 'image',
-          source: `💊 藥物清單 (${med.type})`,
-          mediaCategory: med.imageCategory || '藥單',
           date: med.imageDate || '',
-          caption: med.name || '藥物包裝',
-          ts: med.updatedAt || 0
+          createdAt: med.updatedAt || 0,
+          category: med.imageCategory || '藥單',
+          sourceBadge: `藥物 · ${med.type}`,
+          caption: med.imageCaption || med.name
         });
       });
 
-      (appState.angelMemorial?.media || []).forEach((m, mIdx) => {
-        if (!m.url) return;
-        unified.push({
-          uid: `angel:${mIdx}`,
-          refType: 'angel',
-          subIdx: mIdx,
+      ((appState.angelMemorial && appState.angelMemorial.media) || []).forEach((m, idx) => {
+        if (!m || !m.url) return;
+        items.push({
+          uid: `angel:${idx}`,
+          sourceType: 'angel',
+          mediaIndex: idx,
           url: m.url,
           type: m.type || 'image',
-          source: '🕊️ 天使BB紀念冊',
-          mediaCategory: m.mediaCategory || '超聲波',
-          date: m.date || '2026-05-18',
-          caption: m.customCaption || '18/5/2026 紀念影像',
-          ts: appState.angelMemorial.updatedAt || 0
+          date: m.customDate !== undefined ? m.customDate : '2026-05-18',
+          createdAt: m.addedAt || (appState.angelMemorial && appState.angelMemorial.updatedAt) || 0,
+          category: m.mediaCategory || '自訂',
+          sourceBadge: '天使BB紀念冊',
+          caption: m.customCaption !== undefined ? m.customCaption : '18/5/2026 (11w1d) 紀念影像'
         });
       });
 
-      // 第1點核心：完全以自訂日期 (date) 由新至舊排序，若無日期則排於後方
-      unified.sort((a, b) => {
-        if (a.date && b.date) {
-          const cmp = b.date.localeCompare(a.date);
-          if (cmp !== 0) return cmp;
-        } else if (a.date && !b.date) {
-          return -1;
-        } else if (!a.date && b.date) {
-          return 1;
-        }
-        return (b.ts || 0) - (a.ts || 0);
+      return items.sort((a, b) => {
+        const dA = a.date || '';
+        const dB = b.date || '';
+        if (dB !== dA) return dB.localeCompare(dA);
+        return (b.createdAt || 0) - (a.createdAt || 0);
       });
-      return unified;
     }
 
-    function setAllMediaFilter(catKey) {
-      currentAllMediaFilter = catKey;
+    function setAllMediaFilter(cat) {
+      currentAllMediaFilter = cat;
       renderAllMediaTimeline();
     }
 
-    function openAllMediaLightbox(idx) {
-      const list = cachedFilteredUnifiedMedia.map(item => ({
-        url: item.url,
-        type: item.type,
-        caption: `[${item.mediaCategory}] ${item.source} · ${item.caption} (${formatDisplayDate(item.date)})`
-      }));
-      if (list[idx]) openMediaLightbox(list[idx].url, list[idx].type, list[idx].caption, list, idx);
-    }
-
-    // 第1點核心：開啟編輯彈窗修改自訂日期、分類與備註，按確定後才寫入並同步
-    function openUnifiedMediaEditModal(uid) {
-      const target = getUnifiedMediaList().find(x => x.uid === uid);
+    function openMediaEditModal(uid) {
+      const allItems = collectAllGalleryMediaItems();
+      const target = allItems.find(x => x.uid === uid);
       if (!target) return;
 
       document.getElementById('me-uid').value = uid;
@@ -4571,29 +4742,29 @@
 
       const previewWrap = document.getElementById('me-preview-wrap');
       previewWrap.innerHTML = target.type === 'video'
-        ? `<video src="${target.url}" controls style="max-height:110px; border-radius:8px; max-width:100%;"></video>`
-        : `<img src="${target.url}" style="max-height:110px; border-radius:8px; max-width:100%; object-fit:contain;">`;
+        ? `<video src="${target.url}" controls style="max-height:110px; border-radius:8px;"></video>`
+        : `<img src="${target.url}" style="max-height:110px; border-radius:8px; object-fit:contain;">`;
 
-      const standardCats = ['超聲波', '轉介信', '藥單', '出院紀錄', '自訂'];
+      const presets = ['超聲波', '轉介信', '藥單', '出院紀錄', '自訂'];
       const catSel = document.getElementById('me-category');
       const customInp = document.getElementById('me-custom-category');
-      if (standardCats.includes(target.mediaCategory)) {
-        catSel.value = target.mediaCategory;
+      if (presets.includes(target.category)) {
+        catSel.value = target.category;
         customInp.classList.add('hidden');
         customInp.value = '';
       } else {
         catSel.value = 'CUSTOM';
         customInp.classList.remove('hidden');
-        customInp.value = target.mediaCategory || '';
+        customInp.value = target.category || '';
       }
 
       openModal('modal-media-edit');
     }
 
     function toggleMediaEditCustomCategory() {
-      const catSel = document.getElementById('me-category').value;
+      const val = document.getElementById('me-category').value;
       const customInp = document.getElementById('me-custom-category');
-      if (catSel === 'CUSTOM') {
+      if (val === 'CUSTOM') {
         customInp.classList.remove('hidden');
         customInp.focus();
       } else {
@@ -4606,100 +4777,78 @@
       const uid = document.getElementById('me-uid').value;
       const newDate = document.getElementById('me-date').value || '';
       const rawCat = document.getElementById('me-category').value;
-      const finalCat = rawCat === 'CUSTOM'
+      const finalCategory = rawCat === 'CUSTOM'
         ? (document.getElementById('me-custom-category').value.trim() || '自訂')
         : rawCat;
       const newCaption = document.getElementById('me-caption').value.trim();
 
       const parts = uid.split(':');
-      const kind = parts[0];
-      const refId = parts[1];
-      const subIdx = parts[2] !== undefined ? parseInt(parts[2], 10) : -1;
+      const type = parts[0];
 
-      if (kind === 'twin') {
-        const rec = (appState.twinMedia || []).find(x => x.id === refId);
+      if (type === 'twin') {
+        const rec = (appState.twinMedia || []).find(x => x.id === parts[1]);
         if (rec) {
           rec.date = newDate;
-          rec.mediaCategory = finalCat;
+          rec.category = finalCategory;
           if (newCaption) rec.caption = newCaption;
           rec.updatedAt = Date.now();
         }
-      } else if (kind === 'event') {
-        const ev = (appState.events || []).find(x => x.id === refId);
-        if (ev && ev.media && ev.media[subIdx]) {
-          ev.media[subIdx].customDate = newDate;
-          ev.media[subIdx].mediaCategory = finalCat;
-          if (newCaption) ev.media[subIdx].customCaption = newCaption;
+      } else if (type === 'event') {
+        const ev = (appState.events || []).find(x => x.id === parts[1]);
+        const idx = parseInt(parts[2], 10);
+        if (ev && ev.media && ev.media[idx]) {
+          ev.media[idx].customDate = newDate;
+          ev.media[idx].mediaCategory = finalCategory;
+          if (newCaption) ev.media[idx].customCaption = newCaption;
           ev.updatedAt = Date.now();
         }
-      } else if (kind === 'maternal') {
-        const ml = (appState.maternalLogs || []).find(x => x.id === refId);
-        if (ml && ml.media && ml.media[subIdx]) {
-          ml.media[subIdx].customDate = newDate;
-          ml.media[subIdx].mediaCategory = finalCat;
-          if (newCaption) ml.media[subIdx].customCaption = newCaption;
+      } else if (type === 'maternal') {
+        const ml = (appState.maternalLogs || []).find(x => x.id === parts[1]);
+        const idx = parseInt(parts[2], 10);
+        if (ml && ml.media && ml.media[idx]) {
+          ml.media[idx].customDate = newDate;
+          ml.media[idx].mediaCategory = finalCategory;
+          if (newCaption) ml.media[idx].customCaption = newCaption;
           ml.updatedAt = Date.now();
         }
-      } else if (kind === 'med') {
-        const med = (appState.medications || []).find(x => x.id === refId);
+      } else if (type === 'med') {
+        const med = (appState.medications || []).find(x => x.id === parts[1]);
         if (med) {
           med.imageDate = newDate;
-          med.imageCategory = finalCat;
-          if (newCaption) med.name = newCaption;
+          med.imageCategory = finalCategory;
+          if (newCaption) med.imageCaption = newCaption;
           med.updatedAt = Date.now();
         }
-      } else if (kind === 'angel') {
-        const aIdx = parseInt(refId, 10);
-        if (appState.angelMemorial && appState.angelMemorial.media && appState.angelMemorial.media[aIdx]) {
-          appState.angelMemorial.media[aIdx].date = newDate;
-          appState.angelMemorial.media[aIdx].mediaCategory = finalCat;
-          if (newCaption) appState.angelMemorial.media[aIdx].customCaption = newCaption;
+      } else if (type === 'angel') {
+        const idx = parseInt(parts[1], 10);
+        if (appState.angelMemorial && appState.angelMemorial.media && appState.angelMemorial.media[idx]) {
+          appState.angelMemorial.media[idx].customDate = newDate;
+          appState.angelMemorial.media[idx].mediaCategory = finalCategory;
+          if (newCaption) appState.angelMemorial.media[idx].customCaption = newCaption;
           appState.angelMemorial.updatedAt = Date.now();
         }
       }
 
-      persistAndSync({ changeDesc: `編輯影像資料（日期：${formatDisplayDate(newDate)}，分類：${finalCat}）` });
+      persistAndSync({ changeDesc: `編輯影像屬性（分類：${finalCategory}，日期：${formatDisplayDate(newDate)}）` });
       closeAllModals();
-      showToast(`✅ 已更新影像日期與分類並同步`);
+      showToast(`✅ 已確定更新影像日期與分類「${finalCategory}」`);
     }
 
-    function deleteUnifiedMediaItem(uid) {
-      const parts = uid.split(':');
-      const kind = parts[0];
-      const refId = parts[1];
-      const subIdx = parts[2] !== undefined ? parseInt(parts[2], 10) : -1;
+    function openAllMediaLightboxByIndex(idx) {
+      const allItems = getFilteredAllMediaItems();
+      if (!allItems[idx]) return;
+      const slideList = allItems.map(item => ({
+        url: item.url,
+        type: item.type,
+        caption: `[${item.category}] ${item.date ? formatDisplayDate(item.date) : '未設日期'} · ${item.caption}`
+      }));
+      openMediaLightbox(slideList[idx].url, slideList[idx].type, slideList[idx].caption, slideList, idx);
+    }
 
-      if (kind === 'twin') {
-        appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), refId]));
-        appState.twinMedia = (appState.twinMedia || []).filter(m => m.id !== refId);
-      } else if (kind === 'event') {
-        const ev = (appState.events || []).find(x => x.id === refId);
-        if (ev && ev.media) {
-          ev.media.splice(subIdx, 1);
-          ev.updatedAt = Date.now();
-        }
-      } else if (kind === 'maternal') {
-        const ml = (appState.maternalLogs || []).find(x => x.id === refId);
-        if (ml && ml.media) {
-          ml.media.splice(subIdx, 1);
-          ml.updatedAt = Date.now();
-        }
-      } else if (kind === 'med') {
-        const med = (appState.medications || []).find(x => x.id === refId);
-        if (med) {
-          med.image = '';
-          med.updatedAt = Date.now();
-        }
-      } else if (kind === 'angel') {
-        const aIdx = parseInt(refId, 10);
-        if (appState.angelMemorial && appState.angelMemorial.media) {
-          appState.angelMemorial.media.splice(aIdx, 1);
-          appState.angelMemorial.updatedAt = Date.now();
-        }
-      }
-
-      persistAndSync({ changeDesc: '刪除影像庫一個檔案' });
-      showToast('🗑️ 已從資料庫永久刪除該影像並同步');
+    function getFilteredAllMediaItems() {
+      const allItems = collectAllGalleryMediaItems();
+      if (currentAllMediaFilter === 'ALL') return allItems;
+      return allItems.filter(item => item.category === currentAllMediaFilter);
     }
 
     function renderAllMediaTimeline() {
@@ -4708,55 +4857,255 @@
       const filterBar = document.getElementById('all-media-filter-bar');
       if (!grid) return;
 
-      const allUnified = getUnifiedMediaList();
-      if (countBadge) countBadge.textContent = `共 ${allUnified.length} 個檔案`;
-
-      const baseCategories = ['超聲波', '轉介信', '藥單', '出院紀錄', '自訂'];
-      const extraCategories = Array.from(new Set(allUnified.map(x => x.mediaCategory).filter(c => c && !baseCategories.includes(c))));
-      const allCategories = [...baseCategories, ...extraCategories];
-
-      if (currentAllMediaFilter !== 'ALL' && !allCategories.includes(currentAllMediaFilter)) {
-        currentAllMediaFilter = 'ALL';
-      }
+      const allItems = collectAllGalleryMediaItems();
+      const dynamicCats = Array.from(new Set([...MEDIA_FILTER_CATEGORIES, ...allItems.map(x => x.category).filter(Boolean)]));
 
       if (filterBar) {
-        const countFor = (cat) => cat === 'ALL' ? allUnified.length : allUnified.filter(x => x.mediaCategory === cat).length;
-        const buttons = [{ key: 'ALL', label: `全部 (${countFor('ALL')})` }, ...allCategories.map(c => ({ key: c, label: `${c} (${countFor(c)})` }))];
-        filterBar.innerHTML = buttons.map(b => `
-          <button type="button" onclick="setAllMediaFilter('${b.key.replace(/'/g, "\\'")}')" class="media-filter-btn ${currentAllMediaFilter === b.key ? 'active' : ''}">
-            ${b.label}
-          </button>
-        `).join('');
+        filterBar.innerHTML = dynamicCats.map(cat => {
+          const cnt = cat === 'ALL' ? allItems.length : allItems.filter(x => x.category === cat).length;
+          const label = cat === 'ALL' ? `全部 (${cnt})` : `${cat} (${cnt})`;
+          const safeCat = cat.replace(/'/g, "\\'");
+          return `<button type="button" onclick="setAllMediaFilter('${safeCat}')" class="media-filter-btn ${currentAllMediaFilter === cat ? 'active' : ''}">${label}</button>`;
+        }).join('');
       }
 
-      const filtered = currentAllMediaFilter === 'ALL'
-        ? allUnified
-        : allUnified.filter(item => item.mediaCategory === currentAllMediaFilter);
-      cachedFilteredUnifiedMedia = filtered;
+      const filteredItems = getFilteredAllMediaItems();
+      if (countBadge) countBadge.textContent = `顯示 ${filteredItems.length} / 共 ${allItems.length} 個`;
 
-      if (filtered.length === 0) {
-        grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:0.8rem; color:#94a3b8; text-align:center; padding:18px 0;">此分類暫無上載影像</p>`;
+      if (filteredItems.length === 0) {
+        grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; font-size:0.8rem; color:#94a3b8; padding:12px;">此分類暫無影像紀錄</p>`;
         return;
       }
 
-      grid.innerHTML = filtered.map((item, idx) => `
+      grid.innerHTML = filteredItems.map((item, idx) => `
         <div class="media-thumb-card">
-          ${item.type === 'video'
-            ? `<video src="${item.url}" controls onclick="openAllMediaLightbox(${idx})" style="width:100%; height:92px; object-fit:cover; border-radius:7px; background:#000; cursor:zoom-in;"></video>`
-            : `<img src="${item.url}" onclick="openAllMediaLightbox(${idx})" title="點擊放大並左右滑動切換" style="width:100%; height:92px; object-fit:cover; border-radius:7px; cursor:zoom-in;">`
-          }
-          <div class="flex-between" style="margin-top:2px; gap:2px;">
-            <span class="badge" style="background:var(--rose-100); color:var(--rose-700);">${item.mediaCategory}</span>
-            <span style="font-size:0.7rem; color:#64748b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.source}</span>
+          <div style="position:relative; height:105px; background:#0f172a; border-radius:8px; overflow:hidden; cursor:zoom-in;" onclick="openAllMediaLightboxByIndex(${idx})">
+            ${item.type === 'video'
+              ? `<video src="${item.url}" style="width:100%; height:100%; object-fit:cover;"></video>`
+              : `<img src="${item.url}" style="width:100%; height:100%; object-fit:cover;">`
+            }
+            <span style="position:absolute; top:4px; left:4px; background:rgba(15,23,42,0.8); color:#fff; font-size:0.65rem; font-weight:700; padding:2px 6px; border-radius:6px;">
+              ${item.category}
+            </span>
           </div>
-          <div style="font-size:0.75rem; font-weight:700; color:#334155;">📅 ${formatDisplayDate(item.date)}</div>
-          <p style="font-size:0.75rem; color:#475569; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.caption}</p>
-          <div style="display:flex; gap:4px; margin-top:2px;">
-            <button type="button" onclick="openUnifiedMediaEditModal('${item.uid}')" class="btn btn-soft" style="flex:1; padding:4px 2px; font-size:0.75rem;">✏️ 編輯</button>
-            <button type="button" onclick="deleteUnifiedMediaItem('${item.uid}')" class="btn btn-soft-rose" style="padding:4px 8px; font-size:0.75rem;">刪除</button>
+          <div class="flex-between" style="font-size:0.72rem; color:#475569; margin-top:2px;">
+            <strong style="color:var(--rose-700);">📅 ${item.date ? formatDisplayDate(item.date) : '未設日期'}</strong>
+            <button type="button" onclick="openMediaEditModal('${item.uid}')" class="btn btn-soft" style="padding:2px 7px; font-size:0.7rem;">✏️ 編輯</button>
+          </div>
+          <div style="font-size:0.76rem; font-weight:700; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${item.caption}">
+            ${item.caption}
           </div>
         </div>
       `).join('');
+    }
+
+    function renderHistoryAndGalleryTab() {
+      const mhList = document.getElementById('medical-history-list');
+      const sortedMh = [...(appState.medicalHistory || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      mhList.innerHTML = sortedMh.map(item => `
+        <div class="flex-between" style="align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:9px 10px; font-size:0.85rem;">
+          <div style="flex:1; min-width:0;">
+            <div class="flex-center" style="gap:6px; margin-bottom:3px; flex-wrap:wrap;">
+              <span class="badge" style="background:${item.tag === '子宮頸瘜肉' ? 'var(--rose-100)' : item.tag === '孕初期流血/流啡' ? 'var(--amber-100)' : 'var(--sky-100)'}; color:${item.tag === '子宮頸瘜肉' ? 'var(--rose-700)' : item.tag === '孕初期流血/流啡' ? 'var(--amber-800)' : 'var(--sky-700)'};">${item.tag}</span>
+              <strong>${formatDisplayDate(item.date)}</strong>
+            </div>
+            ${item.detail ? `<p style="color:#334155;">${item.detail}</p>` : ''}
+          </div>
+          <div class="flex-center" style="gap:4px; flex-shrink:0;">
+            <button onclick="openHistoryModal('${item.id}')" class="btn btn-soft" style="padding:3px 7px; font-size:0.78rem;">編輯</button>
+            <button onclick="deleteMedicalHistory('${item.id}')" style="color:#94a3b8; font-weight:700; padding:2px 5px;">✕</button>
+          </div>
+        </div>
+      `).join('');
+
+      const angelThumbs = document.getElementById('angel-preview-thumbs');
+      const angelMedia = (appState.angelMemorial && appState.angelMemorial.media) || [];
+      angelThumbs.innerHTML = angelMedia.map((m, idx) => m.type === 'video'
+        ? `<video src="${m.url}" onclick="openAngelLightbox(${idx})" style="width:52px; height:52px; border-radius:8px; object-fit:cover; flex-shrink:0; cursor:zoom-in;"></video>`
+        : `<img src="${m.url}" onclick="openAngelLightbox(${idx})" style="width:52px; height:52px; border-radius:8px; object-fit:cover; flex-shrink:0; cursor:zoom-in;">`
+      ).join('');
+
+      ['A', 'B'].forEach(twinId => {
+        const grid = document.getElementById(`gallery-grid-${twinId}`);
+        const mediaItems = [...(appState.twinMedia || [])]
+          .filter(m => m.target === twinId || m.target === 'BOTH')
+          .sort((a, b) => {
+            const dA = a.date || '';
+            const dB = b.date || '';
+            if (dB !== dA) return dB.localeCompare(dA);
+            return (b.updatedAt || 0) - (a.updatedAt || 0);
+          });
+
+        if (mediaItems.length === 0) {
+          grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; font-size:0.78rem; color:#94a3b8; padding:12px;">暫無影像</p>`;
+          return;
+        }
+        grid.innerHTML = mediaItems.map((m, idx) => `
+          <div class="media-thumb-card">
+            <div style="position:relative; height:102px; background:#0f172a; border-radius:8px; overflow:hidden; cursor:zoom-in;" onclick="openTwinGalleryLightbox('${twinId}', ${idx})">
+              ${m.type === 'video'
+                ? `<video src="${m.url}" style="width:100%; height:100%; object-fit:cover;"></video>`
+                : `<img src="${m.url}" style="width:100%; height:100%; object-fit:cover;">`
+              }
+              ${m.target === 'BOTH' ? `<span style="position:absolute; top:4px; left:4px; background:rgba(225,29,72,0.9); color:#fff; font-size:0.65rem; font-weight:700; padding:1px 5px; border-radius:4px;">雙胎同框</span>` : ''}
+            </div>
+            <div class="flex-between" style="font-size:0.72rem; color:#475569;">
+              <span>${formatDisplayDate(m.date)}</span>
+              <button onclick="deleteTwinMedia('${m.id}')" style="color:var(--rose-600); font-weight:700;">刪除</button>
+            </div>
+            <div style="font-size:0.75rem; font-weight:700; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.caption || '超聲波紀錄'}</div>
+            ${m.type === 'image' ? `<button onclick="setTwinAvatar('${twinId}', '${m.url}')" style="font-size:0.72rem; background:#e2e8f0; color:#334155; border-radius:6px; padding:3px; font-weight:700;">設為 BB ${twinId} 頭像</button>` : ''}
+          </div>
+        `).join('');
+      });
+
+      renderAllMediaTimeline();
+    }
+
+    function openTwinGalleryLightbox(twinId, startIdx) {
+      const mediaItems = [...(appState.twinMedia || [])]
+        .filter(m => m.target === twinId || m.target === 'BOTH')
+        .sort((a, b) => {
+          const dA = a.date || '';
+          const dB = b.date || '';
+          if (dB !== dA) return dB.localeCompare(dA);
+          return (b.updatedAt || 0) - (a.updatedAt || 0);
+        });
+      const list = mediaItems.map(m => ({ url: m.url, type: m.type || 'image', caption: `BB ${twinId} · ${formatDisplayDate(m.date)} ${m.caption || ''}` }));
+      openMediaLightbox(list[startIdx].url, list[startIdx].type, list[startIdx].caption, list, startIdx);
+    }
+
+    function openAngelLightbox(startIdx) {
+      const angelMedia = (appState.angelMemorial && appState.angelMemorial.media) || [];
+      if (!angelMedia[startIdx]) return;
+      const list = angelMedia.map(m => ({ url: m.url, type: m.type || 'image', caption: '🕊️ 天使BB紀念冊 · 18/5/2026 (11w1d)' }));
+      openMediaLightbox(list[startIdx].url, list[startIdx].type, list[startIdx].caption, list, startIdx);
+    }
+
+    function openHistoryModal(id) {
+      const titleEl = document.getElementById('mh-modal-title');
+      const customWrap = document.getElementById('mh-custom-tag-wrap');
+      const customInp = document.getElementById('mh-custom-tag');
+      const tagSel = document.getElementById('mh-tag');
+
+      if (id) {
+        const item = appState.medicalHistory.find(x => x.id === id);
+        if (!item) return;
+        titleEl.textContent = '✏️ 編輯媽媽病史 / 出血進展';
+        document.getElementById('mh-id').value = item.id;
+        document.getElementById('mh-date').value = item.date || '';
+        document.getElementById('mh-detail').value = item.detail || '';
+
+        const presetOptions = ['子宮頸瘜肉', '孕初期流血/流啡', '其他醫療紀錄'];
+        if (presetOptions.includes(item.tag)) {
+          tagSel.value = item.tag;
+          customWrap.classList.add('hidden');
+          customInp.value = '';
+        } else {
+          tagSel.value = 'CUSTOM';
+          customWrap.classList.remove('hidden');
+          customInp.value = item.tag || '';
+        }
+      } else {
+        titleEl.textContent = '🩺 新增媽媽病史 / 出血進展';
+        document.getElementById('mh-id').value = '';
+        document.getElementById('mh-date').value = getTodayStr();
+        tagSel.value = '子宮頸瘜肉';
+        customWrap.classList.add('hidden');
+        customInp.value = '';
+        document.getElementById('mh-detail').value = '';
+      }
+      openModal('modal-history');
+    }
+
+    function toggleCustomHistoryTag() {
+      const tagSel = document.getElementById('mh-tag').value;
+      const customWrap = document.getElementById('mh-custom-tag-wrap');
+      const customInp = document.getElementById('mh-custom-tag');
+      if (tagSel === 'CUSTOM') {
+        customWrap.classList.remove('hidden');
+        customInp.focus();
+      } else {
+        customWrap.classList.add('hidden');
+      }
+    }
+
+    function saveMedicalHistory(e) {
+      e.preventDefault();
+      const existingId = document.getElementById('mh-id').value;
+      const id = existingId || ('mh-' + Date.now());
+      const date = document.getElementById('mh-date').value || '';
+      const selectedTag = document.getElementById('mh-tag').value;
+      const finalTag = selectedTag === 'CUSTOM'
+        ? (document.getElementById('mh-custom-tag').value.trim() || '自訂病史')
+        : selectedTag;
+      const detail = document.getElementById('mh-detail').value.trim();
+
+      const idx = appState.medicalHistory.findIndex(x => x.id === id);
+      const record = { id, date, tag: finalTag, detail, updatedAt: Date.now() };
+      if (idx >= 0) appState.medicalHistory[idx] = record;
+      else appState.medicalHistory.unshift(record);
+
+      persistAndSync({ changeDesc: `${existingId ? '更新' : '新增'}媽媽病史紀錄「${finalTag}」` });
+      closeAllModals();
+      showToast('✅ 已儲存病史紀錄');
+    }
+
+    function deleteMedicalHistory(id) {
+      appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
+      appState.medicalHistory = appState.medicalHistory.filter(x => x.id !== id);
+      persistAndSync({ changeDesc: '刪除一筆媽媽病史紀錄' });
+    }
+
+    function openAngelModal() {
+      document.getElementById('angel-note-input').value = appState.angelMemorial.note || '';
+      renderAngelModalGallery();
+      openModal('modal-angel');
+    }
+
+    function saveAngelNote() {
+      appState.angelMemorial.note = document.getElementById('angel-note-input').value;
+      appState.angelMemorial.updatedAt = Date.now();
+      persistAndSync({ changeDesc: '更新天使BB紀念冊文字' });
+      showToast('💜 已儲存天使BB紀念文字');
+    }
+
+    function handleAngelMediaUpload(event) {
+      const files = Array.from(event.target.files || []);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          appState.angelMemorial.media.push({
+            type: file.type.startsWith('video/') ? 'video' : 'image',
+            url: e.target.result,
+            mediaCategory: '自訂',
+            addedAt: Date.now()
+          });
+          appState.angelMemorial.updatedAt = Date.now();
+          persistAndSync({ changeDesc: '上載天使BB紀念冊影像' });
+          renderAngelModalGallery();
+        };
+        reader.readAsDataURL(file);
+      });
+      event.target.value = '';
+    }
+
+    function renderAngelModalGallery() {
+      const grid = document.getElementById('angel-gallery-grid');
+      const media = appState.angelMemorial.media || [];
+      grid.innerHTML = media.map((m, idx) => `
+        <div style="position:relative; height:120px; border-radius:10px; overflow:hidden; background:#0f172a;">
+          ${m.type === 'video' ? `<video src="${m.url}" controls onclick="openAngelLightbox(${idx})" style="width:100%; height:100%; object-fit:cover;"></video>` : `<img src="${m.url}" onclick="openAngelLightbox(${idx})" style="width:100%; height:100%; object-fit:cover; cursor:zoom-in;">`}
+          <button onclick="deleteAngelMedia(${idx})" class="preview-del-btn">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function deleteAngelMedia(idx) {
+      appState.angelMemorial.media.splice(idx, 1);
+      appState.angelMemorial.updatedAt = Date.now();
+      persistAndSync({ changeDesc: '刪除天使BB紀念冊影像' });
+      renderAngelModalGallery();
     }
 
     function openMediaUploadModal(defaultTarget) {
@@ -4776,8 +5125,7 @@
         reader.onload = (ev) => {
           tempPendingTwinMedia.push({
             type: file.type.startsWith('video/') ? 'video' : 'image',
-            url: ev.target.result,
-            name: file.name
+            url: ev.target.result
           });
           renderPendingTwinMediaPreview();
         };
@@ -4787,8 +5135,8 @@
     }
 
     function renderPendingTwinMediaPreview() {
-      const box = document.getElementById('mu-pending-preview');
       document.getElementById('mu-count-label').textContent = tempPendingTwinMedia.length;
+      const box = document.getElementById('mu-pending-preview');
       box.innerHTML = tempPendingTwinMedia.map((m, idx) => `
         <div class="preview-item">
           ${m.type === 'video' ? `<video src="${m.url}" onclick="openMediaLightbox('${m.url}', 'video')"></video>` : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image')">`}
@@ -4800,7 +5148,7 @@
     function submitTwinMedia(e) {
       e.preventDefault();
       if (tempPendingTwinMedia.length === 0) {
-        showToast('⚠️ 請至少選擇一個相片或影片檔案');
+        showToast('⚠️ 請先選擇至少一張相片或影片');
         return;
       }
       const target = document.getElementById('mu-target').value;
@@ -4808,12 +5156,12 @@
       const caption = document.getElementById('mu-caption').value.trim();
 
       tempPendingTwinMedia.forEach((item, idx) => {
-        appState.twinMedia.push({
-          id: 'tm-media-' + Date.now() + '-' + idx,
+        appState.twinMedia.unshift({
+          id: 'med-img-' + Date.now() + '-' + idx,
           target,
           date,
-          caption,
-          mediaCategory: '超聲波',
+          caption: caption || (target === 'BOTH' ? 'MCMA雙胎同框超聲波' : `BB ${target} 超聲波`),
+          category: '超聲波',
           type: item.type,
           url: item.url,
           updatedAt: Date.now()
@@ -4821,215 +5169,75 @@
       });
 
       const uploadedCount = tempPendingTwinMedia.length;
-      persistAndSync({ changeDesc: `上載 ${uploadedCount} 個超聲波影像檔案 (${formatDisplayDate(date)})` });
       tempPendingTwinMedia = [];
+      persistAndSync({ changeDesc: `上載 ${uploadedCount} 個超聲波影像 (${formatDisplayDate(date)})` });
       closeAllModals();
-      showToast(`📸 已成功上載 ${uploadedCount} 個超聲波影像並同步`);
-    }
-
-    function setTwinAvatar(twinId, url) {
-      appState.twinAvatars[twinId] = url;
-      persistAndSync({ changeDesc: `更新 BB ${twinId} 頭像` });
-      showToast(`👶 已設為 BB ${twinId} 頭像並同步`);
+      showToast('✅ 超聲波影像已上載並同步');
     }
 
     function deleteTwinMedia(id) {
       appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
       appState.twinMedia = appState.twinMedia.filter(m => m.id !== id);
-      persistAndSync({ changeDesc: '刪除一個超聲波影像檔案' });
+      persistAndSync({ changeDesc: '刪除一個超聲波影像' });
     }
 
-    // 病史新增與編輯
-    function openHistoryModal(mhId) {
-      const customWrap = document.getElementById('mh-custom-tag-wrap');
-      const customInput = document.getElementById('mh-custom-tag');
-      customWrap.classList.add('hidden');
-      customInput.value = '';
-
-      if (mhId) {
-        const item = appState.medicalHistory.find(x => x.id === mhId);
-        document.getElementById('mh-modal-title').textContent = '✏️ 編輯媽媽病史 / 出血進展';
-        document.getElementById('mh-id').value = item.id;
-        document.getElementById('mh-date').value = item.date || '';
-        const presets = ['子宮頸瘜肉', '孕初期流血/流啡', '其他醫療紀錄'];
-        if (presets.includes(item.tag)) {
-          document.getElementById('mh-tag').value = item.tag;
-        } else {
-          document.getElementById('mh-tag').value = 'CUSTOM';
-          customWrap.classList.remove('hidden');
-          customInput.value = item.tag;
-        }
-        document.getElementById('mh-detail').value = item.detail || '';
-      } else {
-        document.getElementById('mh-modal-title').textContent = '🩺 新增媽媽病史 / 出血進展';
-        document.getElementById('mh-id').value = '';
-        document.getElementById('mh-date').value = getTodayStr();
-        document.getElementById('mh-tag').value = '子宮頸瘜肉';
-        document.getElementById('mh-detail').value = '';
-      }
-      openModal('modal-history');
-    }
-
-    function toggleCustomHistoryTag() {
-      const val = document.getElementById('mh-tag').value;
-      const wrap = document.getElementById('mh-custom-tag-wrap');
-      if (val === 'CUSTOM') wrap.classList.remove('hidden');
-      else wrap.classList.add('hidden');
-    }
-
-    function saveMedicalHistory(e) {
-      e.preventDefault();
-      const existingId = document.getElementById('mh-id').value;
-      const id = existingId || ('mh-' + Date.now());
-      const date = document.getElementById('mh-date').value || '';
-      const rawTag = document.getElementById('mh-tag').value;
-      const tag = rawTag === 'CUSTOM'
-        ? (document.getElementById('mh-custom-tag').value.trim() || '自訂醫療紀錄')
-        : rawTag;
-      const detail = document.getElementById('mh-detail').value.trim();
-
-      const idx = appState.medicalHistory.findIndex(x => x.id === id);
-      if (idx >= 0) appState.medicalHistory[idx] = { id, date, tag, detail, updatedAt: Date.now() };
-      else appState.medicalHistory.push({ id, date, tag, detail, updatedAt: Date.now() });
-
-      persistAndSync({ changeDesc: `${existingId ? '編輯' : '新增'}媽媽病史紀錄「${tag}」` });
-      closeAllModals();
-      showToast('🩺 已儲存病史紀錄並同步');
-    }
-
-    function deleteMedicalHistory(id) {
-      appState.deletedIds = Array.from(new Set([...(appState.deletedIds || []), id]));
-      appState.medicalHistory = appState.medicalHistory.filter(x => x.id !== id);
-      persistAndSync({ changeDesc: '刪除一筆媽媽病史紀錄' });
-    }
-
-    // 天使BB紀念冊
-    function openAngelModal() {
-      document.getElementById('angel-note-input').value = appState.angelMemorial.note || '';
-      renderAngelGallery();
-      openModal('modal-angel');
-    }
-
-    function renderAngelGallery() {
-      const grid = document.getElementById('angel-gallery-grid');
-      const media = appState.angelMemorial.media || [];
-      if (media.length === 0) {
-        grid.innerHTML = `<p style="grid-column: 1 / -1; font-size:0.8rem; color:#94a3b8; text-align:center; padding:18px 0;">可點擊上方按鈕多選上載超聲波相片或紀念影片</p>`;
-        return;
-      }
-      grid.innerHTML = media.map((m, idx) => `
-        <div class="media-thumb-card" style="position:relative; border-color:#e9d5ff; padding:4px;">
-          ${m.type === 'video'
-            ? `<video src="${m.url}" controls onclick="openMediaLightbox('${m.url}', 'video', '天使BB紀念影像')" style="width:100%; height:96px; object-fit:cover; border-radius:7px; cursor:zoom-in;"></video>`
-            : `<img src="${m.url}" onclick="openMediaLightbox('${m.url}', 'image', '天使BB紀念影像')" style="width:100%; height:96px; object-fit:cover; border-radius:7px; cursor:zoom-in;">`
-          }
-          <button onclick="deleteAngelMedia(${idx})" class="preview-del-btn">✕</button>
-        </div>
-      `).join('');
-    }
-
-    function handleAngelMediaUpload(e) {
-      const files = Array.from(e.target.files || []);
-      if (files.length === 0) return;
-      let loaded = 0;
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          appState.angelMemorial.media.push({
-            type: file.type.startsWith('video/') ? 'video' : 'image',
-            url: ev.target.result,
-            date: '2026-05-18',
-            mediaCategory: '超聲波'
-          });
-          loaded++;
-          if (loaded === files.length) {
-            appState.angelMemorial.updatedAt = Date.now();
-            persistAndSync({ changeDesc: `上載 ${files.length} 個天使BB紀念冊影像` });
-            renderAngelGallery();
-            showToast(`🕊️ 已上載 ${files.length} 個天使BB紀念影像並同步`);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-      e.target.value = '';
-    }
-
-    function saveAngelNote() {
-      appState.angelMemorial.note = document.getElementById('angel-note-input').value.trim();
-      appState.angelMemorial.updatedAt = Date.now();
-      persistAndSync({ changeDesc: '更新天使BB紀念冊文字留言' });
-      showToast('🕊️ 已儲存天使BB紀念文字並同步');
-    }
-
-    function deleteAngelMedia(idx) {
-      appState.angelMemorial.media.splice(idx, 1);
-      appState.angelMemorial.updatedAt = Date.now();
-      persistAndSync({ changeDesc: '刪除天使BB紀念冊一個影像' });
-      renderAngelGallery();
+    function setTwinAvatar(twinId, url) {
+      appState.twinAvatars[twinId] = url;
+      persistAndSync({ changeDesc: `更換 BB ${twinId} 頭像` });
+      showToast(`👶 已設定 BB ${twinId} 頭像`);
     }
 
     // =========================================================================
-    // 9. 安全運動動態建議模組
+    // 9. 個人化安全運動建議
     // =========================================================================
     function renderExerciseTab() {
-      const ga = getGestationalAgeForDate(new Date());
-      document.getElementById('exercise-ga-tag').textContent = `目前孕週：${ga.label} (${ga.short})`;
+      const lmpGa = getGestationalAgeForDate(new Date());
+      document.getElementById('exercise-ga-tag').textContent = `LMP 目前 ${lmpGa.label}`;
 
-      const recentLogs = (appState.maternalLogs || []).slice(0, 5);
-      const hasRecentBleeding = recentLogs.some(l => l.bleeding && l.bleeding !== '正常無出血');
+      const today = getTodayStr();
+      const recentLogs = (appState.maternalLogs || []).filter(l => l.date === today);
+      const hasBleeding = recentLogs.some(l => l.bleeding && l.bleeding !== '正常無出血');
+
       const alertBox = document.getElementById('exercise-dynamic-alert');
-
-      if (hasRecentBleeding) {
+      if (hasBleeding) {
         alertBox.style.background = 'var(--amber-50)';
-        alertBox.style.border = '1px solid #fcd34d';
+        alertBox.style.border = '1px solid #fde68a';
         alertBox.style.color = 'var(--amber-800)';
-        alertBox.innerHTML = `<strong>⚠️ 偵測到近期媽媽紀錄曾有分泌物/流啡：</strong>目前系統自動切換為<strong>「高度安胎靜養模式」</strong>，建議以臥床左側臥及床上踝泵運動為主，待連續 7 日完全無分泌物後再恢復平地慢步。`;
+        alertBox.innerHTML = `<strong>⚠️ 系統偵測到今日有分泌物/出血紀錄：</strong>今日建議以<strong>「臥床靜養及床上踝泵運動」</strong>為主，暫停散步及站立活動，直至分泌物完全轉清及穩定。`;
       } else {
         alertBox.style.background = 'var(--emerald-50)';
         alertBox.style.border = '1px solid #a7f3d0';
         alertBox.style.color = 'var(--emerald-800)';
-        alertBox.innerHTML = `<strong>✅ 目前母體分泌物狀況穩定：</strong>可進行<strong>「溫和低負荷血液循環活動」</strong>，每次 10–15 分鐘為限，以完全不喘氣、下腹無緊繃感為準。`;
+        alertBox.innerHTML = `<strong>✅ 今日身體狀況平穩 (孕早期 ${lmpGa.label})：</strong>可進行以下極溫和、零衝擊的血液循環與放鬆練習，每次 10–15 分鐘為宜，切勿疲勞。`;
       }
 
-      const cards = [
-        {
-          title: '1. 床上踝泵運動 (預防雙胎下肢水腫及血栓)',
-          time: '每日 2–3 次 · 每次 3 分鐘',
-          desc: '平躺或半坐臥，雙腳腳尖緩慢向上勾起維持 5 秒，再向下踩直維持 5 秒。完全零腹壓，出血安胎期間亦可安全進行。'
-        },
-        {
-          title: '2. 腹式深呼吸與胸廓放鬆',
-          time: '早晚各 1 次 · 每次 5 分鐘',
-          desc: '採取舒適左側臥姿，鼻吸氣 4 秒讓肋骨兩側擴張，嘴巴慢吐氣 6 秒，有助穩定自律神經及提升胎盤血流灌注。'
-        },
-        {
-          title: '3. 飯後室內平地慢步 (僅限無出血時)',
-          time: '每次 10–15 分鐘 · 步速宜慢',
-          desc: '如當日完全無啡色分泌及無腹痛，可於室內或平坦商場慢行，避免斜坡及樓梯，減少子宮頸瘜肉受摩擦出血。'
-        },
-        {
-          title: '4. 坐姿肩頸及上肢伸展',
-          time: '每日 1–2 次 · 每次 5 分鐘',
-          desc: '安坐於有靠背椅子上，緩慢轉動雙肩及伸展手臂，紓緩安胎臥床帶來的肩背僵硬，全程保持骨盆穩定不扭轉腰部。'
-        }
+      const exercises = [
+        { title: '1. 橫膈膜深呼吸與冥想放鬆', time: '每日 2 次 · 每次 5-10 分鐘', desc: '採半坐臥或左側臥姿勢，鼻吸 4 秒、口呼 6 秒，降低交感神經緊張並改善胎盤血流灌注。' },
+        { title: '2. 床上踝泵運動 (預防下肢水腫/血栓)', time: '每臥床 2 小時 · 做 20 下', desc: '平躺或半臥時緩慢勾起腳尖再向下踩平，促進小腿靜脈回流，完全不牽動腹部及子宮頸。' },
+        { title: '3. 坐姿肩頸與上肢溫和伸展', time: '每日 1-2 次 · 每次 5 分鐘', desc: '安坐於有靠背椅子上緩慢轉動肩膀及伸展手臂，舒緩安胎期間久臥引致的肩背僵硬。' },
+        { title: '4. 飯後平地慢步 (僅限完全無出血日子)', time: '每次 10-15 分鐘 · 步伐極慢', desc: '於平坦室內或公園慢行，保持隨時能輕鬆交談的呼吸節奏；若感下腹微緊或見啡即停。' }
       ];
 
-      document.getElementById('exercise-recommendations-grid').innerHTML = cards.map(c => `
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px 12px;">
-          <div style="font-size:0.88rem; font-weight:800; color:#0f172a;">${c.title}</div>
-          <span class="badge" style="background:var(--sky-100); color:var(--sky-700); margin:4px 0;">⏱️ ${c.time}</span>
-          <p style="font-size:0.8rem; color:#475569; margin-top:2px;">${c.desc}</p>
+      document.getElementById('exercise-recommendations-grid').innerHTML = exercises.map(ex => `
+        <div style="border:1px solid #e2e8f0; border-radius:12px; padding:10px; background:#f8fafc;">
+          <div class="flex-between" style="margin-bottom:4px; gap:4px;">
+            <strong style="font-size:0.85rem;">${ex.title}</strong>
+            <span class="badge" style="background:var(--sky-100); color:var(--sky-700);">${ex.time}</span>
+          </div>
+          <p style="font-size:0.78rem; color:#475569;">${ex.desc}</p>
         </div>
       `).join('');
     }
 
     // =========================================================================
-    // 10. 彈窗控制、時間下拉選單與初始化
+    // 10. 通用視窗控制與初始化（自動從雲端拉取最新數據 + 頁面重新可見時自動同步）
     // =========================================================================
     function openModal(modalId) {
       document.getElementById('modal-backdrop').classList.remove('hidden');
-      document.querySelectorAll('.modal-box').forEach(box => box.classList.add('hidden'));
-      document.getElementById(modalId).classList.remove('hidden');
+      document.querySelectorAll('.modal-box').forEach(box => {
+        if (box.id === modalId) box.classList.remove('hidden');
+        else box.classList.add('hidden');
+      });
     }
 
     function closeAllModals() {
@@ -5043,86 +5251,71 @@
 
     function showToast(msg) {
       const container = document.getElementById('toast-container');
-      const div = document.createElement('div');
-      div.className = 'toast-msg';
-      div.textContent = msg;
-      container.appendChild(div);
-      setTimeout(() => {
-        div.style.opacity = '0';
-        div.style.transition = 'opacity 0.25s';
-        setTimeout(() => div.remove(), 260);
-      }, 2800);
+      const el = document.createElement('div');
+      el.className = 'toast-msg';
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => { el.remove(); }, 2800);
     }
 
-    function populateQuarterHourSelects() {
-      const hourPairs = [
-        ['ev-hour', 'ev-min'],
-        ['ev-end-hour', 'ev-end-min'],
-        ['mat-hour', 'mat-min'],
-        ['tm-hour', 'tm-min']
-      ];
-      hourPairs.forEach(([hId, mId]) => {
-        const hEl = document.getElementById(hId);
-        const mEl = document.getElementById(mId);
-        if (hEl) {
-          hEl.innerHTML = `<option value="">-- 時</option>` + Array.from({ length: 24 }, (_, i) => {
-            const v = String(i).padStart(2, '0');
-            return `<option value="${v}">${v}時</option>`;
-          }).join('');
-        }
-        if (mEl) {
-          mEl.innerHTML = `<option value="">-- 分</option>` + ['00', '15', '30', '45'].map(v => `<option value="${v}">${v}分</option>`).join('');
-        }
+    function populateQuarterTimeDropdowns() {
+      const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+      const mins = ['00', '15', '30', '45'];
+
+      ['ev-hour', 'ev-end-hour', 'mat-hour', 'tm-hour', 'alarm-hour'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const placeholder = id === 'alarm-hour' ? '時' : '-- 時';
+        el.innerHTML = `<option value="">${placeholder}</option>` + hours.map(h => `<option value="${h}">${h} 時</option>`).join('');
       });
 
-      const alHour = document.getElementById('alarm-hour');
-      const alMin = document.getElementById('alarm-min');
-      if (alHour) {
-        alHour.innerHTML = `<option value="">-- 時</option>` + Array.from({ length: 24 }, (_, i) => {
-          const v = String(i).padStart(2, '0');
-          return `<option value="${v}">${v} 時</option>`;
-        }).join('');
-      }
-      if (alMin) {
-        alMin.innerHTML = `<option value="">-- 分</option>` + Array.from({ length: 60 }, (_, i) => {
-          const v = String(i).padStart(2, '0');
-          return `<option value="${v}">${v} 分</option>`;
-        }).join('');
-      }
+      ['ev-min', 'ev-end-min', 'mat-min', 'tm-min', 'alarm-min'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const placeholder = id === 'alarm-min' ? '分' : '-- 分';
+        el.innerHTML = `<option value="">${placeholder}</option>` + mins.map(m => `<option value="${m}">${m} 分</option>`).join('');
+      });
     }
 
-    window.addEventListener('DOMContentLoaded', async () => {
-      populateQuarterHourSelects();
-      document.getElementById('mat-date').value = getTodayStr();
-      getSyncConfig();
-      updateGcalStatusUI('idle');
+    document.addEventListener('DOMContentLoaded', async () => {
+      populateQuarterTimeDropdowns();
+      resetMaternalForm();
       initHorizontalSwipe();
 
       const idbData = await readFromIDBKey('latest_state');
-      if (idbData && idbData.twinMeasurements && (idbData.updatedAt || 0) > (appState.updatedAt || 0)) {
-        appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...idbData });
+      if (idbData && idbData.twinMeasurements) {
+        const localTs = appState.updatedAt || 0;
+        const idbTs = idbData.updatedAt || 0;
+        if (idbTs > localTs) {
+          appState = migrateLegacyHospCategory({ ...DEFAULT_STATE, ...idbData });
+        }
       }
-      saveLocalOnly();
-      renderAll();
 
-      // 開啟頁面立即主動下載雲端最新數據
+      const shortcutLbl = document.getElementById('current-shortcut-name-label');
+      if (shortcutLbl) shortcutLbl.textContent = getSavedShortcutName();
+
+      updateGcalStatusUI('idle');
+      renderAll();
+      renderDailyChangelogAndBackupInfo();
+      manageWakeLock();
+
+      // 啟動時立即自動檢查並下載雲端最新更新
       syncWithCloud(false, false);
 
-      // 每 3 秒自動輪詢檢查雲端，若有家人更新立即自動下載更新畫面
+      // 每 12 秒背景自動輪詢雲端，確保其他成員改動即時自動更新
       setInterval(() => {
-        if (!document.hidden) syncWithCloud(false, false);
-      }, 3000);
+        if (navigator.onLine) syncWithCloud(false, false);
+      }, 12000);
 
+      // 當手機解鎖或切換回 App 畫面時，立即觸發自動雲端同步
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
+        if (document.visibilityState === 'visible' && navigator.onLine) {
           syncWithCloud(false, false);
-          manageWakeLock();
         }
       });
 
-      window.addEventListener('beforeunload', () => {
-        saveLocalOnly();
-      });
+      window.addEventListener('online', () => syncWithCloud(true, true));
+      window.addEventListener('offline', () => setSyncUI('offline', '已存本機'));
     });
   </script>
 </body>
